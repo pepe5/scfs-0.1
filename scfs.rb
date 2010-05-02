@@ -1,18 +1,11 @@
 #!/usr/bin/ruby1.8
 #>! 1.9
 $id = '$Id$'
+$pwd = Dir.pwd
 
 class Config;
-  @attrs = \
-  { :cache_dir=> '../.scfs',
-    :work_dir=> Dir.pwd } #>! use ARGV
-  eval "attr_accessor :#{@attrs.keys .join ',:'}"
-  def self.attrh; @attrs end
-  def attrs; @attrs .keys end
-  def initialize;
-    puts 'initialize:..'
-    p self .cache_dir
-    end
+  def cache_dir; '../.scfs' end
+  def work_dir; $pwd end
 end
 $config = Config .new
 
@@ -21,10 +14,10 @@ class Sc;
   # ~ git init - creates cat. tree stru
   def init a=[];
     puts "init: #{a.inspect}.."
-    puts " - cache_dir:#{$config.cache_dir}"
-    puts '..1'+ `ls -Alvd #{$config.cache_dir}`
-    FileUtils .mkdir_p $config.cache_dir+'/a/b/c', :verbose=>true #, :noop=>true
-    puts '..2'+ `ls -Alvd #{$config.cache_dir}`
+    FileUtils .mkdir_p $config.cache_dir+'/atree', :verbose=>true #, :noop=>true # actual tree (ala top-prrt custom arch)
+    FileUtils .mkdir_p $config.cache_dir+'/fvers', :verbose=>true #, :noop=>true
+    FileUtils .mkdir_p $config.cache_dir+'/vfiles', :verbose=>true #, :noop=>true
+    FileUtils .mkdir_p $config.cache_dir+'/archs', :verbose=>true #, :noop=>true
     end
 end
 
