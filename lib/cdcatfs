@@ -1,0 +1,282 @@
+#!/usr/bin/python
+id = '$Id: cdcatfs,v 1.2 2010/01/29 23:17:50 root Exp $'
+#
+#  Copyright (C) 2006 by Dorin Scutara\u015fu <dorin.scutarasu@gmail.com> #
+#  This program is free software; you can redistribute it and/or modify   #
+#  it under the terms of the GNU General Public License. See the file     #
+#  COPYING for details.                                                   #
+
+import os, stat, errno, sys
+from exceptions import ValueError
+from string import Template #new in version 2.4
+import time
+
+import fuse
+from fuse import Fuse
+from pysqlite2 import dbapi2 as sqlite
+
+from Cdcatfs.utils import CacheDict
+
+
+if not hasattr(fuse, '__version__'):
+    raise RuntimeError("your fuse-py doesn't know of fuse.__version__, "
+         "probably it's too old.")
+
+# This setting is optional, but it ensures that this class will keep
+# working after a future API revision
+fuse.fuse_python_api = (0, 2)
+
+
+class MyStat(fuse.Stat):
+    def __init__(self):
+        self.st_mode = 0
+        self.st_ino = 0
+        self.st_dev = 0
+        self.st_nlink = 0
+        self.st_uid = 0
+        self.st_gid = 0
+        self.st_size = 0
+        self.st_atime = 0
+        self.st_mtime = 0
+        self.st_ctime = 0
+        
+        self.st_blocks = 0
+        self.st_blksize = 0
+        self.st_rdev = 0
+
+
+class CDCatFS(Fuse):
+    """
+    A file system that exposes the directory structure of a CD which was
+    previously indexed in the database.
+    """
+    #unfortunately string.Template wasn't added untill python-2.4
+    fakeContentsTemplate = Template('''\
+file $fileName
+----------------------------------------------------------
+file path:              $filePath
+file is on CD:          $cdLabel
+file size:              $size B
+last modified:          $mtime
+last accessed:          $atime
+last status change:     $ctime
+
+-
+CDCatFS
+''')
+    cache = CacheDict()
+    def __init__(self, *args, **kw):
+        Fuse.__init__(self, *args, **kw)
+
+    def connect(self):
+        try:
+            if self.fuse_args.mount_expected():
+                if not os.path.exists(self.database):
+                    raise ValueError('Database not found.')
+                # FIXME: check_same_thread=False is probably not safe.
+                # self.con = sqlite.connect(self.database,check_same_thread=False)
+                self.con = sqlite.connect(self.database)
+                # test if CDs table exists. 
+                # Triggers sqlite.OperationalError if not.
+                self.con.execute('select 1 from CDs;')
+                self.con.row_factory = sqlite.Row    
+                self.con.text_factory = str
+        except sqlite.OperationalError:
+            print >> sys.stderr, "Error: invalid Database."
+            sys.exit(1);
+        except AttributeError:
+            print >> sys.stderr, "Error: you must supply a database name with"\
+                        +' the "-o database=DATABASE" option.'
+            sys.exit(1);
+        except ValueError,details:
+            print >> sys.stderr, details
+            sys.exit(1);
+        
+    def debugOut(self,string):
+        pass
+        print >> sys.stderr, "CatalogFS debug: ",string
+        
+    def getattr(self, path):
+        self.debugOut("attributes of %s" % path)
+        st = MyStat()
+        if len(self.splitPath(path)) <=1 :
+            st.st_mode=stat.S_IFDIR | 0755
+            st.st_nlink=2
+            return st
+        rows= self.getFileMetadata(path)
+        assert len(rows) <= 1
+        self.debugOut(rows)
+        if len(rows)!= 0:
+            row = rows[0];
+            st.st_mode = row["st_mode"]
+            st.st_ino = 0
+            st.st_dev = 0
+            st.st_nlink = row['st_nlink']
+            st.st_uid = row['st_uid']
+            st.st_gid = row['st_gid']
+            
+            #pep>
+            st.st_size = row['st_size']
+            #             if(stat.S_ISDIR(row['st_mode'])):
+            #                 st.st_size = row['st_size']
+            #             else:
+            #                 CDLabel = self.splitPath(path)[0]
+            #                 st.st_size = len(self.getFakeContents(row,CDLabel))
+            
+            st.st_atime = row['st_atime']
+            st.st_mtime = row['st_mtime']
+            st.st_ctime = row['st_ctime']
+            
+            st.st_blocks = 0
+            st.st_blksize = 0
+            st.st_rdev = 0
+        else:  #query returned void result
+            return -errno.ENOENT
+        return st
+
+    def readdir(self,path,offset):
+        self.debugOut("readding directory "+ path)
+        if path == '/':
+            cursor = self.con.cursor()
+            cursor.execute("select label from CDs;")
+            direntries =[row['label'] for row in cursor]
+            direntries[:0] = [".",".."]
+            for e in direntries:
+                yield fuse.Direntry(e)    
+            cursor.close()        
+        else:
+            rows= self.getFileMetadata(path)
+            assert len(rows) <= 1 , (
+                " More than one file with the same path?"
+                " Database is probably corrupted.")
+            self.debugOut(rows)
+            #if len(rows)== 0:
+            #    return -errno.ENOENT
+            fid = rows[0]['fid']
+            cursor = self.con.cursor()
+            cursor.execute("select * from %s_files where pid=%d;" \
+                        %(self.splitPath(path)[0],fid))
+            direntries =[row['fileName'] for row in cursor]
+            direntries[:0] = [".",".."]
+            for e in direntries:
+                yield fuse.Direntry(e)
+            cursor.close()
+
+    def open(self, path, flags):
+        self.debugOut("open "+ path)
+        
+        rows = self.getFileMetadata(path)
+        assert len(rows) <=1
+        
+        self.debugOut(rows)
+        if len(rows)== 0: #query returned void result            
+            return -errno.ENOENT
+        accmode = os.O_RDONLY | os.O_WRONLY | os.O_RDWR
+        if (flags & accmode) != os.O_RDONLY:
+            return -errno.EACCES
+        
+    def read(self, path, size, offset):
+        self.debugOut("reading "+ path)
+        
+        rows = self.getFileMetadata(path)
+        assert len(rows) <=1
+        
+        self.debugOut(rows)
+        if len(rows)!= 0:
+            row = rows[0]
+            CDLabel = self.splitPath(path)[0]
+            fakeContents = self.getFakeContents(row,CDLabel)
+            slen = len(fakeContents)
+            if offset < slen:
+                if offset + size > slen:
+                    size = slen - offset
+                buf = fakeContents[offset:offset+size]
+            else:
+                buf = ''
+            self.debugOut('read("'+fakeContents+'",'+str(offset)+','+str(offset+size)+')= "'+buf+'"')
+            return buf
+        else:
+            return -errno.ENOENT
+
+    def getFakeContents(self, row,CDLabel):
+        values = dict(filePath='not yet implemented', 
+                fileName= row['fileName'],
+                cdLabel=CDLabel,
+                size=row['st_size'],
+                mtime=time.ctime(row['st_mtime']),
+                atime=time.ctime(row['st_atime']),
+                ctime=time.ctime(row['st_ctime']))
+        fakeContents = self.fakeContentsTemplate.safe_substitute(values)
+        return fakeContents
+
+    def getFileMetadata(self,path):
+        #TODO: what if we can't find a path component?
+        try:
+            rows = [self.cache.get(path)]
+        except KeyError:
+            pathComponents = self.splitPath(path)
+            CDLabel = pathComponents[0]
+            pathComponents = pathComponents[1:]
+            
+            pid = 1
+            for name in pathComponents:
+                pid=self.getId(name, pid, CDLabel)
+    
+            cursor = self.con.cursor()
+            fileId = pid
+            cursor.execute("select * from %s_files where fid =%d" \
+                    % (CDLabel,fileId))
+            rows = cursor.fetchall()
+            cursor.close()
+            self.cache.insert(path, rows[0])
+        return rows
+
+    def getId(self,name,pid,CDLabel):
+        if pid == -1: #not found
+            return -1
+        cursor = self.con.cursor()
+        self.con.cursor()
+        cursor.execute("select fid from %s_files where pid =%d and fileName"\
+                "='%s'" % (CDLabel, pid, name))
+        rows = cursor.fetchall()
+        assert len(rows) <= 1
+        if len(rows) == 1:
+            return rows[0]['fid']
+        else:
+            return -1
+
+    def splitPath(self,path):
+        #just to make sure...
+        path = os.path.normpath(path)
+        (prefix,file) = os.path.split(path)
+        if prefix != '/' and prefix != '':
+            result = self.splitPath(prefix)
+        else:
+            result = []
+        if file != '':
+            result.append(file)
+        return result
+
+
+def main():
+    usage="""
+Userspace hello example
+
+""" + Fuse.fusage
+    server = CDCatFS(version="%prog " + fuse.__version__,
+                     usage=usage,
+                     dash_s_do='setsingle')
+    #access as server.database
+    server.parser.add_option(mountopt="database", metavar="CATALOG.DB",\
+                             help="mirror filesystem from the CATALOG.DB "\
+                             "database")
+
+    server.parse(values=server,errex=1)
+    server.connect()
+    try:
+        server.main()
+    except fuse.FuseError,details:
+        print details
+
+if __name__ == '__main__':
+    main()
