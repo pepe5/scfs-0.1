@@ -25,6 +25,7 @@ class Sc;
     FileUtils .mkdir_p $config.cache_dir+'/.wd', :verbose=>true # actual cwd tree cache~ 'index' (at each $ cd; rebuilt)
     FileUtils .mkdir_p $config.cache_dir+'/atree', :verbose=>true # actual tree~ index (ala top-prrt custom arch)
 
+    st = File .stat '/'
     sq = \
     %Q{ BEGIN TRANSACTION;
         CREATE TABLE CDs( fid integer primary key autoincrement,label text);
@@ -32,6 +33,12 @@ class Sc;
         DELETE FROM sqlite_sequence;
         INSERT INTO "sqlite_sequence" VALUES('CDs',1);
         CREATE TABLE #{$config.local_disk}_files (fid integer primary key autoincrement,pid integer,fileName text, st_mode integer, st_nlink integer, st_uid integer default 0, st_gid integer default 0, st_size integer default 0, st_atime integer default 0, st_mtime integer default 0, st_ctime integer default 0, pathCache text);
+        INSERT INTO #{$config.local_disk}_files
+          (fid,fileName,st_mode,st_nlink,st_uid,st_gid,
+           st_size,st_atime,st_mtime,st_ctime,pathCache)
+          VALUES
+          (1,'/',#{st.mode},#{st.nlink},#{st.uid},#{st.gid},
+           #{st.size},'#{st.atime}','#{st.mtime}','#{st.ctime}','');
         CREATE INDEX #{$config.local_disk}_pid_idx ON #{$config.local_disk}_files( pid );
         CREATE INDEX #{$config.local_disk}_pid_fname_idx ON #{$config.local_disk}_files(pid,fileName);
         COMMIT; }
@@ -58,7 +65,11 @@ class Sc;
     end
   end
 
+  ## pid=1 is root '/'
+  def check1 fn, pid=1;
+    $db.execute %Q{SELECT fid FROM #{$config.local_disk} WHERE pid=#{pid} and fileName='#{fn}'} end
   def add1 fn, pid='NULL', fp='';
+    #>! make alg. to fill pid/fp from that other value - to have known boths
     st = File .stat fp+'/'+fn
     #>! if exist update then
     sq = \
@@ -66,7 +77,7 @@ class Sc;
           (pid,fileName,st_mode,st_nlink,st_uid,st_gid,
            st_size,st_atime,st_mtime,st_ctime,pathCache)
           VALUES
-          ('#{fn}',#{pid},#{st.mode},#{st.nlink},#{st.uid},#{st.gid},
+          (#{pid},'#{fn}',#{st.mode},#{st.nlink},#{st.uid},#{st.gid},
            #{st.size},'#{st.atime}','#{st.mtime}','#{st.ctime}','#{fp}'); }
     puts sq
     @db.execute sq
