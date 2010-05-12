@@ -31,7 +31,7 @@ class Sc;
         INSERT INTO "CDs" VALUES(1,'#{$config.local_disk}');
         DELETE FROM sqlite_sequence;
         INSERT INTO "sqlite_sequence" VALUES('CDs',1);
-        CREATE TABLE #{$config.local_disk}_files( fid integer primary key,pid integer,fileName text, st_mode integer, st_nlink integer, st_uid integer default 0, st_gid integer default 0, st_size integer default 0, st_atime integer default 0, st_mtime integer default 0, st_ctime integer default 0);
+        CREATE TABLE #{$config.local_disk}_files (fid integer primary key autoincrement,pid integer,fileName text, st_mode integer, st_nlink integer, st_uid integer default 0, st_gid integer default 0, st_size integer default 0, st_atime integer default 0, st_mtime integer default 0, st_ctime integer default 0, pathCache text);
         CREATE INDEX #{$config.local_disk}_pid_idx ON #{$config.local_disk}_files( pid );
         CREATE INDEX #{$config.local_disk}_pid_fname_idx ON #{$config.local_disk}_files(pid,fileName);
         COMMIT; }
@@ -45,20 +45,31 @@ class Sc;
 
   def add a=[];
     puts "add: #{a.inspect}.."
-    for f in a; puts " <+ #{File .expand_path f}"
+    for f in a;
+      fp = File .dirname File .expand_path f
       fn = File .basename f
-      s = File .stat f
-      #>! insert path fld/s
-      sq = \
-      %Q{ INSERT INTO #{$config.local_disk}_files
-          (fileName,st_mode,st_nlink,st_uid,st_gid,
-           st_size,st_atime,st_mtime,st_ctime)
-          VALUES
-          ('#{fn}',#{s.mode},#{s.nlink},#{s.uid},#{s.gid},
-           #{s.size},'#{s.atime}','#{s.mtime}','#{s.ctime}'); }
-      puts sq
-      @db.execute sq
+      puts " <+ #{fp}/#{fn}"
+
+      #>! insert path fld/s & fn
+      for fld in fp .split '/'; puts " - #{fld}/" end
+      #>! get prevPid; We cannot get ismply range, because some fn/s could be only updating
+      prevPid = '999'
+      nextPid = add1 fn, prevPid, fp
     end
+  end
+
+  def add1 fn, pid='NULL', fp='';
+    st = File .stat fp+'/'+fn
+    #>! if exist update then
+    sq = \
+      %Q{ INSERT INTO #{$config.local_disk}_files
+          (pid,fileName,st_mode,st_nlink,st_uid,st_gid,
+           st_size,st_atime,st_mtime,st_ctime,pathCache)
+          VALUES
+          ('#{fn}',#{pid},#{st.mode},#{st.nlink},#{st.uid},#{st.gid},
+           #{st.size},'#{st.atime}','#{st.mtime}','#{st.ctime}','#{fp}'); }
+    puts sq
+    @db.execute sq
   end
 end
 

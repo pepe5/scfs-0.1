@@ -26,16 +26,20 @@ class TestSet1;
     puts `tree -afi #{cache_dir}` .grep /^.+$/ # $(pwd)/
     end
 
-  # test aScfs#init
+  # test aScfs#add
   def add_tc1 a=[];
     puts "add_tc1: starting at: #{Time .new .strftime "%Y-%m-%d %H:%M:%S"} with: #{a.inspect}"
     cache_dir = '../.scfs'
     #>! assert prepared cache
     puts `tree -afi #{cache_dir}` .grep /^.+$/
+    #>! sqlite3 .. dump
     puts `ruby #{$start_pwd}/scfs.rb add #{Dir .glob '*'}`
     #>! assert seted up site's .scfs cache stru
-    puts "add_tc1: we got to cache (#{Dir.pwd + cache_dir}):"
-    puts `tree -afi #{cache_dir}` .grep /^.+$/
+    #>! sqlite3 .. dump
+
+    ## cln
+    #>! echo delete from aspire1_sda1_files where fileName like "'person%'" \; | sqlite3 files
+    #>! echo select "*" from aspire1_sda1_files \; | sqlite3 files
     end
 end
 
