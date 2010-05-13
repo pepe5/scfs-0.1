@@ -58,7 +58,7 @@ class Sc;
       puts " <+ #{fp}/#{fn}"
 
       #>! insert path fld/s & fn
-      for fld in fp .split ('/') .slice 1,-1; puts " - #{fld}/" end
+      for fld in fp .split ('/') [1..-1]; puts " - #{fld}/" end
       #>! get prevPid; We cannot get ismply range, because some fn/s could be only updating
       prevPid = 1
       nextPid = add1 fn, prevPid, fp
