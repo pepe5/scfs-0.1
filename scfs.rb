@@ -58,16 +58,15 @@ class Sc;
       puts " <+ #{fp}/#{fn}"
 
       #>! insert path fld/s & fn
-      for fld in fp .split ('/') [1..-1]; puts " - #{fld}/" end
-      #>! get prevPid; We cannot get ismply range, because some fn/s could be only updating
       prevPid = 1
-      nextPid = add1 fn, prevPid, fp
-    end
+      for fld in fp .split ('/') [1..-1];
+        #>! get prevPid; We cannot get ismply range, because some fn/s could be only updating
+        nextPid = add1 fn, prevPid, fp
+        puts " - #{fn}: fld:#{fld}/, pid:#{prevPid}, fid:#{nextPid}"
+      end end
   end
 
   ## pid=1 is root '/'
-  def check1 fn, pid=1;
-    $db.execute %Q{SELECT fid FROM #{$config.local_disk} WHERE pid=#{pid} and fileName='#{fn}'} end
   def add1 fn, pid='NULL', fp='';
     #>! make alg. to fill pid/fp from that other value - to have known boths
     st = File .stat fp+'/'+fn
@@ -81,6 +80,10 @@ class Sc;
            #{st.size},'#{st.atime}','#{st.mtime}','#{st.ctime}','#{fp}'); }
     puts sq
     @db.execute sq
+    check1 fn, pid
+  end
+  def check1 fn, pid=1;
+    $db.execute %Q{SELECT fid FROM #{$config.local_disk} WHERE pid=#{pid} and fileName='#{fn}'}
   end
 end
 
