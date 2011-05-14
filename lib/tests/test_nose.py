@@ -10,4 +10,9 @@ def uc1():
     echo ('321', ofile='a/321')
     echo ('123', ofile='b/123')
     f123 = {}; f123['st_nlink'] = stat ('a/123') .S_NLINK
-    assert (f123['st_nlink'], 2)
+    assert f123['st_nlink'], 2
+
+##
+# 1st nose test try
+def test_uc1():
+    pass
