@@ -3,6 +3,7 @@
 
 * TODO
 ** make it [[pydoc]]
+** add Config
 ** test w/ http://ivory.idyll.org/articles/nose-intro.html#test-fixtures
    scfs> nosetests lib/ -v
    test_nose.test_uc1 ... ok
@@ -10,7 +11,15 @@
    Ran 1 test in 0.004s
    OK
 
+** [#B] 
+*** @contextmanager; def [[http://groups.google.com/group/paver/browse_thread/thread/90434e3338e15796%3Fpli%3D1][pushd]](dir)
 
 * ACT INTRO
-** see file:~/text/scfs-stu/doc/1st-try.emacs.con.log
+** dev file:../lib/tests/test_nose.py
+*** dev env depl: 
+    - install -v -d /tmp/scwd/a /tmp/scwd/b
 
+** see file:~/text/scfs-stu/doc/1st-try.emacs.con.log
+   - install python-pysqlite2 python-fuse cdcatfs
+   - scfs> cdcatman add doc CD_7 ~/.scfs/cat1.db # .bak excluded
+   - sudo ls -l ~/mnt/cat1/CD_7
