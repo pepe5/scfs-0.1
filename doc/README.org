@@ -1,0 +1,8 @@
+* Streaming fevent/s collector
+
+* TODO
+** make it pydoc
+
+* ACT INTRO
+** see file:~/text/scfs-stu/doc/1st-try.emacs.con.log
+
