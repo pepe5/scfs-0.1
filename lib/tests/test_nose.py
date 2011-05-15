@@ -8,7 +8,7 @@ import sys
 from stat import *
 
 class Config:
-    wd = '/tmp/scwd'
+    wd = '/tmp/dev/scwd'
     @classmethod
     def load(self):
         self.oldwd = os.getcwd()
