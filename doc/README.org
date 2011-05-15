@@ -1,6 +1,5 @@
 * Streaming fevent/s collector
 
-
 * TODO
 ** make it [[pydoc]]
 ** add Config
@@ -14,12 +13,52 @@
 ** [#B] 
 *** @contextmanager; def [[http://groups.google.com/group/paver/browse_thread/thread/90434e3338e15796%3Fpli%3D1][pushd]](dir)
 
+
 * ACT INTRO
 ** dev file:../lib/tests/test_nose.py
 *** dev env depl: 
     - install -v -d /tmp/scwd/a /tmp/scwd/b
 
+*** :last: scfs> nosetests lib/ -v # <2011-05-14 Sat>
+    Use case 1 ... FAIL
+    ======================================================================
+    FAIL: Use case 1
+    ----------------------------------------------------------------------
+    Traceback (most recent call last):
+    File "/usr/lib/pymodules/python2.6/nose/case.py", line 183, in runTest
+    self.test(*self.arg)
+    File "/home/p-b/text/scfs/lib/tests/test_nose.py", line 48, in test_uc1
+    assert f123['st_nlink'] == 2
+    AssertionError: 
+    -------------------- >> begin captured stdout << ---------------------
+    -mounting to: ~/mnt/cat1
+    -registering (blind dir) at: /tmp/scwd
+    -capturing wd state: 
+    <subprocess.Popen object at 0x87c9aac>
+    --------------------- >> end captured stdout << ----------------------
+
+    ----------------------------------------------------------------------
+    Ran 1 test in 0.018s
+
+    FAILED (failures=1)
+    790854    4 -rw-r--r--   1 p-b      p-b             3 May 14 23:22 ./b/123
+    790853    4 -rw-r--r--   1 p-b      p-b             3 May 14 23:22 ./a/321
+    790852    4 -rw-r--r--   1 p-b      p-b             3 May 14 23:22 ./a/123
+
+
 ** see file:~/text/scfs-stu/doc/1st-try.emacs.con.log
    - install python-pysqlite2 python-fuse cdcatfs
-   - scfs> cdcatman add doc CD_7 ~/.scfs/cat1.db # .bak excluded
+   - scfs> cdcatman add doc/ CD_7 ~/.scfs/cat1.db # .bak excluded
    - sudo ls -l ~/mnt/cat1/CD_7
+
+* FORM/s
+** .desktop
+   (setq ibuffer-filter-groups
+   '(("scfs|.py"
+   (or
+   (filename . "scfs\\|\\.py")))
+   ("dev|catfs stu"
+   (or
+   (filename . "dev\\|catfs")))
+   ("^*"
+   (name . "^*"))))

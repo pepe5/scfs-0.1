@@ -1,0 +1,149 @@
+;; -*- mode: emacs-lisp; coding: emacs-mule; -*-
+;; --------------------------------------------------------------------------
+;; Desktop File for Emacs
+;; --------------------------------------------------------------------------
+;; Created Sun May 15 12:08:32 2011
+;; Desktop file format version 206
+;; Emacs version 23.1.1
+
+;; Global section:
+(setq desktop-missing-file-warning nil)
+(setq tags-file-name nil)
+(setq tags-table-list nil)
+(setq search-ring '("commi" "\n\n" "getw" "def" "\n\n>" "\n\n" "nlink" "s_nlink" "link" "pri" " " ".si" " " "\n\n" " " "\n\nscfs"))
+(setq regexp-search-ring '("\n[ 	]*\n" "[^.]\\.[^.]\\|test" "\\.\\|test" "\n[ 	]*\n"))
+(setq register-alist nil)
+
+;; Buffer section -- buffers listed in same order as in buffer list:
+(desktop-create-buffer 206
+  "/tmp/*shell*"
+  "*shell*"
+  'shell-mode
+  nil
+  34916
+  '(34791 nil)
+  nil
+  nil
+  '((show-trailing-whitespace) (buffer-file-coding-system . utf-8-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  "/home/p-b/text/scfs/doc/README.org"
+  "README.org"
+  'org-mode
+  nil
+  638
+  '(1732 nil)
+  t
+  nil
+  '((show-trailing-whitespace) (buffer-file-coding-system . undecided-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  "/home/p-b/text/scfs/lib/tests/test_nose.py"
+  "test_nose.py"
+  'python-mode
+  nil
+  862
+  '(839 nil)
+  t
+  nil
+  '((tab-width . 8) (indent-tabs-mode) (buffer-file-coding-system . undecided-unix)))
+
+(desktop-create-buffer 206
+  "/tmp/scfs >"
+  "scfs >"
+  'shell-mode
+  nil
+  54459
+  '(53997 nil)
+  nil
+  nil
+  '((show-trailing-whitespace) (buffer-file-coding-system . utf-8-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  nil
+  "~"
+  'dired-mode
+  nil
+  1690
+  '(1 nil)
+  t
+  '("/home/p-b/" "/home/p-b/text/" "/home/p-b/text/scfs/" "/home/p-b/text/scfs/doc/" "/home/p-b/text/scfs/lib/" "/home/p-b/text/scfs/lib/tests/" "/home/p-b/text/scfs/test.in/")
+  '((truncate-lines . t)))
+
+(desktop-create-buffer 206
+  nil
+  "dev"
+  'dired-mode
+  nil
+  172
+  '(1 nil)
+  t
+  '("/tmp/dev/" "/tmp/dev/nose-demo-latest/" "/tmp/dev/nose-demo-latest/basic/" "/tmp/dev/nose-demo-latest/basic/app_package/" "/tmp/dev/nose-demo-latest/basic/tests/" "/tmp/dev/nose-demo-latest/tests/")
+  nil)
+
+(desktop-create-buffer 206
+  nil
+  "a8"
+  'dired-mode
+  nil
+  1355
+  '(1 nil)
+  t
+  '("/mnt/a8/" "/mnt/a8/pepa/" "/mnt/a8/pepa/=!arx+bak/=5ec/" "/mnt/a8/programy/")
+  '((truncate-lines . t)))
+
+(desktop-create-buffer 206
+  nil
+  "programy"
+  'dired-mode
+  nil
+  1977
+  '(1 nil)
+  t
+  '("/mnt/a8/programy/" "/mnt/a8/programy/Pharo/" "/mnt/a8/programy/Pharo/bin/" "/mnt/a8/programy/Pharo/lib/" "/mnt/a8/programy/Pharo/lib/squeak/" "/mnt/a8/programy/Pharo/lib/squeak/3.11.3-2135/" "/mnt/a8/programy/Pharo/package-cache/")
+  '((truncate-lines . t)))
+
+(desktop-create-buffer 206
+  nil
+  "kraljo-desktop"
+  'dired-mode
+  nil
+  70
+  '(nil nil)
+  t
+  '("/mnt/kraljo-desktop/")
+  nil)
+
+(desktop-create-buffer 206
+  "/tmp/nose-demo.tar.gz"
+  "nose-demo.tar.gz"
+  'tar-mode
+  nil
+  37
+  '(nil nil)
+  nil
+  nil
+  '((buffer-file-coding-system . no-conversion) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  nil
+  "*Find*"
+  'dired-mode
+  nil
+  1558
+  '(1 nil)
+  t
+  '("/tmp/dev/")
+  '((truncate-lines . t)))
+
+(desktop-create-buffer 206
+  "/mnt/a8/tmp/cdcatfs-0.1.5.tar.gz"
+  "cdcatfs-0.1.5.tar.gz"
+  'tar-mode
+  nil
+  37
+  '(nil nil)
+  nil
+  nil
+  '((buffer-file-coding-system . no-conversion)))
+
