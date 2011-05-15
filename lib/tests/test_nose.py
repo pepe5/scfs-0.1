@@ -21,9 +21,13 @@ def scatfs(argstr):
     argstr = os.path.expanduser(argstr)
     args = shlex.split(argstr)
     Config.mounto = args [-1]
-    Config.db = re.match('.*database=([^ ]+) ', argstr).group(1)
-    print " -mounting to: %s" % Config.mounto
+    Config.db = re.match('.*database=([^ ]+) ', argstr).group(1) # @KNOWN as not-universal
+    wdtbl = 'WD_UC1'
     print " -registering (blind dir) at: %s" % Config.wd
+    cmd = shlex.split('cdcatman del %s ~/.scfs/cat1.db' % wdtbl)
+    print " -cleaning wd table: \n%s" % subprocess.Popen(cmd)
+    cmd = shlex.split('cdcatman add %s %s ~/.scfs/cat1.db' % (Config.wd, wdtbl))
+    print " -cleaning wd table: \n%s" % subprocess.Popen(cmd)
 
 def echo(data, **kwargs):
     of = file(kwargs['ofile'], 'w')

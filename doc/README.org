@@ -1,6 +1,11 @@
 * Streaming fevent/s collector
 
 * TODO
+** move Cdcatfs (Case Conflict 1)
+   (that symln -> /usr/local/lib/python2.6/dist-packages/Cdcatfs)
+   to other place than cdcatfs exe
+   <= Dropbox rename it - is not case sensitive
+
 ** make it [[pydoc]]
 ** add Config
 ** test w/ http://ivory.idyll.org/articles/nose-intro.html#test-fixtures
@@ -50,6 +55,10 @@
    - install python-pysqlite2 python-fuse cdcatfs
    - scfs> cdcatman add doc/ CD_7 ~/.scfs/cat1.db # .bak excluded
    - sudo ls -l ~/mnt/cat1/CD_7
+   - cdcatman list ~/.scfs/cat1.db
+
+* STU
+** print " -mounting to: %s" % Config.cdpoint
 
 * FORM/s
 ** .desktop
