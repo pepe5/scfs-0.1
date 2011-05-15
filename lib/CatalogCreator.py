@@ -92,6 +92,6 @@ class CatalogCreator:
             "st_ctime integer default 0);" % self.__CDLabel;
         cur.execute(statement)
         cur.execute('CREATE INDEX %s_pid_idx ON %s_files( pid );'% (self.__CDLabel,self.__CDLabel))
-        #cur.execute('CREATE INDEX %s_fname_idx ON %s_files(fileName);'%(self.__CDLabel,self.__CDLabel))
+        cur.execute('CREATE INDEX %s_fname_idx ON %s_files(fileName);'%(self.__CDLabel,self.__CDLabel))
         cur.execute('CREATE INDEX %s_pid_fname_idx ON %s_files(pid,fileName);'%(self.__CDLabel,self.__CDLabel))
         con.commit()
