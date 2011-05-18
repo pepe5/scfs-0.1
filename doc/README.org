@@ -3,6 +3,8 @@
 
 * TODO
 ** [#A] separate cdcat & scat file holders
+   [[file:~/text/scfs/lib/scatfs::/from%20Cdcatfs.utils%20import%20CacheDict/][scatfs::/from *Cdcatfs*.utils import CacheDict/]]
+
 ** move Cdcatfs (Case Conflict 1)
    (that symln -> /usr/local/lib/python2.6/dist-packages/Cdcatfs)
    to other place than cdcatfs exe
@@ -24,6 +26,9 @@
 * ACT INTRO
 ** dev file:../lib/tests/test_nose.py
 *** dev env depl: 
+#  sudo install -v -d /usr/lib/python2.*/site-packages/Scfs/
+    pushd /usr/lib/python2.5/site-packages/; sudo install -v Cdcatfs/*.py Scfs/
+    sudo ln -sv -bf `pwd`/lib/CatalogCreator.py /usr/lib/python2.5/site-packages/Scfs/
     install -v -d /tmp/dev/scwd/a /tmp/dev/scwd/b
     PATH=$PATH:`pwd`/lib
 
@@ -92,7 +97,8 @@
    python lib/scatfs -d -s -o database=~/.scfs/cat1.db ~/mnt/cat1
 #(<) cdcatfs -s -o database=~/.scfs/cat1.db ~/mnt/cat1
 
-   cd ~/text/scfs; cdcatman add doc/ CD_1 ~/.scfs/cat1.db
+   cd ~/text/scfs; python lib/scatman add /tmp/dev/scwd WD_UC2 ~/.scfs/cat1.db
+#*(<) cdcatman add doc/ CD_1 ~/.scfs/cat1.db
    ls -l ~/mnt/cat1/CD_1
    cdcatman list ~/.scfs/cat1.db
    sqlite3 ~/.scfs/cat1.db .dump

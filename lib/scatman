@@ -12,10 +12,9 @@ import sys,os
 
 from pysqlite2 import dbapi2 as sqlite
 
-# print '..1 %s' % sys.argv[0]
-# sys.path = [os.path.dirname (sys.argv[0])] + sys.path # os.path.join , "cdcatfs"
-# print '..2 %s' % sys.path
-from Cdcatfs.CatalogCreator import CatalogCreator
+# sys.path = [os.path.dirname(sys.argv[0])] + sys.path
+# print ' -path: %s' % sys.path
+from Scfs.CatalogCreator import CatalogCreator
 
 usage = '''
 Usage: %s add <CDMountPoint> <CDLabel> <dbfile>
