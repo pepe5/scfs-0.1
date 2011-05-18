@@ -99,11 +99,11 @@ CDCatFS
     def getattr(self, path):
         self.debugOut("attributes of %s" % path)
         st = MyStat()
-        if len(self.splitPath(path)) <=1 :
+        if len(self.splitPath(path)) <=1:
             st.st_mode=stat.S_IFDIR | 0755
             st.st_nlink=2
             return st
-        rows= self.getFileMetadata(path)
+        rows = self.getFileMetadata(path)
         assert len(rows) <= 1
         self.debugOut(rows)
         if len(rows)!= 0:
@@ -225,9 +225,16 @@ CDCatFS
     
             cursor = self.con.cursor()
             fileId = pid
-            cursor.execute("select * from %s_files where fid =%d" \
-                    % (CDLabel,fileId))
+            cmd = ("SELECT fid, pid, %s_files.fileName, st_mode, count_name as st_nlink, st_uid, st_gid, st_size, st_atime, st_mtime, st_ctime " +
+                           "FROM %s_files " +
+                           "JOIN (SELECT fileName, COUNT(fileName) AS count_name FROM %s_files WHERE fileName='%s') AS Tbl2 " +
+                           "ON %s_files.fileName = Tbl2.fileName " +
+			   "WHERE fid =%d;") \
+                    % (CDLabel, CDLabel, CDLabel, name, CDLabel, fileId)
+            self.debugOut (' -scatfs: %s' % cmd)
+            cursor.execute(cmd)
             rows = cursor.fetchall()
+            self.debugOut (' -scatfs >: %s' % repr(rows))
             cursor.close()
             self.cache.insert(path, rows[0])
         return rows

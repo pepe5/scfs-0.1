@@ -45,10 +45,10 @@ def echo(data, **kwargs):
     of.write(data)
     of.close()
 
-def cap(wd):
-    cmd = '/usr/bin/find . -type f -ls'
+def cap(path):
+    cmd = '/usr/bin/find %s -type f -ls' % path
     pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
-    print " -capturing wd state: \n%s" % pop.communicate()[0]
+    print " -capturing overview of path: %s \n%s" % (os.path.abspath(path), pop.communicate()[0])
 
 ##
 # @brief 1/Register (testing) wd, 2/Add mockup, 3/Check duplical file/s
@@ -66,9 +66,10 @@ def test_uc1():
     Config.unload()
 
     Config.load(wd=outroot)
-    print ' -pwd.. %s' % os.getcwd()
-    f123 = {}; f123['st_nlink'] = os.stat(Config.adname + '/a/123')[ST_NLINK]
+    f123 = {}
+    f123['st_nlink'] = os.stat(Config.adname + '/a/123')[ST_NLINK]
     cap('.')
+    print " -got nlink: %s ( -exp: %s )" % (f123['st_nlink'], 2)
     assert f123['st_nlink'] == 2
     Config.unload()
 
