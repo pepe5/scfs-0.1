@@ -9,10 +9,10 @@ from stat import *
 
 class ConfigDict(dict):
     def load(self, **kwargs):
-        if not self['oldwd']:
+        if not 'oldwd' in self:
             self['oldwd'] = []
         self['oldwd'].append(os.getcwd())
-        if not self['wd']:
+        if not 'wd' in self:
             self['wd'] = []
         self['wd'] = kwargs['wd']
         os.chdir(kwargs['wd'])
@@ -20,6 +20,7 @@ class ConfigDict(dict):
     def unload(self):
         self['wd'] = self['oldwd'].pop()
         os.chdir(self['wd'])
+
 Config = ConfigDict()
 
 def scatfs(argstr):
@@ -30,12 +31,12 @@ def scatfs(argstr):
     Config.db = re.match('.*database=([^ ]+) ', argstr).group(1) # @KNOWN as not-universal
     Config.db = os.path.expanduser(Config.db)
     print " -registering (blind dir) at: %s" % Config['wd']
-    wdtbl = 'WD_UC1'
-    print " -into arch.fld: %s" % wdtbl
-    cmd = 'cdcatman del %s %s' % (wdtbl, Config.db)
+    Config.adname = 'WD_UC1'
+    print " -into arch.fld: %s" % Config.adname
+    cmd = 'cdcatman del %s %s' % (Config.adname, Config.db)
     pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
     print " -cleaning wd table: %s" % pop.communicate()[0]
-    cmd = 'cdcatman add %s %s %s' % (Config['wd'], wdtbl, Config.db)
+    cmd = 'cdcatman add %s %s %s' % (Config['wd'], Config.adname, Config.db)
     pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
     print " -adding wd table: \n%s" % pop.communicate()[0]
 
@@ -54,7 +55,8 @@ def cap(wd):
 def test_uc1():
     '''Use case 1'''
     srcd = '/tmp/dev/scwd'
-    outd = os.path.expanduser('~/mnt/cat1')
+    outroot = os.path.expanduser('~/mnt/cat1')
+    Config.adname = 'WD_UC1'
 
     Config.load(wd=srcd)
     scatfs('-s -o database=~/.scfs/cat1.db ~/mnt/cat1')
@@ -63,8 +65,9 @@ def test_uc1():
     echo('123', ofile='b/123')
     Config.unload()
 
-    Config.load(wd=outd)
-    f123 = {}; f123['st_nlink'] = os.stat('a/123')[ST_NLINK]
+    Config.load(wd=outroot)
+    print ' -pwd.. %s' % os.getcwd()
+    f123 = {}; f123['st_nlink'] = os.stat(Config.adname + '/a/123')[ST_NLINK]
     cap('.')
     assert f123['st_nlink'] == 2
     Config.unload()
