@@ -21,13 +21,18 @@ def scatfs(argstr):
     argstr = os.path.expanduser(argstr)
     args = shlex.split(argstr)
     Config.mounto = args [-1]
+    print " -vfs mount point: %s" % Config.mounto
     Config.db = re.match('.*database=([^ ]+) ', argstr).group(1) # @KNOWN as not-universal
-    wdtbl = 'WD_UC1'
+    Config.db = os.path.expanduser(Config.db)
     print " -registering (blind dir) at: %s" % Config.wd
-    cmd = shlex.split('cdcatman del %s ~/.scfs/cat1.db' % wdtbl)
-    print " -cleaning wd table: \n%s" % subprocess.Popen(cmd)
-    cmd = shlex.split('cdcatman add %s %s ~/.scfs/cat1.db' % (Config.wd, wdtbl))
-    print " -cleaning wd table: \n%s" % subprocess.Popen(cmd)
+    wdtbl = 'WD_UC1'
+    print " -into arch.fld: %s" % wdtbl
+    cmd = 'cdcatman del %s %s' % (wdtbl, Config.db)
+    pop = subprocess.Popen(shlex.split(cmd))
+    print " -cleaning wd table: %s" % cmd
+    cmd = 'cdcatman add %s %s %s' % (Config.wd, wdtbl, Config.db)
+    pop = subprocess.Popen(shlex.split(cmd))
+    print " -adding wd table: %s" % cmd
 
 def echo(data, **kwargs):
     of = file(kwargs['ofile'], 'w')
@@ -35,8 +40,9 @@ def echo(data, **kwargs):
     of.close()
 
 def cap(wd):
-    print " -capturing wd state: \n%s" % \
-        subprocess.Popen('/usr/bin/find . -type f -ls'.split())
+    cmd = '/usr/bin/find . -type f -ls'
+    pop = subprocess.Popen(shlex.split(cmd))
+    print " -capturing wd state: \%s" % cmd
 
 ##
 # @brief 1/Register (testing) wd, 2/Add mockup, 3/Check duplical file/s

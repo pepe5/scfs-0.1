@@ -64,8 +64,14 @@
 *** have both cdcat & scat on 1 env; test difference/s
 
 * STU
-** ?? i got 2 traceback/s in 1 tc ?!, <2011-05-18 St>
-   <= maybe by cmd = shlex.split('cdcatman del %s ~/.scfs/cat1.db' % wdtbl) ?
+** subprocess.Popen repr differs in py25 & py26 ?!
+   -cleaning wd table: <subprocess.Popen object at 0xb7aceb8c>
+
+   -> try pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
+    print " -cleaning wd table: %s" % pop.communicate() ...
+
+** i got 2 traceback/s in 1 tc, <2011-05-18 St>
+   <= it is from cdcatman xy subprocess/es
 
 *** 2nd one:
    Traceback (most recent call last):
