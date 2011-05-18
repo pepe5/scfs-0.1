@@ -1,3 +1,4 @@
+# -*- org -*-
 * Streaming fevent/s collector
 
 * TODO
@@ -23,9 +24,15 @@
 * ACT INTRO
 ** dev file:../lib/tests/test_nose.py
 *** dev env depl: 
-    - install -v -d /tmp/dev/scwd/a /tmp/dev/scwd/b
+    install -v -d /tmp/dev/scwd/a /tmp/dev/scwd/b
+    PATH=$PATH:`pwd`/lib
 
-*** :last: scfs> nosetests lib/ -v # <2011-05-14 Sat>
+*** SELECT fid, pid, WD_UC1_files.fileName, st_nlink, Tbl2.count_name
+    FROM WD_UC1_files
+    JOIN (SELECT fileName, COUNT(fileName) as count_name FROM WD_UC1_files WHERE fileName='123') as Tbl2
+    ON WD_UC1_files.fileName = Tbl2.fileName;
+
+*** DONE :last: scfs> nosetests lib/ -v # <2011-05-14 Sat>
     Use case 1 ... FAIL
     ======================================================================
     FAIL: Use case 1
@@ -53,12 +60,13 @@
 
 
 ** SETUP see file:~/text/scfs-stu/doc/1st-try.emacs.con.log
-   - install python-pysqlite2 python-fuse cdcatfs
-   - install -v -d ~/.scfs ~/mnt/cat1
-   - sudo cdcatfs -s -o database=~/.scfs/cat1.db ~/mnt/cat1
-   - scfs> cdcatman add doc/ CD_1 ~/.scfs/cat1.db # .bak excluded
-   - sudo ls -l ~/mnt/cat1/CD_1
-   - cdcatman list ~/.scfs/cat1.db
+   install python-pysqlite2 python-fuse cdcatfs
+   install -v -d ~/.scfs ~/mnt/cat1
+   sudo cdcatfs -s -o database=~/.scfs/cat1.db ~/mnt/cat1
+   cd ~/text/scfs; cdcatman add doc/ CD_1 ~/.scfs/cat1.db
+   sudo ls -l ~/mnt/cat1/CD_1
+   cdcatman list ~/.scfs/cat1.db
+   sqlite3 ~/.scfs/cat1.db .dump
 
 ** dev tasks
 *** have both cdcat & scat on 1 env; test difference/s
