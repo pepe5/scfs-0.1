@@ -49,6 +49,14 @@
     Ran 1 test in 0.426s
     OK
 
+** uc2 - insert
+   cp -r  /tmp/dev/scwd  /tmp/dev/scwd2
+   python lib/scatman del WD_UC2 ~/.scfs/cat1.db
+   python lib/scatman add /tmp/dev/scwd2 WD_UC2 ~/.scfs/cat1.db
+   echo 234 > /tmp/dev/scwd2/b/234
+   python lib/scatman add /tmp/dev/scwd2/b WD_UC2 ~/.scfs/cat1.db
+
+
 ** SETUP see file:~/text/scfs-stu/doc/1st-try.emacs.con.log
    install python-pysqlite2 python-fuse cdcatfs
    usermod -a -G fuse $USER
@@ -67,6 +75,10 @@
 *** have both cdcat & scat on 1 env; test difference/s
 
 * STU
+** TODO fuse args
+   server.parser.parse_args(['-o database=/home/user/.scfs/cat1.db'])
+   server.parse(values=server)
+
 ** print " -mounting to: %s" % Config.cdpoint
 
 ** from pysqlite2 import dbapi2 as sqlite

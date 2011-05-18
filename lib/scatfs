@@ -1,5 +1,4 @@
 #!/usr/bin/python
-id = '$Id: cdcatfs,v 1.2 2010/01/29 23:17:50 root Exp $'
 #
 #  Copyright (C) 2006 by Dorin Scutara\u015fu <dorin.scutarasu@gmail.com> #
 #  This program is free software; you can redistribute it and/or modify   #
@@ -15,7 +14,7 @@ import fuse
 from fuse import Fuse
 from pysqlite2 import dbapi2 as sqlite
 
-from Cdcatfs.utils import CacheDict
+from Scfs.utils import CacheDict
 
 
 if not hasattr(fuse, '__version__'):
@@ -68,9 +67,11 @@ CDCatFS
     def __init__(self, *args, **kw):
         Fuse.__init__(self, *args, **kw)
 
-    def connect(self):
+    def connect(self, **kw):
         try:
-            if self.fuse_args.mount_expected():
+            if self.fuse_args.mount_expected() or 'database' in kw:
+                if 'database' in kw:
+                    self.database = kw['database']
                 if not os.path.exists(self.database):
                     raise ValueError('Database not found.')
                 # FIXME: check_same_thread=False is probably not safe.

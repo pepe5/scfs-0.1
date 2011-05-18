@@ -13,6 +13,7 @@ from stat import *
 
 from pysqlite2 import dbapi2 as sqlite
 
+from ScatServices import *
 from DirectoryWalker import DirectoryWalker
 from utils import ConsoleSpinner
 
@@ -65,7 +66,10 @@ class CatalogCreator:
             rows = cur.fetchall()
             if len(rows)>0 :
                 
-                server = CDCatFS()
+                sys.stdout.write("Label exists. Trying add onto existing mountPoint")
+                server = CDCatFS(version="%prog " + fuse.__version__,
+                     usage='', dash_s_do='setsingle')
+                server.connect(database=self.__dbFile)
                 pid = 1
                 pathComponents = server.splitPath(self.__mountPoint)
                 for name in pathComponents:
@@ -74,9 +78,8 @@ class CatalogCreator:
                         pid = pidTry
                     else:
                         break
-
-                rows = cur.fetchall()
-                sys.stdout.write("Label exists. Trying add onto base: ")
+                sys.stdout.write(" - in -mountPoint:.. -exists-path(%s):.. so we "\
+                                 "will continue -adding:.." % pid)
 
         except sqlite.OperationalError:
             pass
