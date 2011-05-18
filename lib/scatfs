@@ -111,11 +111,12 @@ CDCatFS
             st.st_mode = row["st_mode"]
             st.st_ino = 0
             st.st_dev = 0
-            st.st_nlink = row['st_nlink']
             st.st_uid = row['st_uid']
             st.st_gid = row['st_gid']
             
             #pep>
+            st.st_nlink = row['st_nlink']
+
             st.st_size = row['st_size']
             #             if(stat.S_ISDIR(row['st_mode'])):
             #                 st.st_size = row['st_size']

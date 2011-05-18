@@ -32,6 +32,16 @@
     JOIN (SELECT fileName, COUNT(fileName) as count_name FROM WD_UC1_files WHERE fileName='123') as Tbl2
     ON WD_UC1_files.fileName = Tbl2.fileName;
 
+*** TODO why scfs> sudo find ~/mnt/cat1/WD_UC1 -ls # stops recursion??
+    5    0 drwxr-xr-x   2 root     root            0 led  1  1970 /home/user/mnt/cat1/WD_UC1
+    6    0 drwxr-xr-x   2 user     user           80 kvě 18 07:36 /home/user/mnt/cat1/WD_UC1/a
+    7    0 drwxr-xr-x   2 user     user           60 kvě 18 07:36 /home/user/mnt/cat1/WD_UC1/b
+
+    scfs> sudo find ~/mnt/cat1/WD_UC1/a -ls
+    6    0 drwxr-xr-x   2 user     user           80 kvě 18 07:36 /home/user/mnt/cat1/WD_UC1/a
+    8    0 -rw-rw-r--   1 user     user          329 kvě 18 09:05 /home/user/mnt/cat1/WD_UC1/a/123
+    9    0 -rw-rw-r--   1 user     user          329 kvě 18 09:05 /home/user/mnt/cat1/WD_UC1/a/321
+
 *** DONE :last: scfs> nosetests lib/ -v # <2011-05-14 Sat>
     Use case 1 ... FAIL
     ======================================================================
@@ -61,10 +71,13 @@
 
 ** SETUP see file:~/text/scfs-stu/doc/1st-try.emacs.con.log
    install python-pysqlite2 python-fuse cdcatfs
+   usermod -a -G fuse $USER
+
    install -v -d ~/.scfs ~/mnt/cat1
-   sudo cdcatfs -s -o database=~/.scfs/cat1.db ~/mnt/cat1
+   cdcatfs -s -o database=~/.scfs/cat1.db ~/mnt/cat1
+
    cd ~/text/scfs; cdcatman add doc/ CD_1 ~/.scfs/cat1.db
-   sudo ls -l ~/mnt/cat1/CD_1
+   ls -l ~/mnt/cat1/CD_1
    cdcatman list ~/.scfs/cat1.db
    sqlite3 ~/.scfs/cat1.db .dump
 
