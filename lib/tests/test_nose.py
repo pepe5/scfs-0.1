@@ -28,11 +28,11 @@ def scatfs(argstr):
     wdtbl = 'WD_UC1'
     print " -into arch.fld: %s" % wdtbl
     cmd = 'cdcatman del %s %s' % (wdtbl, Config.db)
-    pop = subprocess.Popen(shlex.split(cmd))
-    print " -cleaning wd table: %s" % cmd
+    pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
+    print " -cleaning wd table: %s" % pop.communicate()[0]
     cmd = 'cdcatman add %s %s %s' % (Config.wd, wdtbl, Config.db)
-    pop = subprocess.Popen(shlex.split(cmd))
-    print " -adding wd table: %s" % cmd
+    pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
+    print " -adding wd table: \n%s" % pop.communicate()[0]
 
 def echo(data, **kwargs):
     of = file(kwargs['ofile'], 'w')
@@ -41,8 +41,8 @@ def echo(data, **kwargs):
 
 def cap(wd):
     cmd = '/usr/bin/find . -type f -ls'
-    pop = subprocess.Popen(shlex.split(cmd))
-    print " -capturing wd state: \%s" % cmd
+    pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
+    print " -capturing wd state: \n%s" % pop.communicate()[0]
 
 ##
 # @brief 1/Register (testing) wd, 2/Add mockup, 3/Check duplical file/s
