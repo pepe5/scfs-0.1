@@ -1,6 +1,7 @@
 * Streaming fevent/s collector
 
 * TODO
+** [#A] separate cdcat & scat file holders
 ** move Cdcatfs (Case Conflict 1)
    (that symln -> /usr/local/lib/python2.6/dist-packages/Cdcatfs)
    to other place than cdcatfs exe
@@ -22,7 +23,7 @@
 * ACT INTRO
 ** dev file:../lib/tests/test_nose.py
 *** dev env depl: 
-    - install -v -d /tmp/scwd/a /tmp/scwd/b
+    - install -v -d /tmp/dev/scwd/a /tmp/dev/scwd/b
 
 *** :last: scfs> nosetests lib/ -v # <2011-05-14 Sat>
     Use case 1 ... FAIL
@@ -51,16 +52,32 @@
     790852    4 -rw-r--r--   1 p-b      p-b             3 May 14 23:22 ./a/123
 
 
-** see file:~/text/scfs-stu/doc/1st-try.emacs.con.log
+** SETUP see file:~/text/scfs-stu/doc/1st-try.emacs.con.log
    - install python-pysqlite2 python-fuse cdcatfs
    - install -v -d ~/.scfs ~/mnt/cat1
    - sudo cdcatfs -s -o database=~/.scfs/cat1.db ~/mnt/cat1
-   - scfs> cdcatman add doc/ CD_7 ~/.scfs/cat1.db # .bak excluded
-   - sudo ls -l ~/mnt/cat1/CD_7
+   - scfs> cdcatman add doc/ CD_1 ~/.scfs/cat1.db # .bak excluded
+   - sudo ls -l ~/mnt/cat1/CD_1
    - cdcatman list ~/.scfs/cat1.db
 
+** dev tasks
+*** have both cdcat & scat on 1 env; test difference/s
 
 * STU
+** ?? i got 2 traceback/s in 1 tc ?!, <2011-05-18 St>
+   <= maybe by cmd = shlex.split('cdcatman del %s ~/.scfs/cat1.db' % wdtbl) ?
+
+*** 2nd one:
+   Traceback (most recent call last):
+   ----------------------------------------------------------------------
+   File "/usr/bin/cdcatman", line 87, in <module>
+   catCreator = CatalogCreator(dbFile, mountPoint, CDLabel)
+   File "/usr/lib/python2.5/site-packages/Cdcatfs/CatalogCreator.py", line 32, in __init__
+   self.__initDb();
+   File "/usr/lib/python2.5/site-packages/Cdcatfs/CatalogCreator.py", line 60, in __initDb
+   con = sqlite.connect(self.__dbFile)
+   pysqlite2.dbapi2.OperationalError: unable to open database file
+
 ** print " -mounting to: %s" % Config.cdpoint
 
 
