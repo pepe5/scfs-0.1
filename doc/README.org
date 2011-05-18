@@ -27,12 +27,49 @@
 ** dev file:../lib/tests/test_nose.py
 *** dev env depl: 
 #  sudo install -v -d /usr/lib/python2.*/site-packages/Scfs/
-    pushd /usr/lib/python2.5/site-packages/; sudo install -v Cdcatfs/*.py Scfs/
-    sudo ln -sv -bf `pwd`/lib/CatalogCreator.py /usr/lib/python2.5/site-packages/Scfs/
+    pushd /usr/lib/python2.*/site-packages/; sudo install -v Cdcatfs/*.py Scfs/
+    sudo ln -sv -bf `pwd`/lib/CatalogCreator.py /usr/lib/python2.*/site-packages/Scfs/
     install -v -d /tmp/dev/scwd/a /tmp/dev/scwd/b
     PATH=$PATH:`pwd`/lib
 
-*** from pysqlite2 import dbapi2 as sqlite
+*** TODO why scfs> sudo find ~/mnt/cat1/WD_UC1 -ls # stops recursion??
+    5    0 drwxr-xr-x   2 root     root            0 led  1  1970 /home/user/mnt/cat1/WD_UC1
+    6    0 drwxr-xr-x   2 user     user           80 kvě 18 07:36 /home/user/mnt/cat1/WD_UC1/a
+    7    0 drwxr-xr-x   2 user     user           60 kvě 18 07:36 /home/user/mnt/cat1/WD_UC1/b
+
+    scfs> sudo find ~/mnt/cat1/WD_UC1/a -ls
+    6    0 drwxr-xr-x   2 user     user           80 kvě 18 07:36 /home/user/mnt/cat1/WD_UC1/a
+    8    0 -rw-rw-r--   1 user     user          329 kvě 18 09:05 /home/user/mnt/cat1/WD_UC1/a/123
+    9    0 -rw-rw-r--   1 user     user          329 kvě 18 09:05 /home/user/mnt/cat1/WD_UC1/a/321
+
+*** scfs> nosetests lib/ -v
+    Use case 1 ... /usr/bin/find: error while loading shared libraries: libselinux.so.1: cannot read file data: Error 21
+    ok
+    ----------------------------------------------------------------------
+    Ran 1 test in 0.426s
+    OK
+
+** SETUP see file:~/text/scfs-stu/doc/1st-try.emacs.con.log
+   install python-pysqlite2 python-fuse cdcatfs
+   usermod -a -G fuse $USER
+
+   install -v -d ~/.scfs ~/mnt/cat1
+   python lib/scatfs -d -s -o database=~/.scfs/cat1.db ~/mnt/cat1
+#(<) cdcatfs -s -o database=~/.scfs/cat1.db ~/mnt/cat1
+
+   cd ~/text/scfs; python lib/scatman add /tmp/dev/scwd WD_UC2 ~/.scfs/cat1.db
+#*(<) cdcatman add doc/ CD_1 ~/.scfs/cat1.db
+   ls -l ~/mnt/cat1/CD_1
+   cdcatman list ~/.scfs/cat1.db
+   sqlite3 ~/.scfs/cat1.db .dump
+
+** dev tasks
+*** have both cdcat & scat on 1 env; test difference/s
+
+* STU
+** print " -mounting to: %s" % Config.cdpoint
+
+** from pysqlite2 import dbapi2 as sqlite
     CDLabel = 'WD_UC1'
     fileId = 6
     name = '123'
@@ -52,17 +89,8 @@
     AS Tbl2
     ON WD_UC1_files.fileName = Tbl2.fileName;
 
-*** TODO why scfs> sudo find ~/mnt/cat1/WD_UC1 -ls # stops recursion??
-    5    0 drwxr-xr-x   2 root     root            0 led  1  1970 /home/user/mnt/cat1/WD_UC1
-    6    0 drwxr-xr-x   2 user     user           80 kvě 18 07:36 /home/user/mnt/cat1/WD_UC1/a
-    7    0 drwxr-xr-x   2 user     user           60 kvě 18 07:36 /home/user/mnt/cat1/WD_UC1/b
 
-    scfs> sudo find ~/mnt/cat1/WD_UC1/a -ls
-    6    0 drwxr-xr-x   2 user     user           80 kvě 18 07:36 /home/user/mnt/cat1/WD_UC1/a
-    8    0 -rw-rw-r--   1 user     user          329 kvě 18 09:05 /home/user/mnt/cat1/WD_UC1/a/123
-    9    0 -rw-rw-r--   1 user     user          329 kvě 18 09:05 /home/user/mnt/cat1/WD_UC1/a/321
-
-*** DONE :last: scfs> nosetests lib/ -v # <2011-05-14 Sat>
+** :last: scfs> nosetests lib/ -v # <2011-05-14 Sat>
     Use case 1 ... FAIL
     ======================================================================
     FAIL: Use case 1
@@ -87,27 +115,6 @@
     790854    4 -rw-r--r--   1 p-b      p-b             3 May 14 23:22 ./b/123
     790853    4 -rw-r--r--   1 p-b      p-b             3 May 14 23:22 ./a/321
     790852    4 -rw-r--r--   1 p-b      p-b             3 May 14 23:22 ./a/123
-
-
-** SETUP see file:~/text/scfs-stu/doc/1st-try.emacs.con.log
-   install python-pysqlite2 python-fuse cdcatfs
-   usermod -a -G fuse $USER
-
-   install -v -d ~/.scfs ~/mnt/cat1
-   python lib/scatfs -d -s -o database=~/.scfs/cat1.db ~/mnt/cat1
-#(<) cdcatfs -s -o database=~/.scfs/cat1.db ~/mnt/cat1
-
-   cd ~/text/scfs; python lib/scatman add /tmp/dev/scwd WD_UC2 ~/.scfs/cat1.db
-#*(<) cdcatman add doc/ CD_1 ~/.scfs/cat1.db
-   ls -l ~/mnt/cat1/CD_1
-   cdcatman list ~/.scfs/cat1.db
-   sqlite3 ~/.scfs/cat1.db .dump
-
-** dev tasks
-*** have both cdcat & scat on 1 env; test difference/s
-
-* STU
-** print " -mounting to: %s" % Config.cdpoint
 
 
 * DONE

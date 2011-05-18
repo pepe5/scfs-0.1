@@ -64,8 +64,20 @@ class CatalogCreator:
                                 self.__CDLabel);
             rows = cur.fetchall()
             if len(rows)>0 :
-                raise ValueError,"Label allready exists. CD " +\
-                        "allready added? Aborting..."
+                
+                server = CDCatFS()
+                pid = 1
+                pathComponents = server.splitPath(self.__mountPoint)
+                for name in pathComponents:
+                    pidTry = server.getId(name, pid, CDLabel)
+                    if pidTry > -1:
+                        pid = pidTry
+                    else:
+                        break
+
+                rows = cur.fetchall()
+                sys.stdout.write("Label exists. Trying add onto base: ")
+
         except sqlite.OperationalError:
             pass
         
