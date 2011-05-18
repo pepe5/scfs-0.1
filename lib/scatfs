@@ -218,24 +218,25 @@ CDCatFS
             pathComponents = self.splitPath(path)
             CDLabel = pathComponents[0]
             pathComponents = pathComponents[1:]
-            baseName = pathComponents[-1]
-            
             pid = 1
             for name in pathComponents:
                 pid=self.getId(name, pid, CDLabel)
     
             cursor = self.con.cursor()
             fileId = pid
+
+            if len(pathComponents) > 0:
+                baseName = pathComponents[-1]
+            else:
+                baseName = ''
             cmd = ("SELECT fid, pid, %s_files.fileName, st_mode, count_name as st_nlink, st_uid, st_gid, st_size, st_atime, st_mtime, st_ctime " +
                            "FROM %s_files " +
                            "JOIN (SELECT fileName, COUNT(fileName) AS count_name FROM %s_files WHERE fileName='%s') AS Tbl2 " +
                            "ON %s_files.fileName = Tbl2.fileName " +
 			   "WHERE fid =%d;") \
                     % (CDLabel, CDLabel, CDLabel, baseName, CDLabel, fileId)
-            self.debugOut (' -scatfs< %s' % cmd)
             cursor.execute(cmd)
             rows = cursor.fetchall()
-            self.debugOut (' -scatfs> %s' % repr(rows))
             cursor.close()
             self.cache.insert(path, rows[0])
         return rows
