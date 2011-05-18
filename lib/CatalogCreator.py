@@ -39,7 +39,7 @@ class CatalogCreator:
 
         walkerKwargs = {}
         if self.middleid:
-            walkerKwargs['startAt'] = 
+            walkerKwargs['startAt'] = ***
 
         for (fileName,stats,fileId,parentId) in\
                             DirectoryWalker(self.__mountPoint):
@@ -79,12 +79,14 @@ class CatalogCreator:
                 server.connect(database=self.__dbFile)
                 self.middleid = 1
                 pathComponents = server.splitPath(self.__mountPoint)
+                newMountPoint = []
                 for name in pathComponents:
                     pidTry = server.getId(name, self.middleid, self.__CDLabel)
                     if pidTry > -1:
                         self.middleid = pidTry
                     else:
                         break
+                self.__mountPoint = 
                 sys.stdout.write(" - in -mountPoint:.. -exists-path(%s):.. so we "\
                                  "will continue -adding:.. \n" % self.middleid)
 
