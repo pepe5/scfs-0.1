@@ -36,7 +36,11 @@ class CatalogCreator:
     def run(self):
         con = sqlite.connect(self.__dbFile)
         cur = con.cursor()
-        #statement = 
+
+        walkerKwargs = {}
+        if self.middleid:
+            walkerKwargs['startAt'] = 
+
         for (fileName,stats,fileId,parentId) in\
                             DirectoryWalker(self.__mountPoint):
 
@@ -48,10 +52,10 @@ class CatalogCreator:
             st_size = stats[6]
             st_atime,st_mtime,st_ctime = stats[7:]
             
-            cur.execute("insert into %s_files"\
-            "(fid,pid,fileName,st_mode,st_nlink,st_uid,"\
+            cur.execute("INSERT OR REPLACE INTO %s_files "\
+            "(fid,pid,fileName,st_mode,st_nlink,st_uid, "\
             "st_gid,st_size,st_atime,st_mtime,st_ctime) "\
-            "values(?,?,?,?,?,?,?,?,?,?,?);" %self.__CDLabel,\
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?);" %self.__CDLabel,\
             (fileId,parentId,fileName,st_mode,st_nlink,st_uid,\
             st_gid,st_size,st_atime,st_mtime,st_ctime))
         self.__spinner.clean()
@@ -60,26 +64,29 @@ class CatalogCreator:
     def __initDb(self):
         con = sqlite.connect(self.__dbFile)
         cur = con.cursor()
+
+        self.startAt = None
+
         try:
-            cur.execute("select * from CDs where label = '%s'" %\
-                                self.__CDLabel);
+            cur.execute("select * from CDs where label = '%s'" % self.__CDLabel);
             rows = cur.fetchall()
             if len(rows)>0 :
                 
-                sys.stdout.write("Label exists. Trying add onto existing mountPoint")
+                sys.stdout.write("Label exists. Trying add onto existing mountPoint\n")
+                self.startAt = self.__mountPoint
                 server = CDCatFS(version="%prog " + fuse.__version__,
                      usage='', dash_s_do='setsingle')
                 server.connect(database=self.__dbFile)
-                pid = 1
+                self.middleid = 1
                 pathComponents = server.splitPath(self.__mountPoint)
                 for name in pathComponents:
-                    pidTry = server.getId(name, pid, CDLabel)
+                    pidTry = server.getId(name, self.middleid, self.__CDLabel)
                     if pidTry > -1:
-                        pid = pidTry
+                        self.middleid = pidTry
                     else:
                         break
                 sys.stdout.write(" - in -mountPoint:.. -exists-path(%s):.. so we "\
-                                 "will continue -adding:.." % pid)
+                                 "will continue -adding:.. \n" % self.middleid)
 
         except sqlite.OperationalError:
             pass
@@ -88,12 +95,11 @@ class CatalogCreator:
             "fid integer primary key autoincrement,"\
             "label text); "
         cur.execute(statement)
-        
         statement = "INSERT INTO CDs (label) "\
                  "VALUES('%s');" % self.__CDLabel
         cur.execute(statement)
         
-        statement = "CREATE TABLE %s_files( "\
+        statement = "CREATE TABLE IF NOT EXISTS %s_files( "\
             "fid integer primary key,"\
             "pid integer,"\
             "fileName text, "\
@@ -106,7 +112,7 @@ class CatalogCreator:
             "st_mtime integer default 0, "\
             "st_ctime integer default 0);" % self.__CDLabel;
         cur.execute(statement)
-        cur.execute('CREATE INDEX %s_pid_idx ON %s_files( pid );'% (self.__CDLabel,self.__CDLabel))
-        cur.execute('CREATE INDEX %s_fname_idx ON %s_files(fileName);'%(self.__CDLabel,self.__CDLabel))
-        cur.execute('CREATE INDEX %s_pid_fname_idx ON %s_files(pid,fileName);'%(self.__CDLabel,self.__CDLabel))
+        cur.execute('CREATE INDEX IF NOT EXISTS %s_pid_idx ON %s_files( pid );'% (self.__CDLabel,self.__CDLabel))
+        cur.execute('CREATE INDEX IF NOT EXISTS %s_fname_idx ON %s_files(fileName);'%(self.__CDLabel,self.__CDLabel))
+        cur.execute('CREATE INDEX IF NOT EXISTS %s_pid_fname_idx ON %s_files(pid,fileName);'%(self.__CDLabel,self.__CDLabel))
         con.commit()
