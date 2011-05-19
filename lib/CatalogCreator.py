@@ -38,8 +38,9 @@ class CatalogCreator:
         cur = con.cursor()
 
         walkerKwargs = {}
-        if self.middleid:
-            walkerKwargs['startAt'] = ***
+        if self.startAt:
+            walkerKwargs['startAt'] = self.__mountPoint
+            sys.stdout.write(" -run startAt will be soon..\n")
 
         for (fileName,stats,fileId,parentId) in\
                             DirectoryWalker(self.__mountPoint):
@@ -66,36 +67,41 @@ class CatalogCreator:
         cur = con.cursor()
 
         self.startAt = None
-
         try:
             cur.execute("select * from CDs where label = '%s'" % self.__CDLabel);
             rows = cur.fetchall()
             if len(rows)>0 :
                 
-                sys.stdout.write("Label exists. Trying add onto existing mountPoint\n")
                 self.startAt = self.__mountPoint
+                sys.stdout.write("Label exists. Trying add onto existing mountPoint\n")
                 server = CDCatFS(version="%prog " + fuse.__version__,
                      usage='', dash_s_do='setsingle')
                 server.connect(database=self.__dbFile)
-                self.middleid = 1
+                self.parentId = 1
                 pathComponents = server.splitPath(self.__mountPoint)
-                newMountPoint = []
+                print " -pathComponents: %s\n" % pathComponents #>-
+
+                # find longest common part
+                self.__mountPoint = []
                 for name in pathComponents:
-                    pidTry = server.getId(name, self.middleid, self.__CDLabel)
-                    if pidTry > -1:
-                        self.middleid = pidTry
-                    else:
+                    print " -name: %s\n" % name #>-
+                    pidTry = server.getId(name, self.parentId, self.__CDLabel)
+                    print " -is common?: %d\n" % pidTry #>-
+                    if pidTry == -1:
                         break
-                self.__mountPoint = 
-                sys.stdout.write(" - in -mountPoint:.. -exists-path(%s):.. so we "\
-                                 "will continue -adding:.. \n" % self.middleid)
+                    else:
+                        self.__mountPoint.append(name)
+                        self.parentId = pidTry
+                sys.stdout.write(" - in (existing, common) -mountPoint(%s):.. -rest to startPoint:..\n"\
+                                     % self.parentId)
+                raise NotImplementedError
 
         except sqlite.OperationalError:
             pass
         
         statement = "CREATE TABLE IF NOT EXISTS CDs( "\
             "fid integer primary key autoincrement,"\
-            "label text); "
+            "label text, mountPoint text); "
         cur.execute(statement)
         statement = "INSERT INTO CDs (label) "\
                  "VALUES('%s');" % self.__CDLabel

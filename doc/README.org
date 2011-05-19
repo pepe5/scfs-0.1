@@ -1,6 +1,10 @@
 # -*- org -*-
 * Streaming fevent/s collector
 
+# Hi-lock: (("\\$> .*" (0 (quote hi-red-b) t)))
+# Hi-lock: (("\\#> .*\\|;\\#" (0 (quote font-lock-comment-face) t)))
+# Hi-lock: (("'[^']+'\\|\"[^\"]+\"" (0 (quote font-lock-string-face) t))) ;"
+
 * TODO
 ** [#A] separate cdcat & scat file holders
    [[file:~/text/scfs/lib/scatfs::/from%20Cdcatfs.utils%20import%20CacheDict/][scatfs::/from *Cdcatfs*.utils import CacheDict/]]
@@ -24,15 +28,21 @@
 
 
 * ACT INTRO
-** dev file:../lib/tests/test_nose.py
-*** dev env depl: 
-#  sudo install -v -d /usr/lib/python2.*/site-packages/Scfs/
-    pushd /usr/lib/python2.*/site-packages/; sudo install -v Cdcatfs/*.py Scfs/
-    sudo ln -sv -bf `pwd`/lib/CatalogCreator.py /usr/lib/python2.*/site-packages/Scfs/
+** dev act/s file:../lib/tests/test_nose.py
+*** dev env depl: (at cd ~/text/scfs/)
+    >! distutil shall handle this!
+    pushd /usr/lib/python2.5/site-packages/ && pakSite=`pwd` && popd
+    pushd /usr/local/lib/python2.6/dist-packages && pakSite=`pwd` && popd
+
+    >? sudo install -v -d $pakSite/Scfs/ # is necessary when vvv #> ?
+    sudo ln -sv -bf `pwd`/lib/Cat*.py `pwd`/lib/Dir*.py $pakSite/Scfs/
+    sudo ln -sv -bf `pwd`/lib/scatfs $pakSite/Scfs/ScatServices.py
+    echo | sudo tee /usr/local/lib/python2.6/dist-packages/Scfs/__init__.py
+    sudo cp -v $pakSite/Cdcatfs/utils.py $pakSite/Scfs/ #> <depends on Cdcatfs
     install -v -d /tmp/dev/scwd/a /tmp/dev/scwd/b
     PATH=$PATH:`pwd`/lib
 
-*** TODO why scfs> sudo find ~/mnt/cat1/WD_UC1 -ls # stops recursion??
+*** TODO why scfs> find ~/mnt/cat1/WD_UC1 -ls # stops recursion??
     5    0 drwxr-xr-x   2 root     root            0 led  1  1970 /home/user/mnt/cat1/WD_UC1
     6    0 drwxr-xr-x   2 user     user           80 kvě 18 07:36 /home/user/mnt/cat1/WD_UC1/a
     7    0 drwxr-xr-x   2 user     user           60 kvě 18 07:36 /home/user/mnt/cat1/WD_UC1/b
@@ -42,6 +52,12 @@
     8    0 -rw-rw-r--   1 user     user          329 kvě 18 09:05 /home/user/mnt/cat1/WD_UC1/a/123
     9    0 -rw-rw-r--   1 user     user          329 kvě 18 09:05 /home/user/mnt/cat1/WD_UC1/a/321
 
+
+** longest common:
+   self.__mountPoint = []
+   [[file:~/text/scfs/lib/CatalogCreator.py::/for%20name%20in%20pathComponents/][for name in pathComponents]]
+
+** <<UC1>> health-check
 *** scfs> nosetests lib/ -v
     Use case 1 ... /usr/bin/find: error while loading shared libraries: libselinux.so.1: cannot read file data: Error 21
     ok
@@ -49,12 +65,77 @@
     Ran 1 test in 0.426s
     OK
 
-** uc2 - insert
-   cp -r  /tmp/dev/scwd  /tmp/dev/scwd2
-   python lib/scatman del WD_UC2 ~/.scfs/cat1.db
-   python lib/scatman add /tmp/dev/scwd2 WD_UC2 ~/.scfs/cat1.db
-   echo 234 > /tmp/dev/scwd2/b/234
-   python lib/scatman add /tmp/dev/scwd2/b WD_UC2 ~/.scfs/cat1.db
+
+** <<UC2>> insert (that simplest one)
+*** design: cp -r  /tmp/dev/scwd  /tmp/dev/scwd2
+    python lib/scatman del WD_UC2 ~/.scfs/cat1.db
+    python lib/scatman add /tmp/dev/scwd WD_UC2 ~/.scfs/cat1.db
+    echo 234 > /tmp/dev/scwd/b/234
+    python lib/scatman add /tmp/dev/scwd/b WD_UC2 ~/.scfs/cat1.db
+
+*** setup
+    :cleanup: rm -vr /tmp/dev/scwd/b/bb
+
+    install -v -d /tmp/dev/scwd/b/bb /tmp/dev/scwd/b/bb/bbb
+    install -v /tmp/dev/scwd/a/321 /tmp/dev/scwd/b/bb
+    echo > /tmp/dev/scwd/b/bb/bbb/234
+
+*** from Scfs.DirectoryWalker import DirectoryWalker
+   for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd/'):
+     print fname, fileId, parentId
+
+*** scfs$> python doc/stu/DirectoryWalker-1.py /tmp/dev/scwd/
+    -argv: ['/tmp/stu.py', '/tmp/dev/scwd/a/']
+    -wd: /tmp/dev/scwd/
+    1 0
+    b 2 1
+    a 3 1
+    321 4 3
+    123 5 3
+    123 6 2
+
+*** scfs$> python doc/stu/DirectoryWalker-1.py /tmp/dev/scwd startAt=b/bb parentId=2 lastId=6
+    -basedir: /tmp/dev/scwd
+    -opts: {'lastId': 6, 'startAt': 'b/bb', 'parentId': 2}
+    /tmp/dev/scwd 7 2
+    b 8 7
+    a 9 7
+    321 10 9
+    123 11 9
+    123 12 8
+    bb 13 8
+    321 14 13
+    bbb 15 13
+    234 16 15
+
+*** :tmp: scfs$> python doc/stu/DirectoryWalker-1.py /tmp/dev/scwd/a/
+    -wd: /tmp/dev/scwd/a/
+    1 0
+    321 2 1
+    123 3 1
+
+    scfs$> python doc/stu/DirectoryWalker-1.py /tmp/dev/scwd/a/ startAt=a parentId=3 lastId=7
+    -basedir: /tmp/dev/scwd/a/
+    -opts: {'lastId': 7, 'startAt': 'a', 'parentId': 3}
+    /tmp/dev/scwd/a 8 3
+    321 9 8
+    123 10 8
+
+
+
+** insert UC/s cmp
+   1. add '/tmp/dev/scwd/b' Tbl (of '/tmp/dev/scwd') [[UC2]] for new; [[UC3]] for update!
+   2. add '/tmp/dev' Tbl (of '/tmp/dev/scwd') [[UC4]] » re-id Tbl root to longest common: '/tmp/dev'
+     - add '/tmp/d' Tbl (of '/tmp/dev/scwd') ([[UC4]]) » re-id Tbl root to longest common: '/tmp' but inside only those 2 branches
+     - add '/var/e' Tbl (of '/tmp/dev/scwd') ([[UC4]]) » re-id Tbl root to longest common: '/' :-S but inside only those 2 branches
+
+** <<UC3>> insert -- update existing
+
+** <<UC4>> instert of 'parent' (of existent record)
+   --> re-id:
+      - old root (fid '1') to '1st' free fid -- &
+      - all its childs
+   * (& you can do rest as UC2 ?!)
 
 
 ** SETUP see file:~/text/scfs-stu/doc/1st-try.emacs.con.log
@@ -73,6 +154,7 @@
 
 ** dev tasks
 *** have both cdcat & scat on 1 env; test difference/s
+
 
 * STU
 ** TODO fuse args
