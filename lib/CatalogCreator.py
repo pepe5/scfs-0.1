@@ -68,11 +68,20 @@ class CatalogCreator:
 
         self.startAt = None
         try:
-            cur.execute("select * from CDs where label = '%s'" % self.__CDLabel);
+            cur.execute("select mountPoint CDs where label = '%s'" % self.__CDLabel);
             rows = cur.fetchall()
             if len(rows)>0 :
                 
                 self.startAt = self.__mountPoint
+                archivedPoint = rows[0]['mountPoint']
+                if archivedPoint == self.__mountPoint:
+                    raise NotImplementedError, "update reload not yet implemented"
+
+                if len(archivedPoint) > len(self.__mountPoint):
+                    raise NotImplementedError, "re-indexing extend not yet implemented"
+
+                ### pathPrefix for deletion ***
+
                 sys.stdout.write("Label exists. Trying add onto existing mountPoint\n")
                 server = CDCatFS(version="%prog " + fuse.__version__,
                      usage='', dash_s_do='setsingle')

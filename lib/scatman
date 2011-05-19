@@ -29,7 +29,7 @@ def removeLabel(dbFile,CDLabel):
             raise ValueError('Database not found.')
         con = sqlite.connect(dbFile)
         cur = con.cursor()
-        cur.execute("select * from CDs where label = '%s'" %CDLabel)
+        cur.execute("select fid,label from CDs where label = '%s'" %CDLabel)
         rows = cur.fetchall()
         if len(rows) == 0 :
             raise ValueError("Label doesn't exist.")
