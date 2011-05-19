@@ -103,8 +103,8 @@ class CatalogCreator:
             "fid integer primary key autoincrement,"\
             "label text, mountPoint text); "
         cur.execute(statement)
-        statement = "INSERT INTO CDs (label) "\
-                 "VALUES('%s');" % self.__CDLabel
+        statement = "INSERT INTO CDs (label, mountPoint) VALUES ('%s', '%s');"\
+            % (self.__CDLabel, self.__mountPoint)
         cur.execute(statement)
         
         statement = "CREATE TABLE IF NOT EXISTS %s_files( "\
