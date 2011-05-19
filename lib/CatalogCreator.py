@@ -68,52 +68,61 @@ class CatalogCreator:
 
         self.startAt = None
         try:
-            cur.execute("select mountPoint CDs where label = '%s'" % self.__CDLabel);
+            cur.execute("select mountPoint from CDs where label = '%s'" % self.__CDLabel);
             rows = cur.fetchall()
             if len(rows)>0 :
                 
                 self.startAt = self.__mountPoint
-                archivedPoint = rows[0]['mountPoint']
+                sys.stdout.write("Label exists. Trying add onto existing mountPoint\n")
+                server = CDCatFS(version="%prog " + fuse.__version__,
+                     usage='', dash_s_do='setsingle')
+                server.connect(database=self.__dbFile)
+                archivedPoint = server.splitPath(rows[0][0])
+                pathComponents = server.splitPath(self.__mountPoint)
+
                 if archivedPoint == self.__mountPoint:
                     raise NotImplementedError, "update reload not yet implemented"
 
                 if len(archivedPoint) > len(self.__mountPoint):
                     raise NotImplementedError, "re-indexing extend not yet implemented"
 
-                ### pathPrefix for deletion ***
-
-                sys.stdout.write("Label exists. Trying add onto existing mountPoint\n")
-                server = CDCatFS(version="%prog " + fuse.__version__,
-                     usage='', dash_s_do='setsingle')
-                server.connect(database=self.__dbFile)
                 self.parentId = 1
-                pathComponents = server.splitPath(self.__mountPoint)
-                print " -pathComponents: %s\n" % pathComponents #>-
+                print " -pathComponents (including): %s" % pathComponents #>-
+                pathComponents = pathComponents[len(archivedPoint):]
+                print " -pathComponents (from:%s): %s"\
+                    % (len(archivedPoint), pathComponents) #>-
 
                 # find longest common part
                 self.__mountPoint = []
+                startName = ''
                 for name in pathComponents:
-                    print " -name: %s\n" % name #>-
+                    print " -name< %s, -pid: %d, -label: %s"\
+                        % (name, self.parentId, self.__CDLabel) #>-
                     pidTry = server.getId(name, self.parentId, self.__CDLabel)
-                    print " -is common?: %d\n" % pidTry #>-
+                    print " -common?> (fid:) %d" % pidTry #>-
                     if pidTry == -1:
                         break
                     else:
                         self.__mountPoint.append(name)
                         self.parentId = pidTry
-                sys.stdout.write(" - in (existing, common) -mountPoint(%s):.. -rest to startPoint:..\n"\
-                                     % self.parentId)
+                        startName = name
+                sys.stdout.write((" - from (archived, common) -mountPoint: %s "\
+                                     " -last-parent: %s to -startPoint: %s\n")\
+                                     % (rows[0][0], self.parentId, pathComponents))
                 raise NotImplementedError
 
-        except sqlite.OperationalError:
+        except sqlite.OperationalError, err:
+            sys.stdout.write(" -got exception at sql execution.. %s\n" % err)
             pass
         
         statement = "CREATE TABLE IF NOT EXISTS CDs( "\
             "fid integer primary key autoincrement,"\
             "label text, mountPoint text); "
         cur.execute(statement)
-        statement = "INSERT INTO CDs (label, mountPoint) VALUES ('%s', '%s');"\
-            % (self.__CDLabel, self.__mountPoint)
+        statement = ("INSERT INTO CDs (label, mountPoint) " +
+            "SELECT '%s', '%s' " +
+            "WHERE NOT EXISTS (SELECT 1 FROM CDs WHERE label = '%s');")\
+            % (self.__CDLabel, self.__mountPoint, self.__CDLabel)
         cur.execute(statement)
         
         statement = "CREATE TABLE IF NOT EXISTS %s_files( "\

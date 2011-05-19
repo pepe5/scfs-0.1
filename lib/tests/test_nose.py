@@ -33,10 +33,10 @@ def scatfs(argstr):
     print " -registering (blind dir) at: %s" % Config['wd']
     Config.adname = 'WD_UC1'
     print " -into arch.fld: %s" % Config.adname
-    cmd = 'cdcatman del %s %s' % (Config.adname, Config.db)
+    cmd = 'scatman del %s %s' % (Config.adname, Config.db)
     pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
     print " -cleaning wd table: %s" % pop.communicate()[0]
-    cmd = 'cdcatman add %s %s %s' % (Config['wd'], Config.adname, Config.db)
+    cmd = 'scatman add %s %s %s' % (Config['wd'], Config.adname, Config.db)
     pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
     print " -adding wd table: \n%s" % pop.communicate()[0]
 
@@ -75,6 +75,6 @@ def test_uc1():
 
 def like_tc2():
     ''' Check add around broken links:
-    scfs> cdcatman add . CD_1 ~/.scfs/cat1.db
+    scfs> scatman add . CD_1 ~/.scfs/cat1.db
     -Error: [Errno 2] No such file or directory: '/home/p-b/text/scfs/lib/Cdcatfs~' '''
     pass

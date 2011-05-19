@@ -43,6 +43,9 @@
     PATH=$PATH:`pwd`/lib
 
 *** TODO why scfs> find ~/mnt/cat1/WD_UC1 -ls # stops recursion??
+    :tip: on ubuntu it works ok, so this (vv) is only aspire1 fc 
+
+**** output
     5    0 drwxr-xr-x   2 root     root            0 led  1  1970 /home/user/mnt/cat1/WD_UC1
     6    0 drwxr-xr-x   2 user     user           80 kvě 18 07:36 /home/user/mnt/cat1/WD_UC1/a
     7    0 drwxr-xr-x   2 user     user           60 kvě 18 07:36 /home/user/mnt/cat1/WD_UC1/b
@@ -94,7 +97,7 @@
     123 5 3
     123 6 2
 
-*** scfs$> python doc/stu/DirectoryWalker-1.py /tmp/dev/scwd startAt=b/bb parentId=2 lastId=6
+*** scfs$> d=/tmp/dev/scwd; python doc/stu/DirectoryWalker-1.py $d startAt=$d/b/bb parentId=2 lastId=6
     -basedir: /tmp/dev/scwd
     -opts: {'lastId': 6, 'startAt': 'b/bb', 'parentId': 2}
     /tmp/dev/scwd 7 2
@@ -128,6 +131,24 @@
    2. add '/tmp/dev' Tbl (of '/tmp/dev/scwd') [[UC4]] » re-id Tbl root to longest common: '/tmp/dev'
      - add '/tmp/d' Tbl (of '/tmp/dev/scwd') ([[UC4]]) » re-id Tbl root to longest common: '/tmp' but inside only those 2 branches
      - add '/var/e' Tbl (of '/tmp/dev/scwd') ([[UC4]]) » re-id Tbl root to longest common: '/' :-S but inside only those 2 branches
+
+*** # pathPrefix for deletion
+                pathPrefix = server.splitPath(archivedPoint)
+                ix = 0
+                for i in range(min(len(pathPrefix), len(pathComponents))):
+                    if pathPrefix[i] != pathComponents[i]:
+                        break
+                    ix =+ 1
+                pathComponents = pathComponents[i+1:]
+
+*** maybe later could has CD more records about additions: ~
+    INSERT INTO "CDs" VALUES(3,'WD_2','/tmp/dev/scwd');
+    INSERT INTO "CDs" VALUES(4,'WD_2','/tmp/dev/scwd/b/bb');
+
+**** for now, restrict it to only 1 record:
+     INSERT INTO CDs (label, mountPoint)
+     SELECT 'WD_2', '/zzz'
+     WHERE NOT EXISTS (SELECT 1 FROM CDs WHERE label = 'WD_2');
 
 ** <<UC3>> insert -- update existing
 
