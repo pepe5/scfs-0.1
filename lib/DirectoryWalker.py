@@ -15,7 +15,7 @@ class DirectoryWalker:
 	# a forward iterator that traverses a directory tree, and
 	# returns the filename
 
-	def __init__(self, directory, opts=[]):
+	def __init__(self, directory, opts={}):
 		directory = os.path.abspath(directory)
 		self.stack = []
 		self.files = [directory]
@@ -27,9 +27,10 @@ class DirectoryWalker:
 		self.parentId = 0	#parent id
 
 		if 'startAt' in opts: #all following must be supplied in this case
-			self.directory = opts['startAt']
+			self.pathPrefix = opts['mountPoint']
 			self.parentId = opts['parentId']
 			self.fileId = opts['lastId']
+			self.directory = opts['startAt']
 
 
 	def __getitem__(self, index):

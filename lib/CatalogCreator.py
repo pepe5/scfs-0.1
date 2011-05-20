@@ -37,13 +37,16 @@ class CatalogCreator:
         con = sqlite.connect(self.__dbFile)
         cur = con.cursor()
 
-        walkerKwargs = {}
+        walkerOpts = {}
         if self.startAt:
-            walkerKwargs['startAt'] = self.__mountPoint
+            walkerOpts['mountPoint'] = self.__mountPoint
+            walkerOpts['parentId'] = self.parentId
+            walkerOpts['lastId'] = self.lastId
+            walkerOpts['startAt'] = self.startAt
             sys.stdout.write(" -run startAt will be soon..\n")
 
         for (fileName,stats,fileId,parentId) in\
-                            DirectoryWalker(self.__mountPoint):
+                            DirectoryWalker(self.__mountPoint, walkerOpts):
 
             if(stat.S_ISDIR(stats[ST_MODE])):
                 self.__spinner.update()
@@ -59,6 +62,7 @@ class CatalogCreator:
             "VALUES (?,?,?,?,?,?,?,?,?,?,?);" %self.__CDLabel,\
             (fileId,parentId,fileName,st_mode,st_nlink,st_uid,\
             st_gid,st_size,st_atime,st_mtime,st_ctime))
+            
         self.__spinner.clean()
         con.commit()
 
@@ -93,20 +97,19 @@ class CatalogCreator:
                 hops = 0
                 self.parentId = 1
                 for name in self.startAt:
-                    print " -name< %s, -pid: %d" % (name, self.parentId) #>-
                     pidTry = server.getId(name, self.parentId, self.__CDLabel)
                     if pidTry == -1:
                         break
                     else:
                         hops += 1
                         self.parentId = pidTry
-                        print " -common?> (fid:) %d (hops -> %d)" % (pidTry, hops) #>-
                 sys.stdout.write(" -last-id from common part: %s\n"\
                                      % (self.parentId))
 
                 self.startAt = self.startAt[hops:]
-                sys.stdout.write(" -startPoint: %s\n" % self.startAt)
-                raise NotImplementedError
+                cur.execute("select max(fid) from %s_files" % self.__CDLabel);
+                self.lastId = cur.fetchall()[0][0]
+                sys.stdout.write(" -startPoint: %s, -lastId: %d\n" % (self.startAt, self.lastId))
 
         except sqlite.OperationalError, err:
             sys.stdout.write(" -got exception at sql execution.. %s\n" % err)
