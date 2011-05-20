@@ -111,11 +111,11 @@ def test_uc2():
     Config.unload()
 
     Config.load(wd=Config.outroot)
-    f123 = {}
-    f123['st_nlink'] = os.stat(Config.adname + '/a/123')[ST_NLINK]
+    print 'pep> -pwd: %s' % os.getcwd()
+    dbbb = os.listdir(os.path.join(Config.adname, 'b/bb/bbb'))
     capture('.')
-    print " -got nlink: %s ( -exp: %s )" % (f123['st_nlink'], 2)
-    assert f123['st_nlink'] == 2
+    print " -got in bbb: %s" % (dbbb)
+    assert dbbb == ['234']
     Config.unload()
 
 def like_tc_l2():
