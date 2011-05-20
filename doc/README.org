@@ -78,10 +78,39 @@
 
 *** setup
     :cleanup: rm -vr /tmp/dev/scwd/b/bb
+    :setup: scfs> scatman add /tmp/dev/scwd/ WD_2 ~/.scfs/cat1.db
+    scfs> sqlite3 ~/.scfs/cat1.db 'select * from WD_2_files'
+    1|0||16877|4|1000|1000|4096|1305837230|1305836661|1305836661
+    2|1|b|16877|2|1000|1000|4096|1305847964|1305851133|1305851133
+    3|1|a|16877|2|1000|1000|4096|1305838778|1305838705|1305838705
+    4|3|321|33188|1|1000|1000|3|1305844485|1305839794|1305839794
+    5|3|123|33188|1|1000|1000|3|1305838705|1305839794|1305839794
+    6|2|123|33188|1|1000|1000|3|1305838705|1305839794|1305839794
 
+    scfs> 
     install -v -d /tmp/dev/scwd/b/bb /tmp/dev/scwd/b/bb/bbb
     install -v /tmp/dev/scwd/a/321 /tmp/dev/scwd/b/bb
     echo > /tmp/dev/scwd/b/bb/bbb/234
+    scfs> install: creating directory `/tmp/dev/scwd/b/bb'
+    install: creating directory `/tmp/dev/scwd/b/bb/bbb'
+    scfs> `/tmp/dev/scwd/a/321' -> `/tmp/dev/scwd/b/bb/321'
+
+    :act: scfs> scatman add /tmp/dev/scwd/b/bb/ WD_2 ~/.scfs/cat1.db
+    Label exists. Trying add onto existing mountPoint
+    - from (common) -mountPoint: /tmp/dev/scwd
+      -name< b, -pid: 1
+      -common?> (fid:) 2 (hops -> 1)
+      -name< bb, -pid: 2
+      -last-id from common part: 2
+      -startPoint: ['bb']
+      Traceback (most recent call last):
+      File "/usr/local/bin/scatman", line 88, in <module>
+      catCreator = CatalogCreator(dbFile, mountPoint, CDLabel)
+      File "/usr/local/lib/python2.6/dist-packages/Scfs/CatalogCreator.py", line 33, in __init__
+      self.__initDb();
+      File "/usr/local/lib/python2.6/dist-packages/Scfs/CatalogCreator.py", line 109, in __initDb
+      raise NotImplementedError
+      NotImplementedError
 
 *** from Scfs.DirectoryWalker import DirectoryWalker
    for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd/'):

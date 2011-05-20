@@ -72,43 +72,40 @@ class CatalogCreator:
             rows = cur.fetchall()
             if len(rows)>0 :
                 
-                self.startAt = self.__mountPoint
                 sys.stdout.write("Label exists. Trying add onto existing mountPoint\n")
                 server = CDCatFS(version="%prog " + fuse.__version__,
                      usage='', dash_s_do='setsingle')
                 server.connect(database=self.__dbFile)
-                archivedPoint = server.splitPath(rows[0][0])
-                pathComponents = server.splitPath(self.__mountPoint)
+                self.startAt = server.splitPath(self.__mountPoint) # user (insertion) path
+                self.__mountPoint = rows[0][0] # already-archived CD's mountPoint path
+                archivedPoint = server.splitPath(self.__mountPoint)
+                sys.stdout.write(" - from (common) -mountPoint: %s\n"
+                                     % self.__mountPoint)
 
-                if archivedPoint == self.__mountPoint:
+                if archivedPoint == self.startAt:
                     raise NotImplementedError, "update reload not yet implemented"
 
-                if len(archivedPoint) > len(self.__mountPoint):
+                if len(archivedPoint) > len(self.startAt):
                     raise NotImplementedError, "re-indexing extend not yet implemented"
 
+                # find longest common part from archived-Point to user-Point
+                self.startAt = self.startAt[len(archivedPoint):]
+                hops = 0
                 self.parentId = 1
-                print " -pathComponents (including): %s" % pathComponents #>-
-                pathComponents = pathComponents[len(archivedPoint):]
-                print " -pathComponents (from:%s): %s"\
-                    % (len(archivedPoint), pathComponents) #>-
-
-                # find longest common part
-                self.__mountPoint = []
-                startName = ''
-                for name in pathComponents:
-                    print " -name< %s, -pid: %d, -label: %s"\
-                        % (name, self.parentId, self.__CDLabel) #>-
+                for name in self.startAt:
+                    print " -name< %s, -pid: %d" % (name, self.parentId) #>-
                     pidTry = server.getId(name, self.parentId, self.__CDLabel)
-                    print " -common?> (fid:) %d" % pidTry #>-
                     if pidTry == -1:
                         break
                     else:
-                        self.__mountPoint.append(name)
+                        hops += 1
                         self.parentId = pidTry
-                        startName = name
-                sys.stdout.write((" - from (archived, common) -mountPoint: %s "\
-                                     " -last-parent: %s to -startPoint: %s\n")\
-                                     % (rows[0][0], self.parentId, pathComponents))
+                        print " -common?> (fid:) %d (hops -> %d)" % (pidTry, hops) #>-
+                sys.stdout.write(" -last-id from common part: %s\n"\
+                                     % (self.parentId))
+
+                self.startAt = self.startAt[hops:]
+                sys.stdout.write(" -startPoint: %s\n" % self.startAt)
                 raise NotImplementedError
 
         except sqlite.OperationalError, err:
