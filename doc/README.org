@@ -114,6 +114,20 @@
       raise NotImplementedError
       NotImplementedError
 
+*** 1st pass (<2011-05-20 Fri>):
+    scfs> find ~/mnt/cat1/ -ls
+    1    0 drwxr-xr-x   2 root     root            0 Jan  1  1970 /home/p-b/mnt/cat1/
+    4    0 drwxr-xr-x   2 root     root            0 Jan  1  1970 /home/p-b/mnt/cat1/WD_2
+    8    0 drwxr-xr-x   1 p-b      p-b          4096 May 19 22:58 /home/p-b/mnt/cat1/WD_2/a
+    9    0 -rw-r--r--   2 p-b      p-b             3 May 19 23:16 /home/p-b/mnt/cat1/WD_2/a/123
+    10    0 -rw-r--r--   2 p-b      p-b             3 May 19 23:16 /home/p-b/mnt/cat1/WD_2/a/321
+    11    0 drwxr-xr-x   1 p-b      p-b          4096 May 20 04:02 /home/p-b/mnt/cat1/WD_2/b
+    12    0 -rw-r--r--   2 p-b      p-b             3 May 19 23:16 /home/p-b/mnt/cat1/WD_2/b/123
+    13    0 drwxr-xr-x   1 p-b      p-b          4096 May 20 04:02 /home/p-b/mnt/cat1/WD_2/b/bb
+    14    0 -rwxr-xr-x   2 p-b      p-b             3 May 20 04:02 /home/p-b/mnt/cat1/WD_2/b/bb/321
+    15    0 drwxr-xr-x   1 p-b      p-b          4096 May 20 04:02 /home/p-b/mnt/cat1/WD_2/b/bb/bbb
+    16    0 -rw-r--r--   1 p-b      p-b             1 May 20 04:02 /home/p-b/mnt/cat1/WD_2/b/bb/bbb/234
+
 *** from Scfs.DirectoryWalker import DirectoryWalker
 for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd',
     {'parentId':2, 'lastId':6, 'startAbs':'/tmp/dev/scwd/b/bb'}):

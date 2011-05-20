@@ -30,6 +30,7 @@ class DirectoryWalker:
 		if 'startAt' in opts: #all following must be supplied in this case
 			self.parentId = opts['parentId']
 			self.directory = opts['startAbs']
+			self.files = [self.directory]
 			self.fileId = opts['lastId']
 			self.startId = self.fileId+1
 
@@ -37,10 +38,15 @@ class DirectoryWalker:
 	def __getitem__(self, index):
 		while True:
 			try:
+				print ' -index: %s, -files |%s|: %r'\
+				    % (self.index, len (self.files), self.files) #>-
 				file = self.files[self.index]
+				print ' -file: %s, index+1..' % self.files #>-
 				self.index = self.index + 1
 			except IndexError:
 			# pop next directory from stack
+				print 'Fetching.. dir: %s ( -stack: %r )'\
+				    % (self.directory, self.stack)
 				self.directory,self.parentId = self.stack.pop()
 				self.files = os.listdir(self.directory)
 				self.index = 0
