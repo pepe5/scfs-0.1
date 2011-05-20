@@ -27,6 +27,10 @@ Config.outroot = os.path.expanduser('~/mnt/cat1')
 Config.db = os.path.expanduser('~/.scfs/cat1.db')
 
 def scatman(argstr, **kw):
+    '''Runs scatman command-line
+    optional @param kw['mountPoint'] can override default Config['wd']
+    optional @param kw['cont'] suppresses setup refreshment of the Table
+    '''
     argstr = os.path.expanduser(argstr)
     args = shlex.split(argstr)
     if 'mountPoint' in kw:
@@ -53,11 +57,13 @@ def scatman(argstr, **kw):
     print " -adding wd table: \n%s" % pop.communicate()[0]
 
 def echo(data, **kwargs):
+    '''echo like utility'''
     of = file(kwargs['ofile'], 'w')
     of.write(data)
     of.close()
 
 def mkdirp(*args):
+    '''mkdir like utility'''
     for d in args:
         try:
             os.makedirs(d)
@@ -65,6 +71,7 @@ def mkdirp(*args):
             print " -makedirs exception: %s" % err
 
 def capture(path):
+    '''lists working dir content'''
     cmd = '/usr/bin/find %s -type f -ls' % path
     pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
     print " -capturing overview of path: %s \n%s" % (os.path.abspath(path), pop.communicate()[0])
