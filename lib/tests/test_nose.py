@@ -22,21 +22,33 @@ class ConfigDict(dict):
         os.chdir(self['wd'])
 
 Config = ConfigDict()
+Config.srcd = '/tmp/dev/scwd'
+Config.outroot = os.path.expanduser('~/mnt/cat1')
+Config.db = os.path.expanduser('~/.scfs/cat1.db')
 
-def scatfs(argstr):
+def scatman(argstr, **kw):
     argstr = os.path.expanduser(argstr)
     args = shlex.split(argstr)
+    if 'mountPoint' in kw:
+        mountPoint = kw['mountPoint']
+        print " -mountPoint redefined: %s" % mountPoint
+    else:
+        mountPoint = Config['wd']
+
     Config.mounto = args [-1]
     print " -vfs mount point: %s" % Config.mounto
     Config.db = re.match('.*database=([^ ]+) ', argstr).group(1) # @KNOWN as not-universal
     Config.db = os.path.expanduser(Config.db)
-    print " -registering (blind dir) at: %s" % Config['wd']
+    print " -registering (blind dir) at: %s" % Config.db
     Config.adname = 'WD_UC1'
     print " -into arch.fld: %s" % Config.adname
-    cmd = 'scatman del %s %s' % (Config.adname, Config.db)
-    pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
-    print " -cleaning wd table: %s" % pop.communicate()[0]
-    cmd = 'scatman add %s %s %s' % (Config['wd'], Config.adname, Config.db)
+
+    if not 'cont' in kw:
+        cmd = 'scatman del %s %s' % (Config.adname, Config.db)
+        pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
+        print " -cleaning wd table: %s" % pop.communicate()[0]
+
+    cmd = 'scatman add %s %s %s' % (mountPoint, Config.adname, Config.db)
     pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
     print " -adding wd table: \n%s" % pop.communicate()[0]
 
@@ -45,35 +57,68 @@ def echo(data, **kwargs):
     of.write(data)
     of.close()
 
-def cap(path):
+def mkdirp(*args):
+    for d in args:
+        try:
+            os.makedirs(d)
+        except OSError, err:
+            print " -makedirs exception: %s" % err
+
+def capture(path):
     cmd = '/usr/bin/find %s -type f -ls' % path
     pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
     print " -capturing overview of path: %s \n%s" % (os.path.abspath(path), pop.communicate()[0])
 
-##
-# @brief 1/Register (testing) wd, 2/Add mockup, 3/Check duplical file/s
+def test_uc0():
+    '''Smoke Test
+    @brief 1/Add dir/s stru, 2/Mount FS
+    '''
+    mkdirp(os.path.join(Config.srcd, 'a'), os.path.join(Config.srcd, 'b'))
+    mkdirp(os.path.join(Config.outroot, Config.db))
+
 def test_uc1():
-    '''Use case 1'''
-    srcd = '/tmp/dev/scwd'
-    outroot = os.path.expanduser('~/mnt/cat1')
+    '''Use case 1
+    @brief 1/Register (testing) wd, 2/Add mockup, 3/Check duplical file/s'''
     Config.adname = 'WD_UC1'
 
-    Config.load(wd=srcd)
-    scatfs('-s -o database=~/.scfs/cat1.db ~/mnt/cat1')
+    Config.load(wd=Config.srcd)
     echo('123', ofile='a/123')
     echo('321', ofile='a/321')
     echo('123', ofile='b/123')
+    scatman('-s -o database=~/.scfs/cat1.db ~/mnt/cat1')
     Config.unload()
 
-    Config.load(wd=outroot)
+    Config.load(wd=Config.outroot)
     f123 = {}
     f123['st_nlink'] = os.stat(Config.adname + '/a/123')[ST_NLINK]
-    cap('.')
+    capture('.')
     print " -got nlink: %s ( -exp: %s )" % (f123['st_nlink'], 2)
     assert f123['st_nlink'] == 2
     Config.unload()
 
-def like_tc2():
+def test_uc2():
+    '''Use case 2
+    @brief 1/UC1, 2/Add Insertion, 3/Check tree graph'''
+    Config.adname = 'WD_UC1'
+
+    Config.load(wd=Config.srcd)
+    userPoint = os.path.join(Config.srcd, 'b', 'bb')
+    mkdirp(userPoint, os.path.join(userPoint, 'bbb'))
+    echo('234', ofile='b/bb/bbb/234')
+    scatman('-s -o database=~/.scfs/cat1.db ~/mnt/cat1',
+            mountPoint = userPoint,
+            cont=True)
+    Config.unload()
+
+    Config.load(wd=Config.outroot)
+    f123 = {}
+    f123['st_nlink'] = os.stat(Config.adname + '/a/123')[ST_NLINK]
+    capture('.')
+    print " -got nlink: %s ( -exp: %s )" % (f123['st_nlink'], 2)
+    assert f123['st_nlink'] == 2
+    Config.unload()
+
+def like_tc_l2():
     ''' Check add around broken links:
     scfs> scatman add . CD_1 ~/.scfs/cat1.db
     -Error: [Errno 2] No such file or directory: '/home/p-b/text/scfs/lib/Cdcatfs~' '''

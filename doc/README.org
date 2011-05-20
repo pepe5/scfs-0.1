@@ -6,9 +6,7 @@
 # Hi-lock: (("'[^']+'\\|\"[^\"]+\"" (0 (quote font-lock-string-face) t))) ;"
 
 * TODO
-** [#A] separate cdcat & scat file holders
-   [[file:~/text/scfs/lib/scatfs::/from%20Cdcatfs.utils%20import%20CacheDict/][scatfs::/from *Cdcatfs*.utils import CacheDict/]]
-
+** print " -makedirs exception: %s" % err >> test exception instead
 ** move Cdcatfs (Case Conflict 1)
    (that symln -> /usr/local/lib/python2.6/dist-packages/Cdcatfs)
    to other place than cdcatfs exe
@@ -180,6 +178,7 @@ for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd',
 ** <<UC2.2>> insert 1 file (non-directory)
 
 ** insert UC/s cmp
+*** 
    1. add '/tmp/dev/scwd/b' Tbl (of '/tmp/dev/scwd') [[UC2]] for new; [[UC3]] for update!
    2. add '/tmp/dev' Tbl (of '/tmp/dev/scwd') [[UC4]] » re-id Tbl root to longest common: '/tmp/dev'
      - add '/tmp/d' Tbl (of '/tmp/dev/scwd') ([[UC4]]) » re-id Tbl root to longest common: '/tmp' but inside only those 2 branches
@@ -202,6 +201,7 @@ for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd',
      INSERT INTO CDs (label, mountPoint)
      SELECT 'WD_2', '/zzz'
      WHERE NOT EXISTS (SELECT 1 FROM CDs WHERE label = 'WD_2');
+
 
 ** <<UC3>> insert -- update existing
 
@@ -286,6 +286,8 @@ for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd',
 
 
 * DONE
+** separate cdcat & scat file holders
+   [[file:~/text/scfs/lib/scatfs::/from%20Cdcatfs.utils%20import%20CacheDict/][scatfs::/from *Cdcatfs*.utils import CacheDict/]]
 ** subprocess.Popen repr differs in py25 & py26 ?!
    -cleaning wd table: <subprocess.Popen object at 0xb7aceb8c>
    -> DONE by pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
