@@ -23,14 +23,15 @@ class DirectoryWalker:
 		self.index = 0
 		self.pathPrefix = directory #marked for deletion
 		self.prefixLen = len(directory)+1
-		self.fileId = 0	#current file id
 		self.parentId = 0	#parent id
+		self.fileId = 0	#current file id
+		self.startId = 1 	#root id
 
 		if 'startAt' in opts: #all following must be supplied in this case
-			self.pathPrefix = opts['mountPoint']
 			self.parentId = opts['parentId']
+			self.directory = opts['startAbs']
 			self.fileId = opts['lastId']
-			self.directory = opts['startAt']
+			self.startId = self.fileId+1
 
 
 	def __getitem__(self, index):
@@ -53,7 +54,7 @@ class DirectoryWalker:
 				#fullname = fullname[self.prefixLen:]
 				#ugly warkaround. It would return the full path of the directory
 				#given as parameter
-				if(self.fileId ==1):
+				if(self.fileId == self.startId):
 					file = file[self.prefixLen:]
 				return (file,stats,self.fileId,self.parentId)
 

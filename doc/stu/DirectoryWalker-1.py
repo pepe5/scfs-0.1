@@ -17,4 +17,4 @@ for k,v in kw.iteritems():
 print ' -opts: %s' % opts
 
 for (fname,stats,fileId,parentId) in DirectoryWalker (basedir,opts):
-  print fname, fileId, parentId
+  print fileId, parentId, fname

@@ -43,6 +43,7 @@ class CatalogCreator:
             walkerOpts['parentId'] = self.parentId
             walkerOpts['lastId'] = self.lastId
             walkerOpts['startAt'] = self.startAt
+            walkerOpts['startAbs'] = self.startAbs
             sys.stdout.write(" -run startAt will be soon..\n")
 
         for (fileName,stats,fileId,parentId) in\
@@ -76,6 +77,7 @@ class CatalogCreator:
             rows = cur.fetchall()
             if len(rows)>0 :
                 
+                self.startAbs = self.__mountPoint
                 sys.stdout.write("Label exists. Trying add onto existing mountPoint\n")
                 server = CDCatFS(version="%prog " + fuse.__version__,
                      usage='', dash_s_do='setsingle')

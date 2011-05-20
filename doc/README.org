@@ -78,6 +78,8 @@
 
 *** setup
     :cleanup: rm -vr /tmp/dev/scwd/b/bb
+    scatman d WD_2 ~/.scfs/cat1.db
+    
     :setup: scfs> scatman add /tmp/dev/scwd/ WD_2 ~/.scfs/cat1.db
     scfs> sqlite3 ~/.scfs/cat1.db 'select * from WD_2_files'
     1|0||16877|4|1000|1000|4096|1305837230|1305836661|1305836661
@@ -113,6 +115,12 @@
       NotImplementedError
 
 *** from Scfs.DirectoryWalker import DirectoryWalker
+for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd',
+    {'parentId':2, 'lastId':6, 'startAbs':'/tmp/dev/scwd/b/bb'}):
+  print fileId, parentId, fname
+
+<<
+   from Scfs.DirectoryWalker import DirectoryWalker
    for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd/'):
      print fname, fileId, parentId
 
@@ -154,6 +162,8 @@
     123 10 8
 
 
+
+** <<UC2.2>> insert 1 file (non-directory)
 
 ** insert UC/s cmp
    1. add '/tmp/dev/scwd/b' Tbl (of '/tmp/dev/scwd') [[UC2]] for new; [[UC3]] for update!
