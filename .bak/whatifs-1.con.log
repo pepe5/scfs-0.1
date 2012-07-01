@@ -1,0 +1,274 @@
+
+tmp> cd ~/text/scfs
+scfs> git pull
+Already up-to-date.
+
+scfs> nosetests lib/ -v
+Use case 1 ... ERROR
+======================================================================
+ERROR: Use case 1
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/pymodules/python2.6/nose/case.py", line 183, in runTest
+    self.test(*self.arg)
+  File "/home/p-b/Dropbox/dev scfs/lib/tests/test_nose.py", line 61, in test_uc1
+    Config.load(wd=srcd)
+  File "/home/p-b/Dropbox/dev scfs/lib/tests/test_nose.py", line 18, in load
+    os.chdir(kwargs['wd'])
+OSError: [Errno 2] No such file or directory: '/tmp/dev/scwd'
+----------------------------------------------------------------------
+Ran 1 test in 0.073s
+FAILED (errors=1)
+
+scfs> install -v -d /tmp/dev/scwd/a /tmp/dev/scwd/b
+install: creating directory `/tmp/dev'
+install: creating directory `/tmp/dev/scwd'
+install: creating directory `/tmp/dev/scwd/a'
+install: creating directory `/tmp/dev/scwd/b'
+
+scfs> nosetests lib/ -v
+Use case 1 ... ERROR
+
+======================================================================
+ERROR: Use case 1
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/pymodules/python2.6/nose/case.py", line 183, in runTest
+    self.test(*self.arg)
+  File "/home/p-b/Dropbox/dev scfs/lib/tests/test_nose.py", line 62, in test_uc1
+    scatfs('-s -o database=~/.scfs/cat1.db ~/mnt/cat1')
+  File "/home/p-b/Dropbox/dev scfs/lib/tests/test_nose.py", line 37, in scatfs
+    pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
+  File "/usr/lib/python2.6/subprocess.py", line 633, in __init__
+    errread, errwrite)
+  File "/usr/lib/python2.6/subprocess.py", line 1139, in _execute_child
+    raise child_exception
+OSError: [Errno 2] No such file or directory
+-------------------- >> begin captured stdout << ---------------------
+ -vfs mount point: ~/mnt/cat1
+ -registering (blind dir) at: /tmp/dev/scwd
+ -into arch.fld: WD_UC1
+--------------------- >> end captured stdout << ----------------------
+----------------------------------------------------------------------
+Ran 1 test in 0.038s
+FAILED (errors=1)
+
+scfs> ll ~/.scfs/
+total 16
+drwxr-xr-x  2 p-b p-b 4096 2011-05-15 21:54 ./
+drwxr-xr-x 79 p-b p-b 4096 2011-05-19 18:06 ../
+-rw-r--r--  1 p-b p-b 7168 2011-05-15 21:54 cat1.db
+
+scfs> ll ~/mnt/cat1
+total 8
+drwxr-xr-x 2 p-b p-b 4096 2011-05-14 17:35 ./
+drwxr-xr-x 3 p-b p-b 4096 2011-05-14 17:35 ../
+
+scfs> scatfs -s -o database=~/.scfs/cat1.db ~/mnt/cat1
+scatfs: command not found
+
+scfs> pushd /usr/lib/python2.5/site-packages/ && pakSite=`pwd` && popd
+    pushd /usr/local/lib/python2.6/dist-packages && pakSite=`pwd` && popd
+bash: pushd: /usr/lib/python2.5/site-packages/: No such file or directory
+scfs> /usr/local/lib/python2.6/dist-packages ~/text/scfs
+~/text/scfs
+
+scfs> sudo install -v -d $pakSite/Scfs
+[sudo] password for p-b: 
+install: creating directory `/usr/local/lib/python2.6/dist-packages/Scfs'
+scfs> sudo ln -sv -bf `pwd`/lib/Cat*.py `pwd`/lib/Dir*.py $pakSite/Scfs/
+    sudo ln -sv -bf `pwd`/lib/scatfs $pakSite/Scfs/ScatServices.py
+    echo | sudo tee /usr/local/lib/python2.6/dist-packages/Scfs/__init__.py
+    sudo cp -v $pakSite/Cdcatfs/utils.py $pakSite/Scfs
+`/usr/local/lib/python2.6/dist-packages/Scfs/CatalogCreator.py' -> `/home/p-b/text/scfs/lib/CatalogCreator.py'
+`/usr/local/lib/python2.6/dist-packages/Scfs/DirectoryWalker.py' -> `/home/p-b/text/scfs/lib/DirectoryWalker.py'
+scfs> `/usr/local/lib/python2.6/dist-packages/Scfs/ScatServices.py' -> `/home/p-b/text/scfs/lib/scatfs'
+scfs> 
+scfs> `/usr/local/lib/python2.6/dist-packages/Cdcatfs/utils.py' -> `/usr/local/lib/python2.6/dist-packages/Scfs/utils.py'
+
+scfs> python lib/scatfs -s -o database=~/.scfs/cat1.db ~/mnt/cat1
+scfs> nosetests lib/ -v
+Use case 1 ... ERROR
+
+======================================================================
+ERROR: Use case 1
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/pymodules/python2.6/nose/case.py", line 183, in runTest
+    self.test(*self.arg)
+  File "/home/p-b/Dropbox/dev scfs/lib/tests/test_nose.py", line 62, in test_uc1
+    scatfs('-s -o database=~/.scfs/cat1.db ~/mnt/cat1')
+  File "/home/p-b/Dropbox/dev scfs/lib/tests/test_nose.py", line 37, in scatfs
+    pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
+  File "/usr/lib/python2.6/subprocess.py", line 633, in __init__
+    errread, errwrite)
+  File "/usr/lib/python2.6/subprocess.py", line 1139, in _execute_child
+    raise child_exception
+OSError: [Errno 2] No such file or directory
+-------------------- >> begin captured stdout << ---------------------
+ -vfs mount point: ~/mnt/cat1
+ -registering (blind dir) at: /tmp/dev/scwd
+ -into arch.fld: WD_UC1
+--------------------- >> end captured stdout << ----------------------
+----------------------------------------------------------------------
+Ran 1 test in 0.020s
+FAILED (errors=1)
+
+scfs> ll ~/mnt/cat1
+total 4
+drwxr-xr-x 2 root root    0 1970-01-01 01:00 ./
+drwxr-xr-x 3 p-b  p-b  4096 2011-05-14 17:35 ../
+drwxr-xr-x 2 root root    0 1970-01-01 01:00 CD_1/
+
+
+scfs> cdcatman
+cdcatman: command not found
+
+scfs> which cdcatman
+scfs> PATH=$PATH:/usr/local/bin
+scfs> which cdcatman
+scfs> whereis cdcatman
+cdcatman: /usr/local/bin/cdcatman
+
+scfs> ll /usr/local/bin/cdcatman
+lrwxrwxrwx 1 root root 32 2011-05-15 17:01 /usr/local/bin/cdcatman -> /home/p-b/text/scfs/lib/cdcatman
+
+scfs> sudo ln -sv /home/p-b/text/scfs/lib/scatman  /usr/local/bin/
+[sudo] password for p-b: 
+`/usr/local/bin/scatman' -> `/home/p-b/text/scfs/lib/scatman'
+
+scfs> sudo ln -sv /home/p-b/text/scfs/lib/scatfs  /usr/local/bin/
+`/usr/local/bin/scatfs' -> `/home/p-b/text/scfs/lib/scatfs'
+
+scfs> ll /usr/local/bin/scatfs 
+lrwxrwxrwx 1 root root 30 2011-05-19 22:50 /usr/local/bin/scatfs -> /home/p-b/text/scfs/lib/scatfs
+
+scfs> ll -L /usr/local/bin/scatfs 
+-rw-r--r-- 1 p-b p-b 9961 2011-05-19 09:10 /usr/local/bin/scatfs
+
+scfs> scatfs
+bash: /usr/local/bin/scatfs: Permission denied
+
+scfs> scatman
+bash: /usr/local/bin/scatman: Permission denied
+
+scfs> scatman
+
+Not enouth arguments.
+
+Usage: /usr/local/bin/scatman add <CDMountPoint> <CDLabel> <dbfile>
+       /usr/local/bin/scatman del <CDLabel> <dbfile>
+       /usr/local/bin/scatman help
+
+
+scfs> nosetests lib/ -v
+Use case 1 ... Error: Label doesn't exist.
+Traceback (most recent call last):
+  File "/usr/local/bin/scatman", line 88, in <module>
+    catCreator = CatalogCreator(dbFile, mountPoint, CDLabel)
+  File "/usr/local/lib/python2.6/dist-packages/Scfs/CatalogCreator.py", line 33, in __init__
+    self.__initDb();
+  File "/usr/local/lib/python2.6/dist-packages/Scfs/CatalogCreator.py", line 117, in __initDb
+    cur.execute(statement)
+pysqlite2.dbapi2.OperationalError: table CDs has no column named mountPoint
+ERROR
+
+======================================================================
+ERROR: Use case 1
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/pymodules/python2.6/nose/case.py", line 183, in runTest
+    self.test(*self.arg)
+  File "/home/p-b/Dropbox/dev scfs/lib/tests/test_nose.py", line 70, in test_uc1
+    f123['st_nlink'] = os.stat(Config.adname + '/a/123')[ST_NLINK]
+OSError: [Errno 22] Invalid argument: 'WD_UC1/a/123'
+-------------------- >> begin captured stdout << ---------------------
+ -vfs mount point: ~/mnt/cat1
+ -registering (blind dir) at: /tmp/dev/scwd
+ -into arch.fld: WD_UC1
+ -cleaning wd table: 
+ -adding wd table: 
+--------------------- >> end captured stdout << ----------------------
+----------------------------------------------------------------------
+Ran 1 test in 0.157s
+FAILED (errors=1)
+
+scfs> rm -v ~/.scfs/cat1.db 
+removed `/home/p-b/.scfs/cat1.db'
+
+scfs> nosetests lib/ -v
+Use case 1 ... Error: Database not found.
+ERROR
+
+======================================================================
+ERROR: Use case 1
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/pymodules/python2.6/nose/case.py", line 183, in runTest
+    self.test(*self.arg)
+  File "/home/p-b/Dropbox/dev scfs/lib/tests/test_nose.py", line 70, in test_uc1
+    f123['st_nlink'] = os.stat(Config.adname + '/a/123')[ST_NLINK]
+OSError: [Errno 22] Invalid argument: 'WD_UC1/a/123'
+-------------------- >> begin captured stdout << ---------------------
+ -vfs mount point: ~/mnt/cat1
+ -registering (blind dir) at: /tmp/dev/scwd
+ -into arch.fld: WD_UC1
+ -cleaning wd table: 
+ -adding wd table: 
+--------------------- >> end captured stdout << ----------------------
+----------------------------------------------------------------------
+Ran 1 test in 1.283s
+FAILED (errors=1)
+
+scfs> rm -v ~/.scfs/cat1.db 
+removed `/home/p-b/.scfs/cat1.db'
+
+scfs> nosetests lib/ -v
+Use case 1 ... ERROR
+
+======================================================================
+ERROR: Use case 1
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/pymodules/python2.6/nose/case.py", line 183, in runTest
+    self.test(*self.arg)
+  File "/home/p-b/Dropbox/dev scfs/lib/tests/test_nose.py", line 62, in test_uc1
+    scatfs('-s -o database=~/.scfs/cat1.db ~/mnt/cat1')
+  File "/home/p-b/Dropbox/dev scfs/lib/tests/test_nose.py", line 37, in scatfs
+    pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
+  File "/usr/lib/python2.6/subprocess.py", line 633, in __init__
+    errread, errwrite)
+  File "/usr/lib/python2.6/subprocess.py", line 1139, in _execute_child
+    raise child_exception
+OSError: [Errno 2] No such file or directory
+-------------------- >> begin captured stdout << ---------------------
+ -vfs mount point: ~/mnt/cat1
+ -registering (blind dir) at: /tmp/dev/scwd
+ -into arch.fld: WD_UC1
+--------------------- >> end captured stdout << ----------------------
+----------------------------------------------------------------------
+Ran 1 test in 0.030s
+FAILED (errors=1)
+
+scfs> sudo umount ~/mnt/cat1/
+[sudo] password for p-b: 
+
+scfs> python lib/scatfs -s -o database=~/.scfs/cat1.db ~/mnt/cat1
+Database not found.
+
+scfs> scatman add doc/ CD_1 ~/.scfs/cat1.db
+scfs> scatfs -s -o database=~/.scfs/cat1.db ~/mnt/cat1
+scfs> ll ~/mnt/cat1
+total 4
+drwxr-xr-x 2 root root    0 1970-01-01 01:00 ./
+drwxr-xr-x 3 p-b  p-b  4096 2011-05-14 17:35 ../
+drwxr-xr-x 2 root root    0 1970-01-01 01:00 CD_1/
+
+scfs> nosetests lib/ -v
+Use case 1 ... Error: Label doesn't exist.
+ok
+----------------------------------------------------------------------
+Ran 1 test in 1.323s
+OK
+
+scfs> 
