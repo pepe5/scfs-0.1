@@ -234,7 +234,22 @@ for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd',
 *** have both cdcat & scat on 1 env; test difference/s
 
 
+* XATTR PART
+** gvfs-info ~ info
+   $> (echo .mode line; echo "select * from WD_UC2_files where fileName = 'c1';") | sqlite3 ~/.scfs/cat1.db
+
+** stu setup
+   - [[xattr stu]]
+
+
 * STU
+** query iface grep-find~
+   - $> find $d -type f | while read L; do echo '' -$L:; locate "$L" | while read F; do ls -lid "$F"; done; done
+
+** xattr stu
+   - $> setfattr -n user.do_i_own -v "YES" /tmp/dev/scwd/c1
+   - $> gvfs-info /tmp/dev/scwd | grep xattr
+
 ** TODO fuse args
    server.parser.parse_args(['-o database=/home/user/.scfs/cat1.db'])
    server.parse(values=server)
