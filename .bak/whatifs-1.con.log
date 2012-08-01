@@ -70,7 +70,11 @@ scatfs: command not found
 scfs> pushd /usr/lib/python2.5/site-packages/ && pakSite=`pwd` && popd
     pushd /usr/local/lib/python2.6/dist-packages && pakSite=`pwd` && popd
 bash: pushd: /usr/lib/python2.5/site-packages/: No such file or directory
+<<<<<<< HEAD
 scfs> /usr/local/lib/python2.6/dist-packages ~/text/scfs
+=======
+/usr/local/lib/python2.6/dist-packages ~/text/scfs
+>>>>>>> da1458b3cf38ae223cd6ce81c100bfc7bfb7e888
 ~/text/scfs
 
 scfs> sudo install -v -d $pakSite/Scfs
@@ -82,9 +86,14 @@ scfs> sudo ln -sv -bf `pwd`/lib/Cat*.py `pwd`/lib/Dir*.py $pakSite/Scfs/
     sudo cp -v $pakSite/Cdcatfs/utils.py $pakSite/Scfs
 `/usr/local/lib/python2.6/dist-packages/Scfs/CatalogCreator.py' -> `/home/p-b/text/scfs/lib/CatalogCreator.py'
 `/usr/local/lib/python2.6/dist-packages/Scfs/DirectoryWalker.py' -> `/home/p-b/text/scfs/lib/DirectoryWalker.py'
+<<<<<<< HEAD
 scfs> `/usr/local/lib/python2.6/dist-packages/Scfs/ScatServices.py' -> `/home/p-b/text/scfs/lib/scatfs'
 scfs> 
 scfs> `/usr/local/lib/python2.6/dist-packages/Cdcatfs/utils.py' -> `/usr/local/lib/python2.6/dist-packages/Scfs/utils.py'
+=======
+`/usr/local/lib/python2.6/dist-packages/Scfs/ScatServices.py' -> `/home/p-b/text/scfs/lib/scatfs'
+`/usr/local/lib/python2.6/dist-packages/Cdcatfs/utils.py' -> `/usr/local/lib/python2.6/dist-packages/Scfs/utils.py'
+>>>>>>> da1458b3cf38ae223cd6ce81c100bfc7bfb7e888
 
 scfs> python lib/scatfs -s -o database=~/.scfs/cat1.db ~/mnt/cat1
 scfs> nosetests lib/ -v
