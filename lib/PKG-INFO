@@ -1,0 +1,23 @@
+Metadata-Version: 1.0
+Name: scatfs
+Version: 0.1.0
+Summary: Catalog Filesystem using FUSE
+Author: Josef Kral
+Author-email: pepe5@email.cz
+License: GNU General Public License (GPL)
+Description: Scatfs (Catalog Filesystem) is a tool that allows one to create a
+	     file catalog from a mounted (or otherwise any directory) and later
+	     mount that catolog and explore it. The program provide mapping of
+	     number of catalogized files onto st_nlink file attribute. The catalog
+	     is stored as a SQLite database and the filesystem is implemented using
+	     FUSE.
+Platform: UNKNOWN
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Environment :: Console
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: License :: OSI Approved :: GNU General Public License (GPL)Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python
+Classifier: Natural Language :: English
+Classifier: Topic :: Database :: Front-Ends
+Classifier: Topic :: System :: Filesystems
+Classifier: Topic :: Utilities

@@ -2,148 +2,347 @@
 ;; --------------------------------------------------------------------------
 ;; Desktop File for Emacs
 ;; --------------------------------------------------------------------------
-;; Created Sun May 15 12:08:32 2011
+;; Created Mon Jun  6 08:36:32 2011
 ;; Desktop file format version 206
-;; Emacs version 23.1.1
+;; Emacs version 23.2.1
 
 ;; Global section:
 (setq desktop-missing-file-warning nil)
 (setq tags-file-name nil)
 (setq tags-table-list nil)
-(setq search-ring '("commi" "\n\n" "getw" "def" "\n\n>" "\n\n" "nlink" "s_nlink" "link" "pri" " " ".si" " " "\n\n" " " "\n\nscfs"))
-(setq regexp-search-ring '("\n[ 	]*\n" "[^.]\\.[^.]\\|test" "\\.\\|test" "\n[ 	]*\n"))
+(setq search-ring '(" sc" ".gi" " log" "pep" " te" " tex" "/" "Dro" "\n\n" "ilo" "ra" "ssh '" "ssh 1" "si" "data from cat" "ssh "))
+(setq regexp-search-ring '("\n[ 	]*\n" "xwi" "apti" "git c" "git" "git c" "git" "status" "\n[ 	]*\n" "nose" " d " " add " " d " "\n[ 	]*\n" "nose" "\n[ 	]*\n"))
 (setq register-alist nil)
+(setq file-name-history '("~/Dropbox/dev py-stu/" "~/text/log/" "/jubiler:/home2/kraljo/text/" "~/text/log" "~/text/" "~/Dropbox/dev py-stu/" "/jubiler:/home2/kraljo/text/" "/jubiler:/home2/kraljo/text/script.py" "/jubiler:/home2/kraljo/" "/mnt/pixu/home/kraljo/" "/home/kraljo/Dropbox/dev py-stu" "/tmp/sshco.py" "/tmp/sshsimpleclient.py" "/host/temp/smsc.docs/SIP/SMSC_53_SIP_Installation_Manual~from-michalm-eml.txt" "~/text/oo-ed/pyuno-stu.py" "/tmp/dev/" "~/text/" "~/Dropbox/" "~/text/" "/tmp/dev/" "*scratch*" "*scrach*" "*scratch*" "~/text/trac-dot/showworkflow" "/home/kraljo/text/trac-dot/workflow_parser.py" "~/text/trac-dot/" "/home/kraljo/Dropbox/B-P/trac-env/conf/trac~.ini,v" "/home/kraljo/Dropbox/B-P/trac-env/conf/trac.ini~,v" "~/text/trac-dot/" "~/text/trac-dot"))
 
 ;; Buffer section -- buffers listed in same order as in buffer list:
 (desktop-create-buffer 206
-  "/tmp/*shell*"
+  "/tmp/dev/*shell*"
   "*shell*"
   'shell-mode
   nil
-  34916
-  '(34791 nil)
+  46000
+  '(45990 nil)
   nil
   nil
   '((show-trailing-whitespace) (buffer-file-coding-system . utf-8-unix) (truncate-lines . t)))
 
 (desktop-create-buffer 206
-  "/home/p-b/text/scfs/doc/README.org"
-  "README.org"
-  'org-mode
   nil
-  638
-  '(1732 nil)
+  "text"
+  'dired-mode
+  nil
+  2980
+  '(2221 nil)
   t
-  nil
-  '((show-trailing-whitespace) (buffer-file-coding-system . undecided-unix) (truncate-lines . t)))
+  '("/home/kraljo/text/" "/home/kraljo/text/log/" "/home/kraljo/text/oo-ed/")
+  nil)
 
 (desktop-create-buffer 206
-  "/home/p-b/text/scfs/lib/tests/test_nose.py"
-  "test_nose.py"
+  nil
+  "kraljo"
+  'dired-mode
+  nil
+  1928
+  '(1986 nil)
+  t
+  '("/scp:jubiler:/home2/kraljo/" "/scp:jubiler:/home2/kraljo/text/" "/scp:jubiler:/home2/kraljo/text/log/" "/scp:jubiler:/home2/kraljo/text/log/lib/" "/scp:jubiler:/home2/kraljo/text/log/lib/app/")
+  nil)
+
+(desktop-create-buffer 206
+  "/home/kraljo/Dropbox/dev py-stu/headings-lister.py"
+  "headings-lister.py"
   'python-mode
   nil
-  862
-  '(839 nil)
+  1
+  '(1131 nil)
+  t
+  nil
+  '((show-trailing-whitespace) (tab-width . 8) (indent-tabs-mode) (buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/tmp/sshco.py"
+  "sshco.py"
+  'python-mode
+  nil
+  3566
+  '(97 nil)
+  nil
+  nil
+  '((show-trailing-whitespace) (tab-width . 8) (indent-tabs-mode) (buffer-file-coding-system . undecided-unix)))
+
+(desktop-create-buffer 206
+  "/tmp/dev/*scratch*"
+  "*scratch*"
+  'fundamental-mode
+  nil
+  345
+  '(160 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  "/tmp/dev/trac.con.log"
+  "trac.con.log"
+  'shell-mode
+  nil
+  335518
+  '(318059 nil)
+  nil
+  nil
+  '((show-trailing-whitespace) (buffer-file-coding-system . utf-8-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  "/home/kraljo/text/oo-ed/pyuno-stu.py"
+  "pyuno-stu.py"
+  'python-mode
+  nil
+  1
+  '(238 nil)
+  t
+  nil
+  '((show-trailing-whitespace) (tab-width . 8) (indent-tabs-mode) (buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/home/kraljo/text/trac-dot/trac.ini"
+  "trac.ini"
+  'conf-unix-mode
+  '(auto-revert-mode)
+  1
+  '(5582 nil)
+  t
+  nil
+  '((show-trailing-whitespace) (buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/home/kraljo/Dropbox/B-P/trac-env/conf/trac.dot"
+  "trac.dot"
+  'sh-mode
+  '(auto-revert-mode)
+  1
+  '(1 nil)
+  t
+  nil
+  '((buffer-file-coding-system . undecided-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  "/home/kraljo/text/trac-dot/workflow_parser.py"
+  "workflow_parser.py"
+  'python-mode
+  nil
+  1
+  '(1645 nil)
   t
   nil
   '((tab-width . 8) (indent-tabs-mode) (buffer-file-coding-system . undecided-unix)))
 
 (desktop-create-buffer 206
-  "/tmp/scfs >"
-  "scfs >"
-  'shell-mode
+  "/home/kraljo/Dropbox/B-P/trac-env/conf/trac-stu.conf"
+  "trac-stu.conf"
+  'conf-unix-mode
   nil
-  54459
-  '(53997 nil)
+  1
+  '(1 nil)
   nil
   nil
-  '((show-trailing-whitespace) (buffer-file-coding-system . utf-8-unix) (truncate-lines . t)))
+  '((buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/usr/share/doc/trac/contrib/workflow/trivial-workflow.ini"
+  "trivial-workflow.ini"
+  'conf-windows-mode
+  '(view-mode)
+  1
+  '(1 nil)
+  t
+  nil
+  '((buffer-file-coding-system . undecided-unix)))
 
 (desktop-create-buffer 206
   nil
-  "~"
+  "workflow"
   'dired-mode
   nil
-  1690
-  '(1 nil)
+  535
+  '(nil nil)
   t
-  '("/home/p-b/" "/home/p-b/text/" "/home/p-b/text/scfs/" "/home/p-b/text/scfs/doc/" "/home/p-b/text/scfs/lib/" "/home/p-b/text/scfs/lib/tests/" "/home/p-b/text/scfs/test.in/")
-  '((truncate-lines . t)))
-
-(desktop-create-buffer 206
-  nil
-  "dev"
-  'dired-mode
-  nil
-  172
-  '(1 nil)
-  t
-  '("/tmp/dev/" "/tmp/dev/nose-demo-latest/" "/tmp/dev/nose-demo-latest/basic/" "/tmp/dev/nose-demo-latest/basic/app_package/" "/tmp/dev/nose-demo-latest/basic/tests/" "/tmp/dev/nose-demo-latest/tests/")
+  '("/usr/share/doc/trac/contrib/workflow/")
   nil)
 
 (desktop-create-buffer 206
+  "/home/kraljo/Dropbox/B-P/my-confs/.emacs"
+  ".emacs"
+  'emacs-lisp-mode
   nil
-  "a8"
-  'dired-mode
-  nil
-  1355
+  1
   '(1 nil)
   t
-  '("/mnt/a8/" "/mnt/a8/pepa/" "/mnt/a8/pepa/=!arx+bak/=5ec/" "/mnt/a8/programy/")
-  '((truncate-lines . t)))
+  nil
+  '((buffer-file-coding-system . utf-8-unix) (truncate-lines . t)))
 
 (desktop-create-buffer 206
+  "/home/kraljo/Dropbox/B-P/trac-env/conf/trac.ps"
+  "trac.ps"
+  'ps-mode
+  '(doc-view-minor-mode)
+  1
+  '(2145 nil)
   nil
-  "programy"
-  'dired-mode
   nil
-  1977
-  '(1 nil)
+  '((buffer-file-coding-system . undecided-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  "/home/kraljo/text/scfs/doc/README.org"
+  "README.org"
+  'org-mode
+  '(hi-lock-mode)
+  1
+  '(3213 nil)
   t
-  '("/mnt/a8/programy/" "/mnt/a8/programy/Pharo/" "/mnt/a8/programy/Pharo/bin/" "/mnt/a8/programy/Pharo/lib/" "/mnt/a8/programy/Pharo/lib/squeak/" "/mnt/a8/programy/Pharo/lib/squeak/3.11.3-2135/" "/mnt/a8/programy/Pharo/package-cache/")
-  '((truncate-lines . t)))
-
-(desktop-create-buffer 206
   nil
-  "kraljo-desktop"
-  'dired-mode
-  nil
-  70
-  '(nil nil)
-  t
-  '("/mnt/kraljo-desktop/")
-  nil)
-
-(desktop-create-buffer 206
-  "/tmp/nose-demo.tar.gz"
-  "nose-demo.tar.gz"
-  'tar-mode
-  nil
-  37
-  '(nil nil)
-  nil
-  nil
-  '((buffer-file-coding-system . no-conversion) (truncate-lines . t)))
+  '((show-trailing-whitespace . t) (buffer-file-coding-system . utf-8-unix) (overwrite-mode) (truncate-lines . t)))
 
 (desktop-create-buffer 206
   nil
   "*Find*"
   'dired-mode
   nil
-  1558
-  '(1 nil)
+  154
+  '(131 nil)
   t
-  '("/tmp/dev/")
-  '((truncate-lines . t)))
+  '("/home/kraljo/Dropbox/")
+  nil)
 
 (desktop-create-buffer 206
-  "/mnt/a8/tmp/cdcatfs-0.1.5.tar.gz"
-  "cdcatfs-0.1.5.tar.gz"
-  'tar-mode
   nil
-  37
+  "Downloads"
+  'dired-mode
+  nil
+  135
   '(nil nil)
+  t
+  '("/home/kraljo/Downloads/")
+  nil)
+
+(desktop-create-buffer 206
+  nil
+  "dev"
+  'dired-mode
+  nil
+  117
+  '(792 nil)
+  t
+  '("/tmp/dev/" "/tmp/dev/py-htfilter-2.dev/" "/tmp/dev/py-htfilter-2.dev/cache/")
+  nil)
+
+(desktop-create-buffer 206
+  "/tmp/projects/sip,sup/SIP_CRS.htm"
+  "SIP_CRS.htm"
+  'html-mode
+  nil
+  1
+  '(327790 nil)
   nil
   nil
-  '((buffer-file-coding-system . no-conversion)))
+  '((buffer-file-coding-system . utf-8-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  nil
+  "tmp"
+  'dired-mode
+  nil
+  665
+  '(172 nil)
+  t
+  '("/tmp/")
+  nil)
+
+(desktop-create-buffer 206
+  "/home/kraljo/text/scfs/lib/CatalogCreator.py"
+  "CatalogCreator.py"
+  'python-mode
+  '(view-mode linum-mode)
+  1
+  '(3095 nil)
+  t
+  nil
+  '((show-trailing-whitespace) (tab-width . 8) (indent-tabs-mode) (buffer-file-coding-system . undecided-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  "/home/kraljo/text/scfs/lib/DirectoryWalker.py"
+  "DirectoryWalker.py"
+  'python-mode
+  nil
+  1
+  '(857 nil)
+  t
+  nil
+  '((show-trailing-whitespace) (tab-width . 8) (buffer-file-coding-system . undecided-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  nil
+  "scfs"
+  'dired-mode
+  nil
+  574
+  '(1156 nil)
+  t
+  '("/home/kraljo/text/scfs/" "/home/kraljo/text/scfs/doc/" "/home/kraljo/text/scfs/lib/" "/home/kraljo/text/scfs/lib/tests/")
+  nil)
+
+(desktop-create-buffer 206
+  "/usr/local/lib/python2.6/dist-packages/Cdcatfs/CatalogCreator.py"
+  "CatalogCreator.py<2>"
+  'python-mode
+  '(view-mode)
+  1
+  '(2444 nil)
+  t
+  nil
+  '((show-trailing-whitespace) (tab-width . 8) (indent-tabs-mode) (buffer-file-coding-system . undecided-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  "/home/kraljo/text/scfs/lib/tests/test_nose.py"
+  "test_nose.py"
+  'python-mode
+  '(view-mode)
+  1
+  '(1 nil)
+  t
+  nil
+  '((tab-width . 8) (indent-tabs-mode) (buffer-file-coding-system . undecided-unix)))
+
+(desktop-create-buffer 206
+  "/home/kraljo/text/scfs/doc/stu/DirectoryWalker-1.py"
+  "DirectoryWalker-1.py"
+  'python-mode
+  nil
+  1
+  '(287 nil)
+  t
+  nil
+  '((tab-width . 8) (indent-tabs-mode) (buffer-file-coding-system . undecided-unix)))
+
+(desktop-create-buffer 206
+  nil
+  "trac-dot"
+  'dired-mode
+  nil
+  304
+  '(1 nil)
+  t
+  '("/home/kraljo/text/trac-dot/")
+  nil)
+
+(desktop-create-buffer 206
+  nil
+  "dev py-stu"
+  'dired-mode
+  nil
+  134
+  '(nil nil)
+  t
+  '("/home/kraljo/Dropbox/dev py-stu/")
+  nil)
 
