@@ -72,17 +72,17 @@
 
 ** <<UC2>> insert (that simplest one)
 *** design: cp -r  /tmp/dev/scwd  /tmp/dev/scwd2
-    python lib/scatman del WD_UC2 ~/.scfs/cat1.sqlite
-    python lib/scatman add /tmp/dev/scwd WD_UC2 ~/.scfs/cat1.sqlite
+    python lib/scatman del WD_UC2 ~/.scfs/cat1.cdcat
+    python lib/scatman add /tmp/dev/scwd WD_UC2 ~/.scfs/cat1.cdcat
     echo 234 > /tmp/dev/scwd/b/234
-    python lib/scatman add /tmp/dev/scwd/b WD_UC2 ~/.scfs/cat1.sqlite
+    python lib/scatman add /tmp/dev/scwd/b WD_UC2 ~/.scfs/cat1.cdcat
 
 *** setup
     :cleanup: rm -vr /tmp/dev/scwd/b/bb
-    scatman d WD_2 ~/.scfs/cat1.sqlite
+    scatman d WD_2 ~/.scfs/cat1.cdcat
     
-    :setup: scfs> scatman add /tmp/dev/scwd/ WD_2 ~/.scfs/cat1.sqlite
-    scfs> sqlite3 ~/.scfs/cat1.sqlite 'select * from WD_2_files'
+    :setup: scfs> scatman add /tmp/dev/scwd/ WD_2 ~/.scfs/cat1.cdcat
+    scfs> sqlite3 ~/.scfs/cat1.cdcat 'select * from WD_2_files'
     1|0||16877|4|1000|1000|4096|1305837230|1305836661|1305836661
     2|1|b|16877|2|1000|1000|4096|1305847964|1305851133|1305851133
     3|1|a|16877|2|1000|1000|4096|1305838778|1305838705|1305838705
@@ -98,7 +98,7 @@
     install: creating directory `/tmp/dev/scwd/b/bb/bbb'
     scfs> `/tmp/dev/scwd/a/321' -> `/tmp/dev/scwd/b/bb/321'
 
-    :act: scfs> scatman add /tmp/dev/scwd/b/bb/ WD_2 ~/.scfs/cat1.sqlite
+    :act: scfs> scatman add /tmp/dev/scwd/b/bb/ WD_2 ~/.scfs/cat1.cdcat
     Label exists. Trying add onto existing mountPoint
     - from (common) -mountPoint: /tmp/dev/scwd
       -name< b, -pid: 1
@@ -222,8 +222,8 @@ for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd',
 
 *** mount
    install -v -d ~/.scfs ~/mnt/cat1
-   python lib/scatfs -d -s -o database=~/.scfs/cat1.sqlite ~/mnt/cat1
-#(<) cdcatfs -s -o database=~/.scfs/cat1.sqlite ~/mnt/cat1
+   python lib/scatfs -d -s -o database=~/.scfs/cat1.cdcat ~/mnt/cat1
+#(<) cdcatfs -s -o database=~/.scfs/cat1.cdcat ~/mnt/cat1
 
 *** add content
 <<<<<<< HEAD
@@ -234,11 +234,11 @@ for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd',
 **** front UC
 =======
 >>>>>>> da1458b3cf38ae223cd6ce81c100bfc7bfb7e888
-   cd ~/text/scfs; python lib/scatman add /tmp/dev/scwd WD_UC2 ~/.scfs/cat1.sqlite
-#*(<) cdcatman add doc/ CD_1 ~/.scfs/cat1.sqlite
+   cd ~/text/scfs; python lib/scatman add /tmp/dev/scwd WD_UC2 ~/.scfs/cat1.cdcat
+#*(<) cdcatman add doc/ CD_1 ~/.scfs/cat1.cdcat
    ls -l ~/mnt/cat1/CD_1
-   cdcatman list ~/.scfs/cat1.sqlite
-   sqlite3 ~/.scfs/cat1.sqlite .dump
+   cdcatman list ~/.scfs/cat1.cdcat
+   sqlite3 ~/.scfs/cat1.cdcat .dump
 
 ** dev tasks
 *** have both cdcat & scat on 1 env; test difference/s
@@ -246,7 +246,7 @@ for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd',
 
 * XATTR PART
 ** gvfs-info ~ info
-   $> (echo .mode line; echo "select * from WD_UC2_files where fileName = 'c1';") | sqlite3 ~/.scfs/cat1.sqlite
+   $> (echo .mode line; echo "select * from WD_UC2_files where fileName = 'c1';") | sqlite3 ~/.scfs/cat1.cdcat
 
 ** stu setup
    - [[xattr stu]]
@@ -264,7 +264,7 @@ for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd',
    - $> gvfs-info /tmp/dev/scwd | grep xattr
 
 ** TODO fuse args
-   server.parser.parse_args(['-o database=/home/user/.scfs/cat1.sqlite'])
+   server.parser.parse_args(['-o database=/home/user/.scfs/cat1.cdcat'])
    server.parse(values=server)
 
 ** print " -mounting to: %s" % Config.cdpoint
@@ -273,7 +273,7 @@ for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd',
     CDLabel = 'WD_UC1'
     fileId = 6
     name = '123'
-    con = sqlite.connect('/home/user/.scfs/cat1.sqlite')
+    con = sqlite.connect('/home/user/.scfs/cat1.cdcat')
     cmd = ("SELECT fid ,pid ,fileName, st_mode, count_name, st_uid, st_gid, st_size, st_atime, st_mtime, st_ctime " +
                            "FROM %s_files " +
                            "JOIN (SELECT fileName, COUNT(fileName) AS count_name FROM %s_files WHERE fileName='%s') AS Tbl2 " +
