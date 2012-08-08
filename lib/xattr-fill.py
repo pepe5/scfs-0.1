@@ -2,15 +2,21 @@ import os
 import sys
 from pysqlite2 import dbapi2 as sqlite
 
+filename = 'a'
+
 dbfile = os.path.expanduser ('~/.scfs/cat1.sqlite')
-cdlabel = 'WD_UC2'
 if not os.path.exists (dbfile):
     raise ValueError ('Database not found.')
 con = sqlite.connect (dbfile)
 cur = con.cursor ()
-cur.execute ("select fid,label from CDs where label = '%s'" % cdlabel)
+
+cdlabel = 'WD_UC2'
+cur.execute \
+    ("select * from %s where fileName = '%s'" %
+     (cdlabel+'_files', filename))
+
 rows = cur.fetchall()
-print 'label: fid: %s' % rows
+print 'attr/s of %s: %s' % (filename,rows)
 
 # while 1: 
 #    try:
