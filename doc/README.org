@@ -246,7 +246,18 @@ for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd',
 
 * XATTR PART
 ** gvfs-info ~ info
-   $> (echo .mode line; echo "select * from WD_UC2_files where fileName = 'c1';") | sqlite3 ~/.scfs/cat1.cdcat
+   - $> (echo .mode line; echo "select * from WD_UC2_files where fileName = 'c1';") | sqlite3 ~/.scfs/cat1.cdcat
+   - #> fid = 2
+     pid = 1
+     fileName = a
+     st_mode = 16877
+     st_nlink = 2
+     st_uid = 1000
+     st_gid = 1000
+     st_size = 4096
+     st_atime = 1341952183
+     st_mtime = 1341952183
+     st_ctime = 1341952183
 
 ** stu setup
    - [[xattr stu]]
