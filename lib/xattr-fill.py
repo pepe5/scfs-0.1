@@ -24,5 +24,19 @@ while 1:
     cur.execute \
         ("select * from %s where fileName = '%s'" %
          (cdlabel+'_files', filename))
-    rows = cur.fetchall()
-    print 'attr/s of %s: %s' % (filename,rows)
+    row1 = cur.fetchall () [0]
+    rowd = []
+    for k,v in zip (('fid',
+         'pid',
+         'fileName',
+         'st_mode',
+         'st_nlink',
+         'st_uid',
+         'st_gid',
+         'st_size',
+         'st_atime',
+         'st_mtime',
+         'st_ctime'), row1):
+        print k,v
+        rowd [k] = v
+    print 'attr/s of %s: %s' % (filename,rowd)
