@@ -25,7 +25,7 @@ while 1:
         ("select * from %s where fileName = '%s'" %
          (cdlabel+'_files', filename))
     row1 = cur.fetchall () [0]
-    rowd = []
+    rowd = {}
     for k,v in zip (('fid',
          'pid',
          'fileName',
@@ -37,6 +37,6 @@ while 1:
          'st_atime',
          'st_mtime',
          'st_ctime'), row1):
-        print k,v
         rowd [k] = v
-    print 'attr/s of %s: %s' % (filename,rowd)
+        print '''setfattr -n user.scfs.%s.%s %s -v "%s"''' % (cdlabel,rowd['fid'], k,v)
+    # print 'attr/s of %s: %s' % (filename,rowd)

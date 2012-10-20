@@ -266,6 +266,7 @@ for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd',
 *** $> inotail -f /tmp/in | python -u lib/xattr-fill.py &
 *** $> date -Is >> /tmp/in
 
+
 * STU
 ** query iface grep-find~
    - $> find $d -type f | while read L; do echo '' -$L:; locate "$L" | while read F; do ls -lid "$F"; done; done
