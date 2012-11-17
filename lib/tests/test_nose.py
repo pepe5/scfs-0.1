@@ -58,7 +58,7 @@ def scatman(argstr, **kw):
 
 def echo(data, **kwargs):
     '''echo like utility'''
-    of = file(kwargs['ofile'], 'w')
+    of = file(kwargs['tofile'], 'w')
     of.write(data)
     of.close()
 
@@ -76,22 +76,22 @@ def capture(path):
     pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
     print " -capturing overview of path: %s \n%s" % (os.path.abspath(path), pop.communicate()[0])
 
-def test_uc0():
+def test_uc0z():
     '''Smoke Test
     @brief 1/Add dir/s stru, 2/Mount FS
     '''
     mkdirp(os.path.join(Config.srcd, 'a'), os.path.join(Config.srcd, 'b'))
     mkdirp(os.path.join(Config.outroot, Config.db))
 
-def test_uc1():
+def test_uc1z():
     '''Use case 1
     @brief 1/Register (testing) wd, 2/Add mockup, 3/Check duplical file/s'''
     Config.adname = 'WD_UC1'
 
     Config.load(wd=Config.srcd)
-    echo('123', ofile='a/123')
-    echo('321', ofile='a/321')
-    echo('123', ofile='b/123')
+    echo('123', tofile='a/123')
+    echo('321', tofile='a/321')
+    echo('123', tofile='b/123')
     scatman('-s -o database=~/.scfs/cat1.db ~/mnt/cat1')
     Config.unload()
 
@@ -103,7 +103,17 @@ def test_uc1():
     assert f123['st_nlink'] == 2
     Config.unload()
 
-def test_uc2():
+def test_uc1 ():
+    '''Use case 1 (Catalog for xattrs)
+    @brief 1/Add 2files, 2/Ins.them, 3/ls.theirs xattrs'''
+    Config.adname = 'WD_UC1'
+    Config.load (wd = Config.srcd)
+    echo ('123', tofile = 'a/123')
+    echo ('234', tofile = 'b/bb/234')
+    scatman('-s -o database=~/.scfs/cat1.sqlite ~/mnt/cat1')
+    Config.unload()
+
+def test_uc2z():
     '''Use case 2
     @brief 1/UC1, 2/Add Insertion, 3/Check tree graph'''
     Config.adname = 'WD_UC1'
@@ -111,7 +121,7 @@ def test_uc2():
     Config.load(wd=Config.srcd)
     userPoint = os.path.join(Config.srcd, 'b', 'bb')
     mkdirp(userPoint, os.path.join(userPoint, 'bbb'))
-    echo('234', ofile='b/bb/bbb/234')
+    echo('234', tofile='b/bb/bbb/234')
     scatman('-s -o database=~/.scfs/cat1.db ~/mnt/cat1',
             mountPoint = userPoint,
             cont=True)

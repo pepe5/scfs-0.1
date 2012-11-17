@@ -57,6 +57,10 @@
     9    0 -rw-rw-r--   1 user     user          329 kvě 18 09:05 /home/user/mnt/cat1/WD_UC1/a/321
 
 
+** UC1 /def test_uc1/
+
+
+* OLD
 ** longest common:
    self.__mountPoint = []
    [[file:~/text/scfs/lib/CatalogCreator.py::/for%20name%20in%20pathComponents/][for name in pathComponents]]

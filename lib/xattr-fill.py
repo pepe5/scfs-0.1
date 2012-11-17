@@ -38,5 +38,7 @@ while 1:
          'st_mtime',
          'st_ctime'), row1):
         rowd [k] = v
-        print '''setfattr -n user.scfs.%s.%s %s -v "%s"''' % (cdlabel,rowd['fid'], k,v)
+        if k != 'fid':
+            print '''setfattr -n user.scfs.%s.%s.%s -v "%s"''' %\
+                (cdlabel,rowd['fid'], k,v)
     # print 'attr/s of %s: %s' % (filename,rowd)
