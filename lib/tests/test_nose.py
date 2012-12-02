@@ -105,12 +105,14 @@ def test_uc1z():
 
 def test_uc1 ():
     '''Use case 1 (Catalog for xattrs)
-    @brief 1/Add 2files, 2/Ins.them, 3/ls.theirs xattrs'''
+    @brief 1/Add 2files, 2/Ins.them, 3/Ls.theirs xattrs'''
     Config.adname = 'WD_UC1'
     Config.load (wd = Config.srcd)
     echo ('123', tofile = 'a/123')
     echo ('234', tofile = 'b/bb/234')
-    scatman('-s -o database=~/.scfs/cat1.sqlite ~/mnt/cat1')
+    scatman ('-s -o database=~/.scfs/cat1.sqlite')
+    scatxattrs ('-i database=~/.scfs/cat1.sqlite')
+    capture ('.', xattrs='user.*')
     Config.unload()
 
 def test_uc2z():
