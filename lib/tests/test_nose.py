@@ -79,18 +79,35 @@ def capture (path, **kw):
     pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
     print " -capturing overview of path: %s \n%s" % (os.path.abspath(path), pop.communicate()[0])
 
+def test_setup ():
+    '''Basic Test/s Setup
+    @brief 1/Add dir/s stru
+    '''
+    mkdirp(os.path.join(Config.srcd, 'a'), os.path.join(Config.srcd, 'b/bb'))
+
+def scatXattrs (argstr, **kw):
+    pass
+
+def test_uc1 ():
+    '''Use case 1 (Catalog for xattrs)
+    @brief 1/Add 2files, 2/Ins.them, 3/Ls.theirs xattrs'''
+    Config.adname = 'WD_UC1'
+    Config.load (wd = Config.srcd)
+    echo ('123', tofile = 'a/123')
+    echo ('234', tofile = 'b/bb/234')
+    scatman ('-s -o database=~/.scfs/cat1.sqlite')
+    scatXattrs ('-i database=~/.scfs/cat1.sqlite')
+    capture ('.', xattrs='user.*')
+    Config.unload()
+
+###
+# :ARCHIVE:
 def Z_uc0z():
     '''Smoke Test
     @brief 1/Add dir/s stru, 2/Mount FS
     '''
     mkdirp(os.path.join(Config.srcd, 'a'), os.path.join(Config.srcd, 'b'))
     mkdirp(os.path.join(Config.outroot, Config.db))
-
-def test_setup ():
-    '''Basic Test/s Setup
-    @brief 1/Add dir/s stru
-    '''
-    mkdirp(os.path.join(Config.srcd, 'a'), os.path.join(Config.srcd, 'b/bb'))
 
 def Z_tearDown ():
     '''Fresh env
@@ -116,21 +133,6 @@ def Z_uc1z():
     capture('.')
     print " -got nlink: %s ( -exp: %s )" % (f123['st_nlink'], 2)
     assert f123['st_nlink'] == 2
-    Config.unload()
-
-def scatXattrs (argstr, **kw):
-    pass
-
-def test_uc1 ():
-    '''Use case 1 (Catalog for xattrs)
-    @brief 1/Add 2files, 2/Ins.them, 3/Ls.theirs xattrs'''
-    Config.adname = 'WD_UC1'
-    Config.load (wd = Config.srcd)
-    echo ('123', tofile = 'a/123')
-    echo ('234', tofile = 'b/bb/234')
-    scatman ('-s -o database=~/.scfs/cat1.sqlite')
-    scatXattrs ('-i database=~/.scfs/cat1.sqlite')
-    capture ('.', xattrs='user.*')
     Config.unload()
 
 def Z_uc2z():
