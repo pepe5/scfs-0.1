@@ -17,11 +17,13 @@
 ** make it [[pydoc]]
 ** add Config
 ** test w/ http://ivory.idyll.org/articles/nose-intro.html#test-fixtures
-   scfs> nosetests lib/ -v
-   test_nose.test_uc1 ... ok
-   ----------------------------------------------------------------------
-   Ran 1 test in 0.004s
-   OK
+*** scfs> nosetests -v lib/ --collect-only
+*** scfs> nosetests -v lib/ # :ARCHIVE: #
+    test_nose.test_uc1 ... ok
+    ----------------------------------------------------------------------
+    Ran 1 test in 0.004s
+    OK
+
 
 ** [#B] 
 *** @contextmanager; def [[http://groups.google.com/group/paver/browse_thread/thread/90434e3338e15796%3Fpli%3D1][pushd]](dir)
@@ -29,19 +31,8 @@
 
 * ACT INTRO
 ** dev act/s file:../lib/tests/test_nose.py
-*** dev env depl: (at cd ~/text/scfs/)
-    >! distutil shall handle this!
-    pushd /usr/lib/python2.5/site-packages/ && pakSite=`pwd` && popd
-    pushd /usr/local/lib/python2.6/dist-packages/ && pakSite=`pwd` && popd
-    pushd /usr/lib/python2.7/dist-packages/ && pakSite=`pwd` && popd
-
-    >? sudo install -v -d $pakSite/Scfs/ # is necessary when vvv #> ?
-    sudo ln -sv -bf `pwd`/lib/Cat*.py `pwd`/lib/Dir*.py $pakSite/Scfs/
-    sudo ln -sv -bf `pwd`/lib/scatfs $pakSite/Scfs/ScatServices.py
-    echo | sudo tee $pakSite/Scfs/__init__.py
-    sudo cp -v $pakSite/Cdcatfs/utils.py $pakSite/Scfs/ #> <depends on Cdcatfs
-    install -v -d /tmp/dev/scwd/a /tmp/dev/scwd/b
-    PATH=$PATH:`pwd`/lib
+*** [[dev env depl]]
+    - $> rm -vr /tmp/dev/scwd/* ~/.scfs/cat1.sqlite; nosetests -v lib/
 
 *** TODO why scfs> find ~/mnt/cat1/WD_UC1 -ls # stops recursion??
     :tip: on ubuntu it works ok, so this (vv) is only aspire1 fc 
@@ -60,7 +51,142 @@
 ** UC1 /def test_uc1/
 
 
-* OLD
+* SETUP
+** dev env depl (at $> cd ~/text/scfs/:)
+*** TODO add this from context/s of: [[file:::/install%20-v%20-d%20/tmp/dev/scwd/][/install -v -d /tmp/dev/scwd/]]
+*** INST (only 1st time)
+**** >! distutil shall handle this!
+     pushd /usr/lib/python2.5/site-packages/ && pakSite=`pwd` && popd
+     pushd /usr/local/lib/python2.6/dist-packages/ && pakSite=`pwd` && popd
+     pushd /usr/lib/python2.7/dist-packages/ && pakSite=`pwd` && popd
+
+**** >? sudo install -v -d $pakSite/Scfs/ # is necessary when vvv #> ?
+     sudo ln -sv -bf `pwd`/lib/Cat*.py `pwd`/lib/Dir*.py $pakSite/Scfs/
+     sudo ln -sv -bf `pwd`/lib/scatfs $pakSite/Scfs/ScatServices.py
+     echo | sudo tee $pakSite/Scfs/__init__.py
+     sudo cp -v $pakSite/Cdcatfs/utils.py $pakSite/Scfs/ #> <depends on Cdcatfs
+     install -v -d /tmp/dev/scwd/a /tmp/dev/scwd/b
+     PATH=$PATH:`pwd`/lib
+
+**** $> PATH=$PATH:$HOME/text/scfs/lib
+*** RE/FRESH (tear down dev env)
+**** $> rm -vr /tmp/dev/scwd/*
+**** $> rm -vr ~/.scfs/cat1.sqlite
+
+** os/pkg depl (TODO)
+
+
+* XATTR PART
+** gvfs-info ~ info
+   - $> (echo .mode line; echo "select * from WD_UC2_files where fileName = 'c1';") | sqlite3 ~/.scfs/cat1.cdcat
+   - #> fid = 2
+     pid = 1
+     fileName = a
+     st_mode = 16877
+     st_nlink = 2
+     st_uid = 1000
+     st_gid = 1000
+     st_size = 4096
+     st_atime = 1341952183
+     st_mtime = 1341952183
+     st_ctime = 1341952183
+
+** stu setup
+   - [[xattr stu]]
+
+** test, 2012-08-01 22:37:01, 6ef7af8
+*** $> inotail -f /tmp/in | python -u lib/xattr-fill.py &
+*** $> date -Is >> /tmp/in
+
+
+* STU
+** query iface grep-find~
+   - $> find $d -type f | while read L; do echo '' -$L:; locate "$L" | while read F; do ls -lid "$F"; done; done
+
+** xattr stu
+   - $> setfattr -n user.do_i_own -v "YES" /tmp/dev/scwd/c1
+   - $> gvfs-info /tmp/dev/scwd | grep xattr
+
+** TODO fuse args
+   server.parser.parse_args(['-o database=/home/user/.scfs/cat1.cdcat'])
+   server.parse(values=server)
+
+** print " -mounting to: %s" % Config.cdpoint
+
+** from pysqlite2 import dbapi2 as sqlite
+    CDLabel = 'WD_UC1'
+    fileId = 6
+    name = '123'
+    con = sqlite.connect('/home/user/.scfs/cat1.cdcat')
+    cmd = ("SELECT fid ,pid ,fileName, st_mode, count_name, st_uid, st_gid, st_size, st_atime, st_mtime, st_ctime " +
+                           "FROM %s_files " +
+                           "JOIN (SELECT fileName, COUNT(fileName) AS count_name FROM %s_files WHERE fileName='%s') AS Tbl2 " +
+                           "ON %s_files.fileName = Tbl2.fileName " +
+    			   "WHERE fid =%d;") \
+                        % (CDLabel, CDLabel, name, CDLabel, fileId)
+    rows = con.cursor().execute(cmd).fetchall()
+    rows
+
+**** SELECT fid, pid, WD_UC1_files.fileName, st_nlink, Tbl2.count_name
+    FROM WD_UC1_files
+    JOIN (SELECT fileName, COUNT(fileName) AS count_name FROM WD_UC1_files WHERE fileName='123')
+    AS Tbl2
+    ON WD_UC1_files.fileName = Tbl2.fileName;
+
+
+** :last: scfs> nosetests lib/ -v # <2011-05-14 Sat>
+    Use case 1 ... FAIL
+    ======================================================================
+    FAIL: Use case 1
+    ----------------------------------------------------------------------
+    Traceback (most recent call last):
+    File "/usr/lib/pymodules/python2.6/nose/case.py", line 183, in runTest
+    self.test(*self.arg)
+    File "/home/p-b/text/scfs/lib/tests/test_nose.py", line 48, in test_uc1
+    assert f123['st_nlink'] == 2
+    AssertionError: 
+    -------------------- >> begin captured stdout << ---------------------
+    -mounting to: ~/mnt/cat1
+    -registering (blind dir) at: /tmp/scwd
+    -capturing wd state: 
+    <subprocess.Popen object at 0x87c9aac>
+    --------------------- >> end captured stdout << ----------------------
+
+    ----------------------------------------------------------------------
+    Ran 1 test in 0.018s
+
+    FAILED (failures=1)
+    790854    4 -rw-r--r--   1 p-b      p-b             3 May 14 23:22 ./b/123
+    790853    4 -rw-r--r--   1 p-b      p-b             3 May 14 23:22 ./a/321
+    790852    4 -rw-r--r--   1 p-b      p-b             3 May 14 23:22 ./a/123
+
+
+* DONE
+** separate cdcat & scat file holders
+   [[file:~/text/scfs/lib/scatfs::/from%20Cdcatfs.utils%20import%20CacheDict/][scatfs::/from *Cdcatfs*.utils import CacheDict/]]
+** subprocess.Popen repr differs in py25 & py26 ?!
+   -cleaning wd table: <subprocess.Popen object at 0xb7aceb8c>
+   -> DONE by pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
+    print " -cleaning wd table: %s" % pop.communicate() ...
+
+** i got 2 traceback/s in 1 tc, <2011-05-18 St>
+   -> DONE by expanduser on Config.db
+   <= it is from cdcatman xy subprocess/es
+
+*** 2nd one:
+   Traceback (most recent call last):
+   ----------------------------------------------------------------------
+   File "/usr/bin/cdcatman", line 87, in <module>
+   catCreator = CatalogCreator(dbFile, mountPoint, CDLabel)
+   File "/usr/lib/python2.5/site-packages/Cdcatfs/CatalogCreator.py", line 32, in __init__
+   self.__initDb();
+   File "/usr/lib/python2.5/site-packages/Cdcatfs/CatalogCreator.py", line 60, in __initDb
+   con = sqlite.connect(self.__dbFile)
+   pysqlite2.dbapi2.OperationalError: unable to open database file
+
+
+
+* :ARCHIVE: OLD
 ** longest common:
    self.__mountPoint = []
    [[file:~/text/scfs/lib/CatalogCreator.py::/for%20name%20in%20pathComponents/][for name in pathComponents]]
@@ -246,116 +372,6 @@ for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd',
 
 ** dev tasks
 *** have both cdcat & scat on 1 env; test difference/s
-
-
-* XATTR PART
-** gvfs-info ~ info
-   - $> (echo .mode line; echo "select * from WD_UC2_files where fileName = 'c1';") | sqlite3 ~/.scfs/cat1.cdcat
-   - #> fid = 2
-     pid = 1
-     fileName = a
-     st_mode = 16877
-     st_nlink = 2
-     st_uid = 1000
-     st_gid = 1000
-     st_size = 4096
-     st_atime = 1341952183
-     st_mtime = 1341952183
-     st_ctime = 1341952183
-
-** stu setup
-   - [[xattr stu]]
-
-** test, 2012-08-01 22:37:01, 6ef7af8
-*** $> inotail -f /tmp/in | python -u lib/xattr-fill.py &
-*** $> date -Is >> /tmp/in
-
-
-* STU
-** query iface grep-find~
-   - $> find $d -type f | while read L; do echo '' -$L:; locate "$L" | while read F; do ls -lid "$F"; done; done
-
-** xattr stu
-   - $> setfattr -n user.do_i_own -v "YES" /tmp/dev/scwd/c1
-   - $> gvfs-info /tmp/dev/scwd | grep xattr
-
-** TODO fuse args
-   server.parser.parse_args(['-o database=/home/user/.scfs/cat1.cdcat'])
-   server.parse(values=server)
-
-** print " -mounting to: %s" % Config.cdpoint
-
-** from pysqlite2 import dbapi2 as sqlite
-    CDLabel = 'WD_UC1'
-    fileId = 6
-    name = '123'
-    con = sqlite.connect('/home/user/.scfs/cat1.cdcat')
-    cmd = ("SELECT fid ,pid ,fileName, st_mode, count_name, st_uid, st_gid, st_size, st_atime, st_mtime, st_ctime " +
-                           "FROM %s_files " +
-                           "JOIN (SELECT fileName, COUNT(fileName) AS count_name FROM %s_files WHERE fileName='%s') AS Tbl2 " +
-                           "ON %s_files.fileName = Tbl2.fileName " +
-    			   "WHERE fid =%d;") \
-                        % (CDLabel, CDLabel, name, CDLabel, fileId)
-    rows = con.cursor().execute(cmd).fetchall()
-    rows
-
-**** SELECT fid, pid, WD_UC1_files.fileName, st_nlink, Tbl2.count_name
-    FROM WD_UC1_files
-    JOIN (SELECT fileName, COUNT(fileName) AS count_name FROM WD_UC1_files WHERE fileName='123')
-    AS Tbl2
-    ON WD_UC1_files.fileName = Tbl2.fileName;
-
-
-** :last: scfs> nosetests lib/ -v # <2011-05-14 Sat>
-    Use case 1 ... FAIL
-    ======================================================================
-    FAIL: Use case 1
-    ----------------------------------------------------------------------
-    Traceback (most recent call last):
-    File "/usr/lib/pymodules/python2.6/nose/case.py", line 183, in runTest
-    self.test(*self.arg)
-    File "/home/p-b/text/scfs/lib/tests/test_nose.py", line 48, in test_uc1
-    assert f123['st_nlink'] == 2
-    AssertionError: 
-    -------------------- >> begin captured stdout << ---------------------
-    -mounting to: ~/mnt/cat1
-    -registering (blind dir) at: /tmp/scwd
-    -capturing wd state: 
-    <subprocess.Popen object at 0x87c9aac>
-    --------------------- >> end captured stdout << ----------------------
-
-    ----------------------------------------------------------------------
-    Ran 1 test in 0.018s
-
-    FAILED (failures=1)
-    790854    4 -rw-r--r--   1 p-b      p-b             3 May 14 23:22 ./b/123
-    790853    4 -rw-r--r--   1 p-b      p-b             3 May 14 23:22 ./a/321
-    790852    4 -rw-r--r--   1 p-b      p-b             3 May 14 23:22 ./a/123
-
-
-* DONE
-** separate cdcat & scat file holders
-   [[file:~/text/scfs/lib/scatfs::/from%20Cdcatfs.utils%20import%20CacheDict/][scatfs::/from *Cdcatfs*.utils import CacheDict/]]
-** subprocess.Popen repr differs in py25 & py26 ?!
-   -cleaning wd table: <subprocess.Popen object at 0xb7aceb8c>
-   -> DONE by pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
-    print " -cleaning wd table: %s" % pop.communicate() ...
-
-** i got 2 traceback/s in 1 tc, <2011-05-18 St>
-   -> DONE by expanduser on Config.db
-   <= it is from cdcatman xy subprocess/es
-
-*** 2nd one:
-   Traceback (most recent call last):
-   ----------------------------------------------------------------------
-   File "/usr/bin/cdcatman", line 87, in <module>
-   catCreator = CatalogCreator(dbFile, mountPoint, CDLabel)
-   File "/usr/lib/python2.5/site-packages/Cdcatfs/CatalogCreator.py", line 32, in __init__
-   self.__initDb();
-   File "/usr/lib/python2.5/site-packages/Cdcatfs/CatalogCreator.py", line 60, in __initDb
-   con = sqlite.connect(self.__dbFile)
-   pysqlite2.dbapi2.OperationalError: unable to open database file
-
 
 
 * FORM/s

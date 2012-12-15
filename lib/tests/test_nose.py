@@ -1,3 +1,4 @@
+# -*- subword -*-
 # use: cd /home/user/text/scfs; ruby lib/test/scfs-fun.rb
 import os
 import re
@@ -26,7 +27,7 @@ Config.srcd = '/tmp/dev/scwd'
 Config.outroot = os.path.expanduser('~/mnt/cat1')
 Config.db = os.path.expanduser('~/.scfs/cat1.db')
 
-def scatman(argstr, **kw):
+def scatman (argstr, **kw):
     '''Runs scatman command-line
     optional @param kw['mountPoint'] can override default Config['wd']
     optional @param kw['cont'] suppresses setup refreshment of the Table
@@ -41,20 +42,22 @@ def scatman(argstr, **kw):
 
     Config.mounto = args [-1]
     print " -vfs mount point: %s" % Config.mounto
-    Config.db = re.match('.*database=([^ ]+) ', argstr).group(1) # @KNOWN as not-universal
+    Config.db = re.match('.*database=([^ ]+)', argstr).group(1) # @KNOWN as not-universal
     Config.db = os.path.expanduser(Config.db)
     print " -registering (blind dir) at: %s" % Config.db
     Config.adname = 'WD_UC1'
     print " -into arch.fld: %s" % Config.adname
 
-    if not 'cont' in kw:
+    if 'fresh' in kw:
         cmd = 'scatman del %s %s' % (Config.adname, Config.db)
+        print " -cmd: " + cmd
         pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
         print " -cleaning wd table: %s" % pop.communicate()[0]
 
     cmd = 'scatman add %s %s %s' % (mountPoint, Config.adname, Config.db)
+    print " -cmd: " + cmd
     pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
-    print " -adding wd table: \n%s" % pop.communicate()[0]
+    print "Adding wd table.. \n%s" % pop.communicate()[0]
 
 def echo(data, **kwargs):
     '''echo like utility'''
@@ -70,20 +73,32 @@ def mkdirp(*args):
         except OSError, err:
             print " -makedirs exception: %s" % err
 
-def capture(path):
+def capture (path, **kw):
     '''lists working dir content'''
     cmd = '/usr/bin/find %s -type f -ls' % path
     pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
     print " -capturing overview of path: %s \n%s" % (os.path.abspath(path), pop.communicate()[0])
 
-def test_uc0z():
+def Z_uc0z():
     '''Smoke Test
     @brief 1/Add dir/s stru, 2/Mount FS
     '''
     mkdirp(os.path.join(Config.srcd, 'a'), os.path.join(Config.srcd, 'b'))
     mkdirp(os.path.join(Config.outroot, Config.db))
 
-def test_uc1z():
+def test_setup ():
+    '''Basic Test/s Setup
+    @brief 1/Add dir/s stru
+    '''
+    mkdirp(os.path.join(Config.srcd, 'a'), os.path.join(Config.srcd, 'b/bb'))
+
+def Z_tearDown ():
+    '''Fresh env
+    @brief To be sure that everything work/s - we must start from time to time from real fresh env
+    for now - let we do it by bash rm -rf
+    '''
+
+def Z_uc1z():
     '''Use case 1
     @brief 1/Register (testing) wd, 2/Add mockup, 3/Check duplical file/s'''
     Config.adname = 'WD_UC1'
@@ -103,6 +118,9 @@ def test_uc1z():
     assert f123['st_nlink'] == 2
     Config.unload()
 
+def scatXattrs (argstr, **kw):
+    pass
+
 def test_uc1 ():
     '''Use case 1 (Catalog for xattrs)
     @brief 1/Add 2files, 2/Ins.them, 3/Ls.theirs xattrs'''
@@ -111,11 +129,11 @@ def test_uc1 ():
     echo ('123', tofile = 'a/123')
     echo ('234', tofile = 'b/bb/234')
     scatman ('-s -o database=~/.scfs/cat1.sqlite')
-    scatxattrs ('-i database=~/.scfs/cat1.sqlite')
+    scatXattrs ('-i database=~/.scfs/cat1.sqlite')
     capture ('.', xattrs='user.*')
     Config.unload()
 
-def test_uc2z():
+def Z_uc2z():
     '''Use case 2
     @brief 1/UC1, 2/Add Insertion, 3/Check tree graph'''
     Config.adname = 'WD_UC1'
@@ -126,7 +144,7 @@ def test_uc2z():
     echo('234', tofile='b/bb/bbb/234')
     scatman('-s -o database=~/.scfs/cat1.db ~/mnt/cat1',
             mountPoint = userPoint,
-            cont=True)
+            fresh=True)
     Config.unload()
 
     Config.load(wd=Config.outroot)
