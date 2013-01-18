@@ -101,6 +101,8 @@
 
 * STU
 ** query iface grep-find~
+   - $> find $d -type f | while read L; do echo '' -$L:; locate "$L" | awk '{print "\""$0"\""}' | xargs ls -dilt; done
+*** :ARCHIVE:
    - $> find $d -type f | while read L; do echo '' -$L:; locate "$L" | while read F; do ls -lid "$F"; done; done
 
 ** xattr stu
@@ -372,6 +374,7 @@ for (fname,stats,fileId,parentId) in DirectoryWalker ('/tmp/dev/scwd',
 
 ** dev tasks
 *** have both cdcat & scat on 1 env; test difference/s
+
 
 
 * FORM/s
