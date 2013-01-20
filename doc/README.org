@@ -74,6 +74,13 @@
 **** $> rm -vr ~/.scfs/cat1.sqlite
 
 ** os/pkg depl (TODO)
+*** install scfs module
+**** $> sudo install -v -d $pakSite/Scfs
+**** $> sudo touch $pakSite/Scfs/__init__.py
+**** $> sudo ln -sv -bf `pwd`/lib/Cat*.py `pwd`/lib/Dir*.py $pakSite/Scfs/
+**** TODO $> sudo ln -sv -bf `pwd`/lib/scatfs $pakSite/Scfs/ScatServices.py
+**** TODO $> sudo cp -v $pakSite/Cdcatfs/utils.py $pakSite/Scfs
+**** $> ln -sv `pwd`/lib/scat* ~/bin
 
 
 * XATTR PART
@@ -115,7 +122,7 @@
 
 ** print " -mounting to: %s" % Config.cdpoint
 
-** from pysqlite2 import dbapi2 as sqlite
+** import sqlite3 as sqlite #(<) from pysqlite2 import dbapi2 as sqlite
     CDLabel = 'WD_UC1'
     fileId = 6
     name = '123'

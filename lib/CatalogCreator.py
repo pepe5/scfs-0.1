@@ -11,7 +11,8 @@
 import os,stat,sys
 from stat import *
 
-from pysqlite2 import dbapi2 as sqlite
+# from pysqlite2 import dbapi2 as sqlite
+import sqlite3 as sqlite
 
 from ScatServices import *
 from DirectoryWalker import DirectoryWalker

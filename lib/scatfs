@@ -10,9 +10,12 @@ from exceptions import ValueError
 from string import Template #new in version 2.4
 import time
 
-import fuse
-from fuse import Fuse
-from pysqlite2 import dbapi2 as sqlite
+print 'pep> %s' % sys.argv[0]
+if sys.argv[0][-6:] == 'scatfs':
+    import fuse
+    from fuse import Fuse
+import sqlite3 as sqlite
+# from pysqlite2 import dbapi2 as sqlite
 
 from Scfs.utils import CacheDict
 
