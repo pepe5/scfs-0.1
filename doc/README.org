@@ -74,12 +74,16 @@
 **** $> rm -vr ~/.scfs/cat1.sqlite
 
 ** os/pkg depl (TODO)
+*** install fuse binding
+**** TODO :STU: a8h if is there too ver.: ftp://ftp.pbone.net/mirror/archive.fedoraproject.org/fedora/linux/releases/11/Everything/x86_64/os/Packages/fuse-python-0.2-10.fc11.x86_64.rpm
+
 *** install scfs module
 **** $> sudo install -v -d $pakSite/Scfs
 **** $> sudo touch $pakSite/Scfs/__init__.py
 **** $> sudo ln -sv -bf `pwd`/lib/Cat*.py `pwd`/lib/Dir*.py $pakSite/Scfs/
-**** TODO $> sudo ln -sv -bf `pwd`/lib/scatfs $pakSite/Scfs/ScatServices.py
-**** TODO $> sudo cp -v $pakSite/Cdcatfs/utils.py $pakSite/Scfs
+**** $> sudo ln -sv -bf `pwd`/lib/scatfs $pakSite/Scfs/ScatServices.py
+**** $> wget -O - http://ie.archive.ubuntu.com/download.sourceforge.net/pub/sourceforge/c/project/cd/cdcatfs/cdcatfs/0.1.5/cdcatfs-0.1.5.tar.gz | tar xzf - -O cdcatfs-0.1.5/src/Cdcatfs/utils.py | sudo tee $pakSite/Scfs/utils.py | wc
+**** $> sudo ln -sv /usr/lib64/python2.4/site-packages/fuse* $pakSite
 **** $> ln -sv `pwd`/lib/scat* ~/bin
 
 
