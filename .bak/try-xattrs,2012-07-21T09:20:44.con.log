@@ -1,0 +1,54 @@
+
+
+~$> cd text/scfs/
+scfs$> git status
+# On branch master
+# Changed but not updated:
+#   (use "git add <file>..." to update what will be committed)
+#   (use "git checkout -- <file>..." to discard changes in working directory)
+#
+#	modified:   doc/README.org
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	nohup.out
+no changes added to commit (use "git add" and/or "git commit -a")
+
+scfs$> trash-put nohup.out 
+scfs$> sqlite3 ~/.scfs/cat1.db .dump
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE CDs( fid integer primary key autoincrement,label text, mountPoint text);
+INSERT INTO "CDs" VALUES(1,'WD_UC2','/tmp/dev/scwd');
+CREATE TABLE WD_UC2_files( fid integer primary key,pid integer,fileName text, st_mode integer, st_nlink integer, st_uid integer default 0, st_gid integer default 0, st_size integer default 0, st_atime integer default 0, st_mtime integer default 0, st_ctime integer default 0);
+INSERT INTO "WD_UC2_files" VALUES(1,0,'',16893,4,500,501,4096,1341141018,1341141054,1341141054);
+INSERT INTO "WD_UC2_files" VALUES(2,1,'b',16893,2,500,501,4096,1341141018,1341141018,1341141018);
+INSERT INTO "WD_UC2_files" VALUES(3,1,'a',16893,2,500,501,4096,1341141018,1341141038,1341141038);
+INSERT INTO "WD_UC2_files" VALUES(4,1,'c1',33204,1,500,501,25,1341141054,1341141054,1341141054);
+INSERT INTO "WD_UC2_files" VALUES(5,3,'a1',33204,1,500,501,25,1341141038,1341141038,1341141038);
+DELETE FROM sqlite_sequence;
+INSERT INTO "sqlite_sequence" VALUES('CDs',1);
+CREATE INDEX WD_UC2_pid_idx ON WD_UC2_files( pid );
+CREATE INDEX WD_UC2_fname_idx ON WD_UC2_files(fileName);
+CREATE INDEX WD_UC2_pid_fname_idx ON WD_UC2_files(pid,fileName);
+COMMIT;
+
+scfs$> gvfs-info /tmp/dev/scwd/a
+display name: a
+edit name: a
+name: a
+type: directory
+size:  4096
+attributes:
+  standard::type: 2
+  standard::name: a
+  standard::display-name: a
+  standard::edit-name: a
+  standard::copy-name: a
+  standard::icon: inode-directory, gnome-mime-inode-directory, inode-x-generic, folder
+  standard::content-type: inode/directory
+..
+  xattr-sys::security.selinux: unconfined_u:object_r:tmp_t:s0
+
+scfs$> 

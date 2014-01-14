@@ -1,0 +1,339 @@
+~$> cd text/scfs/
+scfs$> nosetests -v lib/
+Command not found. Install package 'python-nose' to provide command 'nosetests'? [N/y] y
+
+ * Downloading details about the software sources... 
+ * Running.. 
+ * Resolving dependencies..   C-c C-c
+
+scfs$> nosetests -v lib/
+Basic Test/s Setup ... ok
+Use case 1 (Catalog for xattrs) ... ERROR
+======================================================================
+ERROR: Use case 1 (Catalog for xattrs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python2.6/site-packages/nose/case.py", line 182, in runTest
+    self.test(*self.arg)
+  File "/mnt/lifeboat-home/kraljo/text/scfs/lib/tests/test_nose.py", line 96, in test_uc1
+    echo ('123', tofile = 'a/123')
+  File "/mnt/lifeboat-home/kraljo/text/scfs/lib/tests/test_nose.py", line 64, in echo
+    of = file(kwargs['tofile'], 'w')
+IOError: [Errno 13] Permission denied: 'a/123'
+----------------------------------------------------------------------
+Ran 2 tests in 0.007s
+
+FAILED (errors=1)
+
+scfs$> nosetests -v lib/
+Basic Test/s Setup ... ok
+Use case 1 (Catalog for xattrs) ... ERROR
+======================================================================
+ERROR: Use case 1 (Catalog for xattrs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python2.6/site-packages/nose/case.py", line 182, in runTest
+    self.test(*self.arg)
+  File "/mnt/lifeboat-home/kraljo/text/scfs/lib/tests/test_nose.py", line 98, in test_uc1
+    scatman ('-s -o database=~/.scfs/cat1.sqlite')
+  File "/mnt/lifeboat-home/kraljo/text/scfs/lib/tests/test_nose.py", line 59, in scatman
+    pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
+  File "/usr/lib64/python2.6/subprocess.py", line 639, in __init__
+    errread, errwrite)
+  File "/usr/lib64/python2.6/subprocess.py", line 1228, in _execute_child
+    raise child_exception
+OSError: [Errno 2] No such file or directory
+-------------------- >> begin captured stdout << ---------------------
+ -vfs mount point: database=~/.scfs/cat1.sqlite
+ -registering (blind dir) at: /home/kraljo/.scfs/cat1.sqlite
+ -into arch.fld: WD_UC1
+ -cmd: scatman add /tmp/dev/scwd WD_UC1 /home/kraljo/.scfs/cat1.sqlite
+--------------------- >> end captured stdout << ----------------------
+----------------------------------------------------------------------
+Ran 2 tests in 0.016s
+
+FAILED (errors=1)
+
+scfs$> scatman add /tmp/dev/scwd WD_UC1 /home/kraljo/.scfs/cat1.sqlite
+Command not found. 
+
+scfs$> pushd /usr/local/lib/python2.6/dist-packages/ && pakSite=`pwd` && popd
+bash: pushd: /usr/local/lib/python2.6/dist-packages/: No such file or directory
+
+scfs$> pushd /usr/lib/python2.7/dist-packages/ && pakSite=`pwd` && popd
+bash: pushd: /usr/lib/python2.7/dist-packages/: No such file or directory
+
+scfs$> locate dist-packages | head
+scfs$> locate packages | grep python | head
+/mnt/lifeboat-home/kraljo/opt/python-2.7/lib/python2.7/site-packages
+/mnt/lifeboat-home/kraljo/opt/python-2.7/lib64/python2.7/site-packages
+/mnt/lifeboat-home/kraljo/opt/python-2.7/lib64/python2.7/site-packages/README
+/usr/lib/python2.6/site-packages
+/usr/lib/python2.6/site-packages/ANSI.py
+/usr/lib/python2.6/site-packages/ANSI.pyc
+/usr/lib/python2.6/site-packages/ANSI.pyo
+/usr/lib/python2.6/site-packages/Beaker-1.3.1-py2.6.egg-info
+/usr/lib/python2.6/site-packages/Django-1.3.2-py2.6.egg-info
+/usr/lib/python2.6/site-packages/FSM.py
+
+scfs$> locate packages | grep python | grep dist- | head
+scfs$> pakSite=/usr/lib/python2.6/site-packages
+scfs$> sudo install -v -d $pakSite/Scfs
+[sudo] password for kraljo: 
+install: creating directory `/usr/lib/python2.6/site-packages/Scfs'
+
+scfs$> sudo ln -sv -bf `pwd`/lib/Cat*.py `pwd`/lib/Dir*.py $pakSite/Scfs/
+`/usr/lib/python2.6/site-packages/Scfs/CatalogCreator.py' -> `/home/kraljo/text/scfs/lib/CatalogCreator.py'
+`/usr/lib/python2.6/site-packages/Scfs/DirectoryWalker.py' -> `/home/kraljo/text/scfs/lib/DirectoryWalker.py'
+
+scfs$> nosetests -v lib/
+Basic Test/s Setup ... ok
+Use case 1 (Catalog for xattrs) ... ERROR
+======================================================================
+ERROR: Use case 1 (Catalog for xattrs)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python2.6/site-packages/nose/case.py", line 182, in runTest
+    self.test(*self.arg)
+  File "/mnt/lifeboat-home/kraljo/text/scfs/lib/tests/test_nose.py", line 98, in test_uc1
+    scatman ('-s -o database=~/.scfs/cat1.sqlite')
+  File "/mnt/lifeboat-home/kraljo/text/scfs/lib/tests/test_nose.py", line 59, in scatman
+    pop = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE)
+  File "/usr/lib64/python2.6/subprocess.py", line 639, in __init__
+    errread, errwrite)
+  File "/usr/lib64/python2.6/subprocess.py", line 1228, in _execute_child
+    raise child_exception
+OSError: [Errno 2] No such file or directory
+-------------------- >> begin captured stdout << ---------------------
+ -vfs mount point: database=~/.scfs/cat1.sqlite
+ -registering (blind dir) at: /home/kraljo/.scfs/cat1.sqlite
+ -into arch.fld: WD_UC1
+ -cmd: scatman add /tmp/dev/scwd WD_UC1 /home/kraljo/.scfs/cat1.sqlite
+--------------------- >> end captured stdout << ----------------------
+----------------------------------------------------------------------
+Ran 2 tests in 0.016s
+
+FAILED (errors=1)
+
+scfs$> scatman add /tmp/dev/scwd WD_UC1 /home/kraljo/.scfs/cat1.sqlite
+Command not found. 
+
+scfs$> ln -sv `pwd`/lib/scat* ~/bin
+`/home/kraljo/bin/scatfs' -> `/home/kraljo/text/scfs/lib/scatfs'
+`/home/kraljo/bin/scatman' -> `/home/kraljo/text/scfs/lib/scatman'
+
+scfs$> scatman add /tmp/dev/scwd WD_UC1 /home/kraljo/.scfs/cat1.sqlite
+Traceback (most recent call last):
+  File "/home/kraljo/bin/scatman", line 13, in <module>
+    from pysqlite2 import dbapi2 as sqlite
+ImportError: No module named pysqlite2
+
+scfs$> python -c 'import sqlite3'
+scfs$> python -c 'import pysqlite2'
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ImportError: No module named pysqlite2
+
+scfs$> scatman add /tmp/dev/scwd WD_UC1 /home/kraljo/.scfs/cat1.sqlite
+Traceback (most recent call last):
+  File "/home/kraljo/bin/scatman", line 18, in <module>
+    from Scfs.CatalogCreator import CatalogCreator
+ImportError: No module named Scfs.CatalogCreator
+
+scfs$> sudo touch $pakSite/Scfs/__init__.py
+scfs$> scatman add /tmp/dev/scwd WD_UC1 /home/kraljo/.scfs/cat1.sqlite
+Traceback (most recent call last):
+  File "/home/kraljo/bin/scatman", line 18, in <module>
+    from Scfs.CatalogCreator import CatalogCreator
+  File "/usr/lib/python2.6/site-packages/Scfs/CatalogCreator.py", line 14, in <module>
+    from pysqlite2 import dbapi2 as sqlite
+ImportError: No module named pysqlite2
+
+ #pep> replaced by import sqlite3 as sqlite
+scfs$> find . -name "*.py" -or -name "scat*" -exec grep -Hin 'sqlite[23]' "{}" \;
+./lib/scatfs:15:import sqlite3 as sqlite
+./lib/scatfs:16:# from pysqlite2 import dbapi2 as sqlite
+./lib/scatman:13:# from pysqlite2 import dbapi2 as sqlite
+./lib/scatman:14:import sqlite3 as sqlite
+
+scfs$> scatman add /tmp/dev/scwd WD_UC1 /home/kraljo/.scfs/cat1.sqlite
+Traceback (most recent call last):
+  File "/home/kraljo/bin/scatman", line 18, in <module>
+    from Scfs.CatalogCreator import CatalogCreator
+  File "/usr/lib/python2.6/site-packages/Scfs/CatalogCreator.py", line 17, in <module>
+    from ScatServices import *
+ImportError: No module named ScatServices
+
+scfs$> sudo ln -sv -bf `pwd`/lib/scatfs $pakSite/Scfs/ScatServices.py
+`/usr/lib/python2.6/site-packages/Scfs/ScatServices.py' -> `/home/kraljo/text/scfs/lib/scatfs'
+
+scfs$> scatman add /tmp/dev/scwd WD_UC1 /home/kraljo/.scfs/cat1.sqlite
+Traceback (most recent call last):
+  File "/home/kraljo/bin/scatman", line 18, in <module>
+    from Scfs.CatalogCreator import CatalogCreator
+  File "/usr/lib/python2.6/site-packages/Scfs/CatalogCreator.py", line 17, in <module>
+    from ScatServices import *
+  File "/usr/lib/python2.6/site-packages/Scfs/ScatServices.py", line 13, in <module>
+    import fuse
+ImportError: No module named fuse
+ #pep> scatfs edited
+
+scfs$> scatman add /tmp/dev/scwd WD_UC1 /home/kraljo/.scfs/cat1.sqlite
+pep> /home/kraljo/bin/scatman
+Traceback (most recent call last):
+  File "/home/kraljo/bin/scatman", line 18, in <module>
+    from Scfs.CatalogCreator import CatalogCreator
+  File "/usr/lib/python2.6/site-packages/Scfs/CatalogCreator.py", line 17, in <module>
+    from ScatServices import *
+  File "/usr/lib/python2.6/site-packages/Scfs/ScatServices.py", line 20, in <module>
+    from Scfs.utils import CacheDict
+ImportError: No module named utils
+
+scfs$> wget -O - http://ie.archive.ubuntu.com/download.sourceforge.net/pub/sourceforge/c/project/cd/cdcatfs/cdcatfs/0.1.5/cdcatfs-0.1.5.tar.gz | tar xzf - -O cdcatfs-0.1.5/src/Cdcatfs/utils.py | sudo tee $pakSite/Scfs/utils.py | wc
+--2013-01-20 17:07:51--  http://ie.archive.ubuntu.com/download.sourceforge.net/pub/sourceforge/c/project/cd/cdcatfs/cdcatfs/0.1.5/cdcatfs-0.1.5.tar.gz
+Resolving ie.archive.ubuntu.com... 193.1.193.69, 2001:770:18:aa40::c101:c145
+Connecting to ie.archive.ubuntu.com|193.1.193.69|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 17565 (17K) [application/x-gzip]
+Saving to: “STDOUT”
+     0K .......... .......                                    100% 47.9K=0.4s
+2013-01-20 17:07:51 (47.9 KB/s) - written to stdout [17565/17565]
+     44     116    1521
+
+scfs$> scatman add /tmp/dev/scwd WD_UC1 /home/kraljo/.scfs/cat1.sqlite
+pep> /home/kraljo/bin/scatman
+Traceback (most recent call last):
+  File "/home/kraljo/bin/scatman", line 18, in <module>
+    from Scfs.CatalogCreator import CatalogCreator
+  File "/usr/lib/python2.6/site-packages/Scfs/CatalogCreator.py", line 17, in <module>
+    from ScatServices import *
+  File "/usr/lib/python2.6/site-packages/Scfs/ScatServices.py", line 23, in <module>
+    if not hasattr(fuse, '__version__'):
+NameError: name 'fuse' is not defined
+
+scfs$> sudo ln -sv /usr/lib64/python2.4/site-packages/fuse* $pakSite
+[sudo] password for kraljo: 
+`/usr/lib/python2.6/site-packages/fuseparts' -> `/usr/lib64/python2.4/site-packages/fuseparts'
+`/usr/lib/python2.6/site-packages/fuse.py' -> `/usr/lib64/python2.4/site-packages/fuse.py'
+`/usr/lib/python2.6/site-packages/fuse.pyc' -> `/usr/lib64/python2.4/site-packages/fuse.pyc'
+`/usr/lib/python2.6/site-packages/fuse.pyo' -> `/usr/lib64/python2.4/site-packages/fuse.pyo'
+`/usr/lib/python2.6/site-packages/fuse_python-0.2.1-py2.4.egg-info' -> `/usr/lib64/python2.4/site-packages/fuse_python-0.2.1-py2.4.egg-info'
+
+scfs$> scatman add /tmp/dev/scwd WD_UC1 /home/kraljo/.scfs/cat1.sqlite
+Traceback (most recent call last):
+  File "/home/kraljo/bin/scatman", line 18, in <module>
+    from Scfs.CatalogCreator import CatalogCreator
+  File "/usr/lib/python2.6/site-packages/Scfs/CatalogCreator.py", line 17, in <module>
+    from ScatServices import *
+  File "/usr/lib/python2.6/site-packages/Scfs/ScatServices.py", line 30, in <module>
+    class MyStat(fuse.Stat):
+NameError: name 'fuse' is not defined
+
+pep$> wget ftp://ftp.pbone.net/mirror/archive.fedoraproject.org/fedora/linux/releases/11/Everything/x86_64/os/Packages/fuse-python-0.2-10.fc11.x86_64.rpm
+scfs$> scatman add /tmp/dev/scwd WD_UC1 /home/kraljo/.scfs/cat1.sqlite
+Traceback (most recent call last):
+  File "/home/kraljo/bin/scatman", line 18, in <module>
+    from Scfs.CatalogCreator import CatalogCreator
+  File "/usr/lib/python2.6/site-packages/Scfs/CatalogCreator.py", line 17, in <module>
+    from ScatServices import *
+  File "/usr/lib/python2.6/site-packages/Scfs/ScatServices.py", line 30, in <module>
+    class MyStat(fuse.Stat):
+NameError: name 'fuse' is not defined
+
+scfs$> python -c 'import fuse; print dir (fuse)'
+['APIVersion', 'Direntry', 'E2BIG', 'EACCES', 'EADDRINUSE', 'EADDRNOTAVAIL', 'EADV', 'EAFNOSUPPORT', 'EAGAIN', 'EALREADY', 'EBADE', 'EBADF', 'EBADFD', 'EBADMSG', 'EBADR', 'EBADRQC', 'EBADSLT', 'EBFONT', 'EBUSY', 'ECHILD', 'ECHRNG', 'ECOMM', 'ECONNABORTED', 'ECONNREFUSED', 'ECONNRESET', 'EDEADLK', 'EDEADLOCK', 'EDESTADDRREQ', 'EDOM', 'EDOTDOT', 'EDQUOT', 'EEXIST', 'EFAULT', 'EFBIG', 'EHOSTDOWN', 'EHOSTUNREACH', 'EIDRM', 'EILSEQ', 'EINPROGRESS', 'EINTR', 'EINVAL', 'EIO', 'EISCONN', 'EISDIR', 'EISNAM', 'EL2HLT', 'EL2NSYNC', 'EL3HLT', 'EL3RST', 'ELIBACC', 'ELIBBAD', 'ELIBEXEC', 'ELIBMAX', 'ELIBSCN', 'ELNRNG', 'ELOOP', 'EMFILE', 'EMLINK', 'EMSGSIZE', 'EMULTIHOP', 'ENAMETOOLONG', 'ENAVAIL', 'ENETDOWN', 'ENETRESET', 'ENETUNREACH', 'ENFILE', 'ENOANO', 'ENOBUFS', 'ENOCSI', 'ENODATA', 'ENODEV', 'ENOENT', 'ENOEXEC', 'ENOLCK', 'ENOLINK', 'ENOMEM', 'ENOMSG', 'ENONET', 'ENOPKG', 'ENOPROTOOPT', 'ENOSPC', 'ENOSR', 'ENOSTR', 'ENOSYS', 'ENOTBLK', 'ENOTCONN', 'ENOTDIR', 'ENOTEMPTY', 'ENOTNAM', 'ENOTSOCK', 'ENOTTY', 'ENOTUNIQ', 'ENXIO', 'EOPNOTSUPP', 'EOVERFLOW', 'EPERM', 'EPFNOSUPPORT', 'EPIPE', 'EPROTO', 'EPROTONOSUPPORT', 'EPROTOTYPE', 'ERANGE', 'EREMCHG', 'EREMOTE', 'EREMOTEIO', 'ERESTART', 'EROFS', 'ESHUTDOWN', 'ESOCKTNOSUPPORT', 'ESPIPE', 'ESRCH', 'ESRMNT', 'ESTALE', 'ESTRPIPE', 'ETIME', 'ETIMEDOUT', 'ETOOMANYREFS', 'ETXTBSY', 'EUCLEAN', 'EUNATCH', 'EUSERS', 'EWOULDBLOCK', 'EXDEV', 'EXFULL', 'ErrnoWrapper', 'FUSE_PYTHON_API_VERSION', 'Flock', 'Fuse', 'FuseAPIVersion', 'FuseArgs', 'FuseError', 'FuseFileInfo', 'FuseFormatter', 'FuseGetContext', 'FuseInvalidate', 'FuseOptParse', 'FuseStruct', 'OptParseError', 'SUPPRESS_HELP', 'Stat', 'StatVfs', 'SubOptsHive', 'SubbedOptFormatter', 'SubbedOptIndentedFormatter', 'SubbedOptParse', 'Timespec', '__builtins__', '__doc__', '__file__', '__getenv__', '__name__', '__package__', '__version__', 'compat_0_1', 'environ', 'errorcode', 'feature_assert', 'feature_needs', 'fuse_python_api', 'get_compat_0_1', 'get_fuse_python_api', 'join', 'main', 're', 'set', 'sys', 'warnings']
+
+scfs$> python -c 'import fuse; print dir (fuse.Stat)'
+['__class__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__']
+
+scfs$> scatman add /tmp/dev/scwd WD_UC1 /home/kraljo/.scfs/cat1.sqlite
+Traceback (most recent call last):
+  File "/home/kraljo/bin/scatman", line 89, in <module>
+    catCreator = CatalogCreator(dbFile, mountPoint, CDLabel)
+  File "/usr/lib/python2.6/site-packages/Scfs/CatalogCreator.py", line 34, in __init__
+    self.__initDb();
+  File "/usr/lib/python2.6/site-packages/Scfs/CatalogCreator.py", line 72, in __initDb
+    con = sqlite.connect(self.__dbFile)
+sqlite3.OperationalError: unable to open database file
+
+scfs$> mkdir -v ~/.scfs/
+mkdir: created directory `/home/kraljo/.scfs/'
+
+scfs$> scatman add /tmp/dev/scwd WD_UC1 /home/kraljo/.scfs/cat1.sqlite
+ -got exception at sql execution.. no such table: CDs
+ -index: 0, -files |1|: ['/tmp/dev/scwd']
+ -file: ['/tmp/dev/scwd'], index+1..
+ - -index: 1, -files |1|: ['/tmp/dev/scwd']
+Fetching.. dir: /tmp/dev/scwd ( -stack: [('/tmp/dev/scwd', 1)] )
+ -index: 0, -files |2|: ['a', 'b']
+ -file: ['a', 'b'], index+1..
+ \ -index: 1, -files |2|: ['a', 'b']
+ -file: ['a', 'b'], index+1..
+ | -index: 2, -files |2|: ['a', 'b']
+Fetching.. dir: /tmp/dev/scwd ( -stack: [('/tmp/dev/scwd/a', 2), ('/tmp/dev/scwd/b', 3)] )
+ -index: 0, -files |1|: ['bb']
+ -file: ['bb'], index+1..
+ / -index: 1, -files |1|: ['bb']
+Fetching.. dir: /tmp/dev/scwd/b ( -stack: [('/tmp/dev/scwd/a', 2), ('/tmp/dev/scwd/b/bb', 4)] )
+ -index: 0, -files |1|: ['234']
+ -file: ['234'], index+1..
+ -index: 1, -files |1|: ['234']
+Fetching.. dir: /tmp/dev/scwd/b/bb ( -stack: [('/tmp/dev/scwd/a', 2)] )
+ -index: 0, -files |1|: ['123']
+ -file: ['123'], index+1..
+ -index: 1, -files |1|: ['123']
+Fetching.. dir: /tmp/dev/scwd/a ( -stack: [] )
+
+scfs$> rm -vr /tmp/dev/scwd/*; rm -vr ~/.scfs/cat1.sqlite
+removed `/tmp/dev/scwd/a/123'
+removed directory: `/tmp/dev/scwd/a'
+removed `/tmp/dev/scwd/b/bb/234'
+removed directory: `/tmp/dev/scwd/b/bb'
+removed directory: `/tmp/dev/scwd/b'
+removed `/home/kraljo/.scfs/cat1.sqlite'
+
+scfs$> nosetests -v lib/
+Basic Test/s Setup ... ok
+Use case 1 (Catalog for xattrs) ... ok
+----------------------------------------------------------------------
+Ran 2 tests in 0.541s
+OK
+
+scfs$> rmdir -v ~/.scfs/
+rmdir: removing directory, `/home/kraljo/.scfs/'
+rmdir: failed to remove `/home/kraljo/.scfs/': Directory not empty
+
+scfs$> ll ~/.scfs/
+total 8
+-rw-r--r--. 1 kraljo kraljo 7168 Jan 20 20:41 cat1.sqlite
+
+scfs$> rm -vr /tmp/dev/scwd/*; rm -vr ~/.scfs/cat1.sqlite
+removed `/tmp/dev/scwd/a/123'
+removed directory: `/tmp/dev/scwd/a'
+removed `/tmp/dev/scwd/b/bb/234'
+removed directory: `/tmp/dev/scwd/b/bb'
+removed directory: `/tmp/dev/scwd/b'
+removed `/home/kraljo/.scfs/cat1.sqlite'
+
+scfs$> rmdir -v ~/.scfs/
+rmdir: removing directory, `/home/kraljo/.scfs/'
+
+scfs$> nosetests -v lib/
+Basic Test/s Setup ... ok
+Use case 1 (Catalog for xattrs) ... Traceback (most recent call last):
+  File "/home/kraljo/bin/scatman", line 89, in <module>
+    catCreator = CatalogCreator(dbFile, mountPoint, CDLabel)
+  File "/usr/lib/python2.6/site-packages/Scfs/CatalogCreator.py", line 34, in __init__
+    self.__initDb();
+  File "/usr/lib/python2.6/site-packages/Scfs/CatalogCreator.py", line 72, in __initDb
+    con = sqlite.connect(self.__dbFile)
+sqlite3.OperationalError: unable to open database file
+ok
+----------------------------------------------------------------------
+Ran 2 tests in 0.048s
+OK
+
+scfs$> ll ~/.scfs/
+ls: cannot access /home/kraljo/.scfs/: No such file or directory
+
+scfs$> 

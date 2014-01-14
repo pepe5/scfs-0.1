@@ -7,6 +7,58 @@
 
 
 * TODO
+** see rework @ [[file:/home/kraljo/text/my-confs/doc/readme.org::sclocate-import.pl%20|%20pv%20|%20sqlite3%20$F.sqlite][sclocate-import.pl | pv | sqlite3 $F.sqlite]]
+*** (vv) sclocate-import.pl, <2014-01-14 Tue>
+#> F=$(df -hP | egrep " `pwd`$" | cut -d\  -f1 | xargs basename)@`uname -n`,`date -Id`; echo F:$F
+#> find . -type f -ls | ~kraljo/bin/sclocate-import.pl | pv | sqlite3 $F.sqlite
+use POSIX;
+BEGIN
+{ print "PRAGMA foreign_keys=OFF;
+      BEGIN TRANSACTION;
+      CREATE VIRTUAL TABLE find_ls USING fts4
+      ( ix INTEGER PRIMARY KEY AUTOINCREMENT,
+        dt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        fts4 TEXT );" }
+
+s/'/''/g; 
+s/\\([^\\])/$1/g;
+print "INSERT INTO find_ls VALUES
+      ( NULL,
+        '".(strftime "%F %T", localtime)."',
+        '$_');";
+
+END { print "COMMIT;" }
+
+*** TODO $> find . -type f -printf "%i %k %M %n %u %g %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n"
+*** ( :43_time: ) $> FSs=`mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | xargs echo`; echo FSs:$FSs
+    - $> eval ls -ld {`echo $FSs | perl -pe 's/ /,/g'`}/*@*.sqlite
+
+*** $> S=sierra; echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
+cd $FS; ls -ldh `pwd`/*@*.sqlite
+sqlite3 *@*.sqlite "SELECT * FROM find_ls WHERE fts4 MATCH '$S*' LIMIT 10"
+echo; done
+
+*** new model:
+**** 1 [[fvlocation]] :: id/ed by (key): location fname, location dirname, mtime, fs-id
+**** redundant data > [[fvlocation]] dependent:
+***** fs data ~> size, x-time/s, fs-based perm/s, ..
+
+**** 1 [[fversion]] :: id/ed by "content check/s authenticity":
+***** analysis ~> sum, other analysis, ..
+
+**** redundant data > [[fversion]] - content dependent:
+***** db-own data ~> use, purpose perm/s
+
+
+***** [[fversion]]/s can be grouped to [[File-tree]]
+      - which is obj. /Class/ (prototype) - not content /instance/
+
+
+**** redundant data > every-time calculated:
+***** [[fversion]] HA ~> mirrors#, age of cache/s, accessibility stat/s
+***** [[fversion]] SYNChronicity ~> if it is head of [[File-tree]]
+
+
 ** print " -makedirs exception: %s" % err >> test exception instead
    + mountPoint = userPoint --> addPoint = userPoint
 ** move Cdcatfs (Case Conflict 1)
@@ -54,26 +106,20 @@
 * SETUP
 ** dev env depl (at $> cd ~/text/scfs/:)
 *** TODO add this from context/s of: [[file:::/install%20-v%20-d%20/tmp/dev/scwd/][/install -v -d /tmp/dev/scwd/]]
-*** INST (only 1st time)
-**** >! distutil shall handle this!
-     pushd /usr/lib/python2.5/site-packages/ && pakSite=`pwd` && popd
-     pushd /usr/local/lib/python2.6/dist-packages/ && pakSite=`pwd` && popd
-     pushd /usr/lib/python2.7/dist-packages/ && pakSite=`pwd` && popd
 
-**** >? sudo install -v -d $pakSite/Scfs/ # is necessary when vvv #> ?
-     sudo ln -sv -bf `pwd`/lib/Cat*.py `pwd`/lib/Dir*.py $pakSite/Scfs/
-     sudo ln -sv -bf `pwd`/lib/scatfs $pakSite/Scfs/ScatServices.py
-     echo | sudo tee $pakSite/Scfs/__init__.py
-     sudo cp -v $pakSite/Cdcatfs/utils.py $pakSite/Scfs/ #> <depends on Cdcatfs
-     install -v -d /tmp/dev/scwd/a /tmp/dev/scwd/b
-     PATH=$PATH:`pwd`/lib
-
-**** $> PATH=$PATH:$HOME/text/scfs/lib
 *** RE/FRESH (tear down dev env)
 **** $> rm -vr /tmp/dev/scwd/*
 **** $> rm -vr ~/.scfs/cat1.sqlite
 
-** os/pkg depl (TODO)
+** INST (only 1st time)
+*** linking to site-packages
+     pushd /usr/lib/python2.5/site-packages/ && pakSite=`pwd` && popd
+     pushd /usr/local/lib/python2.6/dist-packages/ && pakSite=`pwd` && popd
+     pushd /usr/lib/python2.7/dist-packages/ && pakSite=`pwd` && popd
+**** TODO >! distutil shall handle this!
+
+**** $> PATH=$PATH:$HOME/text/scfs/lib
+
 *** install fuse binding
 **** TODO :STU: a8h if is there too ver.: ftp://ftp.pbone.net/mirror/archive.fedoraproject.org/fedora/linux/releases/11/Everything/x86_64/os/Packages/fuse-python-0.2-10.fc11.x86_64.rpm
 
@@ -85,6 +131,9 @@
 **** $> wget -O - http://ie.archive.ubuntu.com/download.sourceforge.net/pub/sourceforge/c/project/cd/cdcatfs/cdcatfs/0.1.5/cdcatfs-0.1.5.tar.gz | tar xzf - -O cdcatfs-0.1.5/src/Cdcatfs/utils.py | sudo tee $pakSite/Scfs/utils.py | wc
 **** $> sudo ln -sv /usr/lib64/python2.4/site-packages/fuse* $pakSite
 **** $> ln -sv `pwd`/lib/scat* ~/bin
+
+*** opening .scfs personal repo
+**** $> mkdir -v ~/.scfs/
 
 
 * XATTR PART
