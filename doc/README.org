@@ -61,6 +61,11 @@ END { print "COMMIT;" }
 
 *** $> S=sierra; echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
 cd $FS; ls -ldh `pwd`/*@*.sqlite
+sqlite3 `ls -1t *@*.sqlite | head -1` "SELECT * FROM find_printf WHERE fn LIKE '$S%' LIMIT 10"
+echo; done
+
+**** :ARCHIVE: $> S=sierra; echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
+cd $FS; ls -ldh `pwd`/*@*.sqlite
 sqlite3 *@*.sqlite "SELECT * FROM find_ls WHERE fts4 MATCH '$S*' LIMIT 10"
 echo; done
 
