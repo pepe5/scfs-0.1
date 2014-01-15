@@ -8,6 +8,14 @@
 
 * TODO
 ** see rework @ [[file:/home/kraljo/text/my-confs/doc/readme.org::sclocate-import.pl%20|%20pv%20|%20sqlite3%20$F.sqlite][sclocate-import.pl | pv | sqlite3 $F.sqlite]]
+*** entry stat:> echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
+cd $FS
+F=$(df -hP | egrep " `pwd`$" | cut -d\  -f1 | xargs basename)@`uname -n`,`date -Id`; echo F:$F
+mv -vbf $F.sqlite{,~}
+find . -type f -printf "%i %k %M %n %u %g %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" | head -3 | ~kraljo/bin/sclocate-import.pl | pv | sqlite3 $F.sqlite
+ls -ldh `pwd`/*@*.sqlite `pwd`/$F.sqlite | sort -u
+echo; done
+
 *** (vv) sclocate-import.pl, <2014-01-14 Tue>
 #> F=$(df -hP | egrep " `pwd`$" | cut -d\  -f1 | xargs basename)@`uname -n`,`date -Id`; echo F:$F
 #> find . -type f -ls | ~kraljo/bin/sclocate-import.pl | pv | sqlite3 $F.sqlite
@@ -30,6 +38,11 @@ print "INSERT INTO find_ls VALUES
 END { print "COMMIT;" }
 
 *** TODO $> find . -type f -printf "%i %k %M %n %u %g %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n"
+
+
+*** TODO gen [[fs-id]]/s ~ in py> product('ABCD', repeat=2) #> AA AB AC AD BA BB BC BD CA CB CC CD DA DB DC DD
+    - >? http://stackoverflow.com/questions/8242972/is-there-anything-like-python-itertools-in-perl
+
 *** ( :43_time: ) $> FSs=`mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | xargs echo`; echo FSs:$FSs
     - $> eval ls -ld {`echo $FSs | perl -pe 's/ /,/g'`}/*@*.sqlite
 
@@ -39,7 +52,7 @@ sqlite3 *@*.sqlite "SELECT * FROM find_ls WHERE fts4 MATCH '$S*' LIMIT 10"
 echo; done
 
 *** new model:
-**** 1 [[fvlocation]] :: id/ed by (key): location fname, location dirname, mtime, fs-id
+**** 1 [[fvlocation]] :: id/ed by (key): location fname, location dirname, mtime, [[fs-id]]
 **** redundant data > [[fvlocation]] dependent:
 ***** fs data ~> size, x-time/s, fs-based perm/s, ..
 
@@ -160,6 +173,10 @@ echo; done
 
 
 * STU
+** :whatif: new (sql) schema #> Error: table find_printf has 10 columns but 11 values were supplied
+   - > cound file:../lib/sclocate-import.pl::/,$/
+   - <2014-01-15 Wed> i missed ',' after /lns INTEGER/
+
 ** query iface grep-find~
    - $> find $d -type f | while read L; do echo '' -$L:; locate "$L" | awk '{print "\""$0"\""}' | xargs ls -dilt; done
 *** :ARCHIVE:
