@@ -12,9 +12,22 @@
 cd $FS
 F=$(df -hP | egrep " `pwd`$" | cut -d\  -f1 | xargs basename)@`uname -n`,`date -Id`; echo F:$F
 mv -vbf $F.sqlite{,~}
-find . -type f -printf "%i %k %M %n %u %g %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" | head -3 | ~kraljo/bin/sclocate-import.pl | pv | sqlite3 $F.sqlite
-ls -ldh `pwd`/*@*.sqlite `pwd`/$F.sqlite | sort -u
+find . -type f -printf "%i %k %M %n %u %g %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" | ~/bin/sclocate-import.pl | pv | sqlite3 $F.sqlite
+ls -ldht `pwd`/*@*.sqlite* `pwd`/$F.sqlite | sort -t@ -k2r -u
 echo; done
+**** $> echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
+cd $FS
+F=$(df -hP | egrep " `pwd`$" | cut -d\  -f1 | xargs basename)@`uname -n`,`date -Id`; echo F:$F
+cat <<EOF | sqlite3 $F.sqlite
+CREATE INDEX "find_printf_inode" on find_printf (inode ASC);
+CREATE INDEX "find_printf_s" on find_printf (s ASC);
+CREATE INDEX "find_printf_mtime" on find_printf (mtime ASC);
+CREATE INDEX "find_printf_dir" on find_printf (dir ASC);
+CREATE INDEX "find_printf_fn" on find_printf (fn ASC);
+EOF
+ls -ldht `pwd`/*@*.sqlite* `pwd`/$F.sqlite | sort -t@ -k2r -u
+echo; done
+
 
 *** (vv) sclocate-import.pl, <2014-01-14 Tue>
 #> F=$(df -hP | egrep " `pwd`$" | cut -d\  -f1 | xargs basename)@`uname -n`,`date -Id`; echo F:$F
