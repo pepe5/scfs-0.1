@@ -1,2 +1,28 @@
 #!/bin/bash
-/bin/ls $* | tr '[:lower:]' '[:upper:]'
+# remove -l from switches
+
+if [[ $@ =~ ^--sc|\ --sc\ |--sc$ ]];
+then echo '' --sc: implies -l.. 1>&2
+else exec /bin/ls $*
+fi
+
+A=''; for ARG in $*; do
+    A="$A `echo $ARG | perl -ne '
+    if (/^-/ and not /^--/) {s/l//g and print qq{$_}}
+    elsif (not /^--sc$/) {print}'`";
+done; echo '' -ARGS:$A 1>&2
+
+/bin/ls $A -1 | while read F; do
+    S=${F##*/}; echo '' -S:$S 1>&2
+    mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
+        cd $FS
+        CAT=`ls -1t *@*.sqlite | head -1`
+        export CAT
+        sqlite3 $CAT "
+        SELECT * FROM find_printf
+        WHERE fn = '$S'
+        LIMIT 10" \
+            | cut -d\| -f3- | sed -e 's/|/ /g' \
+            | awk -v C=${CAT%%@*} '{print C": "$0}'
+    done
+done
