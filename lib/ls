@@ -15,14 +15,16 @@ done; echo '' -ARGS:$A 1>&2
 /bin/ls $A -1 | while read F; do
     S=${F##*/}; echo '' -S:$S 1>&2
     mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
-        cd $FS
+        cd $FS 2>/dev/null
         CAT=`ls -1t *@*.sqlite | head -1`
         export CAT
         sqlite3 $CAT "
         SELECT * FROM find_printf
         WHERE fn = '$S'
         LIMIT 10" \
-            | cut -d\| -f3- | sed -e 's/|/ /g' \
-            | awk -v C=${CAT%%@*} '{print C": "$0}'
+            | perl -nle '
+              @A=split (/\|/); @A=@A[2..$#A];
+              $ENV{"CAT"} =~ /(.*)@([^.,]+)[.,]/;
+              print join (" ",@A[0..3]).qq{ $1 $2 }.join (" ",@A[5..$#A-1])."$A[$#A]"'
     done
 done
