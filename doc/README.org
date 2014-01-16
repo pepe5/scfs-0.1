@@ -19,39 +19,16 @@ echo; done
 cd $FS
 F=$(df -hP | egrep " `pwd`$" | cut -d\  -f1 | xargs basename)@`uname -n`,`date -Id`; echo F:$F
 cat <<EOF | sqlite3 $F.sqlite
-CREATE INDEX "find_printf_inode" on find_printf (inode ASC);
-CREATE INDEX "find_printf_s" on find_printf (s ASC);
-CREATE INDEX "find_printf_mtime" on find_printf (mtime ASC);
-CREATE INDEX "find_printf_dir" on find_printf (dir ASC);
-CREATE INDEX "find_printf_fn" on find_printf (fn ASC);
+CREATE INDEX "find_printf_inode" ON find_printf (inode ASC);
+CREATE INDEX "find_printf_s" ON find_printf (s ASC);
+CREATE INDEX "find_printf_mtime" ON find_printf (mtime ASC);
+CREATE INDEX "find_printf_dir" ON find_printf (dir ASC);
+CREATE INDEX "find_printf_fn" ON find_printf (fn ASC);
 EOF
 ls -ldht `pwd`/*@*.sqlite* `pwd`/$F.sqlite | sort -t@ -k2r -u
 echo; done
 
-
-*** (vv) sclocate-import.pl, <2014-01-14 Tue>
-#> F=$(df -hP | egrep " `pwd`$" | cut -d\  -f1 | xargs basename)@`uname -n`,`date -Id`; echo F:$F
-#> find . -type f -ls | ~kraljo/bin/sclocate-import.pl | pv | sqlite3 $F.sqlite
-use POSIX;
-BEGIN
-{ print "PRAGMA foreign_keys=OFF;
-      BEGIN TRANSACTION;
-      CREATE VIRTUAL TABLE find_ls USING fts4
-      ( ix INTEGER PRIMARY KEY AUTOINCREMENT,
-        dt DATETIME DEFAULT CURRENT_TIMESTAMP,
-        fts4 TEXT );" }
-
-s/'/''/g; 
-s/\\([^\\])/$1/g;
-print "INSERT INTO find_ls VALUES
-      ( NULL,
-        '".(strftime "%F %T", localtime)."',
-        '$_');";
-
-END { print "COMMIT;" }
-
-*** TODO $> find . -type f -printf "%i %k %M %n %u %g %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n"
-
+*** file:~/text/scfs/lib/sclocate-import.pl
 
 *** TODO gen [[fs-id]]/s ~ in py> product('ABCD', repeat=2) #> AA AB AC AD BA BB BC BD CA CB CC CD DA DB DC DD
     - >? http://stackoverflow.com/questions/8242972/is-there-anything-like-python-itertools-in-perl
