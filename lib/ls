@@ -7,20 +7,19 @@ else exec /bin/ls $*
 fi
 
 # remove -l from switches
-#>! fixme: this still excludes --long opts
-AnL=''; for ARG in $*
+# separate switches OPTS & files-specs ARGS
+O=''; A=''; for A1 in $*
 do
-    AnL="$AnL `echo $ARG | perl -ne '
-    if (/^-/ and not /^--/) {s/l//g and print qq{$_}}
-    elsif (not /^--sc$/) {print}'`";
-done; echo '' -ARGS:$AnL 1>&2
-
-# separate swithes OPTS & files-specs ARGS
-O=''; A=''
-
+    case $A1 in
+        (--sc) ;;
+        (--*) O="$O $A1";;
+        (-*) O="$O `echo $A1 | sed -e 's/l//g'`";;
+        (*) A="$A $A1";;
+    esac
+done; echo '' -O:$O -A: $A 1>&2
 
 # foreach file-spec/*, list CAT/s rec/s
-/bin/ls -1 $AnL | while read F
+/bin/ls -1 $A | while read F
 do
     S=${F##*/}; echo '' -$S: 1>&2
     ls -dils --time-style=long-iso "$F"
