@@ -8,9 +8,6 @@ then true
 else exec /bin/ls $*
 fi
 
-echo '' -1-pwd: `pwd`
-echo '' -1-args: $@
-
 # remove -l from switches
 # separate switches OPTS & files-specs ARGS
 O=''; A=''; for A1 in $*
@@ -26,7 +23,7 @@ done
 # echo '' -O:$O -A: $A 1>&2
 
 # we need to track dir/s from $A/s
-#>! lets have only 1 arg in $A for now
+#>? lets have only 1 arg in $A for now
 if [[ $A =~ [^[:space:]]+ ]];
 then A=${A## }
 else A=.
@@ -35,8 +32,8 @@ fi
 # foreach file-spec/*, list CAT/s rec/s
 /bin/ls -1 $O $A | while read F
 do
-    S=${F##*/}; echo '' -$S: 1>&2
-    /bin/ls -dl --time-style=long-iso "$A/$F" || echo '' -2-pwd: `pwd`
+    S=${F##*/}
+    /bin/ls -dl --time-style=long-iso "$A/$F"
         #>! try if prepending fn by ../ would help dired to handle directories
         # echo $S: # '' -$S: 1>&2
         # ..
