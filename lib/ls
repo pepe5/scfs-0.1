@@ -2,10 +2,14 @@
 
 # wrapper fallback
 if [[ $@ =~ ^--sc|\ --sc\ |--sc$ ]]
-then echo '' --sc: implies -l --time-style=long-iso .. 1>&2
-# -dils is not matching dired defaults
+then true
+    # echo '' --sc: implies -l --time-style=long-iso .. 1>&2
+    # -dils is not matching dired defaults
 else exec /bin/ls $*
 fi
+
+echo '' -1-pwd: `pwd`
+echo '' -1-args: $@
 
 # remove -l from switches
 # separate switches OPTS & files-specs ARGS
@@ -18,13 +22,27 @@ do
         (-*) O="$O `echo $A1 | sed -e 's/l//g'`";;
         (*) A="$A $A1";;
     esac
-done; echo '' -O:$O -A: $A 1>&2
+done
+# echo '' -O:$O -A: $A 1>&2
+
+# we need to track dir/s from $A/s
+#>! lets have only 1 arg in $A for now
+if [[ $A =~ [^[:space:]]+ ]];
+then A=${A## }
+else A=.
+fi
 
 # foreach file-spec/*, list CAT/s rec/s
 /bin/ls -1 $O $A | while read F
 do
     S=${F##*/}; echo '' -$S: 1>&2
-    ls -dl --time-style=long-iso "$F"
+    /bin/ls -dl --time-style=long-iso "$A/$F" || echo '' -2-pwd: `pwd`
+        #>! try if prepending fn by ../ would help dired to handle directories
+        # echo $S: # '' -$S: 1>&2
+        # ..
+        # | perl -nle '
+        #   @A=split / /
+        #   print join (" ",@A[0..6]).qq{ ../}.join (" ",@A[7..$#A])'
     if ! [[ -d $F ]]
     then        
         mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS
@@ -41,5 +59,6 @@ do
                       $ENV{"CAT"} =~ /(.*)@([^.,]+)[.,]/;
                       print join (" ",@A[0..1]).qq{ $1 $2 }.join (" ",@A[3..$#A-1])."$A[$#A]"'
         done
-    fi; if [[ $GROUP = fn ]]; then echo; fi
+        if [[ $GROUP = fn ]]; then echo; fi
+    fi
 done
