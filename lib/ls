@@ -13,6 +13,7 @@ O=''; A=''; for A1 in $*
 do
     case $A1 in
         (--sc) ;;
+        (--group=fn) GROUP=fn;;
         (--*) O="$O $A1";;
         (-*) O="$O `echo $A1 | sed -e 's/l//g'`";;
         (*) A="$A $A1";;
@@ -40,5 +41,5 @@ do
                       $ENV{"CAT"} =~ /(.*)@([^.,]+)[.,]/;
                       print join (" ",@A[0..1]).qq{ $1 $2 }.join (" ",@A[3..$#A-1])."$A[$#A]"'
         done
-    fi
+    fi; if [[ $GROUP = fn ]]; then echo; fi
 done
