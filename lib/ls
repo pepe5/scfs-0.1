@@ -2,7 +2,8 @@
 
 # wrapper fallback
 if [[ $@ =~ ^--sc|\ --sc\ |--sc$ ]]
-then echo '' --sc: implies -dils --time-style=long-iso .. 1>&2
+then echo '' --sc: implies -l --time-style=long-iso .. 1>&2
+# -dils is not matching dired defaults
 else exec /bin/ls $*
 fi
 
@@ -19,10 +20,10 @@ do
 done; echo '' -O:$O -A: $A 1>&2
 
 # foreach file-spec/*, list CAT/s rec/s
-/bin/ls -1 $A | while read F
+/bin/ls -1 $O $A | while read F
 do
     S=${F##*/}; echo '' -$S: 1>&2
-    ls -dils --time-style=long-iso "$F"
+    ls -dl --time-style=long-iso "$F"
     if ! [[ -d $F ]]
     then        
         mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS
@@ -30,14 +31,14 @@ do
             cd $FS 2>/dev/null
             export CAT=`ls -1t *@*.sqlite | head -1`
             sqlite3 $CAT "
-                      SELECT inode,du,perms,lns,ug,s,mtime,dir,fn
+                      SELECT perms,lns,ug,s,mtime,dir,fn
                       FROM find_printf
                       WHERE fn = '$S'
                       LIMIT 10" \
                   | perl -nle '
                       @A=split /\|/;
                       $ENV{"CAT"} =~ /(.*)@([^.,]+)[.,]/;
-                      print join (" ",@A[0..3]).qq{ $1 $2 }.join (" ",@A[5..$#A-1])."$A[$#A]"'
+                      print join (" ",@A[0..1]).qq{ $1 $2 }.join (" ",@A[3..$#A-1])."$A[$#A]"'
         done
     fi
 done
