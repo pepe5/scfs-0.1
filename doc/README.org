@@ -7,7 +7,7 @@
 
 
 * TODO
-** see rework @ [[file:/home/kraljo/text/my-confs/doc/readme.org::sclocate-import.pl%20|%20pv%20|%20sqlite3%20$F.sqlite][sclocate-import.pl | pv | sqlite3 $F.sqlite]]
+** rework @ [[file:/home/kraljo/text/my-confs/doc/readme.org::sclocate-import.pl%20|%20pv%20|%20sqlite3%20$F.sqlite][sclocate-import.pl | pv | sqlite3 $F.sqlite]]
 *** entry stat:> echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
 cd $FS
 F=$(df -hP | egrep " `pwd`$" | cut -d\  -f1 | xargs basename)@`uname -n`,`date -Id`; echo F:$F
@@ -90,6 +90,18 @@ echo; done
 
 
 * ACT INTRO
+** fresh os inst howto
+   - basically you have root (-/) fs of files from os inst &
+     all other (--customized) files have to go to /{mnt|media}/vol-name/
+*** so on root fs you will have
+    - minimal inst-pkg/s file/s
+    - (rest of) initial inst-pkg/s file/s
+    - added-pkg/s files
+    - (added) app-generated cache/s
+    - mount-point/s to real data-store/s
+    - file-link/s replacements instead of files which you customized
+    - dir-link/s replacements of dir/s which where empty & you want them fill
+
 ** dev act/s file:../lib/tests/test_nose.py
 *** [[dev env depl]]
     - $> rm -vr /tmp/dev/scwd/* ~/.scfs/cat1.sqlite; nosetests -v lib/
@@ -106,7 +118,6 @@ echo; done
     6    0 drwxr-xr-x   2 user     user           80 kvě 18 07:36 /home/user/mnt/cat1/WD_UC1/a
     8    0 -rw-rw-r--   1 user     user          329 kvě 18 09:05 /home/user/mnt/cat1/WD_UC1/a/123
     9    0 -rw-rw-r--   1 user     user          329 kvě 18 09:05 /home/user/mnt/cat1/WD_UC1/a/321
-
 
 ** UC1 /def test_uc1/
 
