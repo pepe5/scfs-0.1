@@ -28,11 +28,12 @@ O=''; A=''
             cd $FS 2>/dev/null
             export CAT=`ls -1t *@*.sqlite | head -1`
             sqlite3 $CAT "
-                      SELECT * FROM find_printf
+                      SELECT inode,du,perms,lns,ug,s,mtime,dir,fn
+                      FROM find_printf
                       WHERE fn = '$S'
                       LIMIT 10" \
                   | perl -nle '
-                      @A=split (/\|/); @A=@A[2..$#A];
+                      @A=split (/\|/);
                       $ENV{"CAT"} =~ /(.*)@([^.,]+)[.,]/;
                       print join (" ",@A[0..3]).qq{ $1 $2 }.join (" ",@A[5..$#A-1])."$A[$#A]"'
         done
