@@ -3,21 +3,22 @@
 # wrapper fallback
 if [[ $@ =~ ^--sc|\ --sc\ |--sc$ ]]
 then true
-    # echo '' --sc: implies -l --time-style=long-iso .. 1>&2
-    # -dils is not matching dired defaults
-else exec /bin/ls $*
+    # echo '' -scls: pwd: `pwd` 1>&2
+    # echo '' -scls: `perl -e 'for $i (0 .. $#ARGV) {print "$i: @ARGV[$i]\n"}' -- "$@"` 1>&2
+else
+    exec /bin/ls "$@"
 fi
 
 # remove -l from switches
 # separate switches OPTS & files-specs ARGS
-O=''; A=''; for A1 in $*
+O=''; A=''; for A1 in "$@"
 do
     case $A1 in
         (--sc) ;;
         (--group=fn) GROUP=fn;;
         (--*) O="$O $A1";;
         (-*) O="$O `echo $A1 | sed -e 's/l//g; s/^-$//'`";;
-        (*) A="$A $A1";;
+        (*) A="$A $A1";; #>? ="$A \"$A1\"" -- how to have 2+ ARG/s?
     esac
 done
 # echo '' -O:$O -A: $A 1>&2
@@ -30,7 +31,7 @@ else A=.
 fi
 
 # foreach file-spec/*, list CAT/s rec/s
-/bin/ls -1 $O $A | while read F
+/bin/ls -1 $O "$A" | while read F #>? eval? #| echo .. xargs? -- how to have 2+ ARG/s?
 do
     S=${F##*/}
     /bin/ls -dl --time-style=long-iso "$A/$F"
