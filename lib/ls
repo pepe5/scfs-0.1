@@ -2,9 +2,14 @@
 
 # wrapper fallback
 if [[ $@ =~ ^--sc|\ --sc\ |--sc$ ]]
-then true
-    # echo '' -scls: pwd: `pwd` 1>&2
-    # echo '' -scls: `perl -e 'for $i (0 .. $#ARGV) {print "$i: @ARGV[$i]\n"}' -- "$@"` 1>&2
+then
+    if [[ $1 =~ --verbose.* ]]
+    then
+        echo '' -scls: pwd: `pwd` 1>&2
+        echo '' -scls: `perl -e 'for $i (0 .. $#ARGV) {print "$i: @ARGV[$i]\n"}' -- "$@"` 1>&2
+        if [[ $1 = --verbose=x ]]; then set -x; fi
+        shift
+    fi
 else
     exec /bin/ls "$@"
 fi
@@ -34,7 +39,7 @@ fi
 /bin/ls -1 $O "$A" | while read F #>? eval? #| echo .. xargs? -- how to have 2+ ARG/s?
 do
     S=${F##*/}
-    /bin/ls -dl --time-style=long-iso "$A/$F"
+    /bin/ls -dl --time-style=long-iso "$F" #>? "$A/$S"
         #>! try if prepending fn by ../ would help dired to handle directories
         # echo $S: # '' -$S: 1>&2
         # ..

@@ -36,6 +36,7 @@ echo; done
 *** ( :43_time: ) $> FSs=`mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | xargs echo`; echo FSs:$FSs
     - $> eval ls -ld {`echo $FSs | perl -pe 's/ /,/g'`}/*@*.sqlite
 
+*** $> rsync -abvP -e 'ssh -l sam' 10.0.0.189:/media/sam/*/*15.sqlite /mnt/lifeboat-tmp/
 *** $> S=sierra; echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
 cd $FS; ls -ldh `pwd`/*@*.sqlite
 sqlite3 `ls -1t *@*.sqlite | head -1` "SELECT * FROM find_printf WHERE fn LIKE '$S%' LIMIT 10"
@@ -45,6 +46,14 @@ echo; done
 cd $FS; ls -ldh `pwd`/*@*.sqlite
 sqlite3 *@*.sqlite "SELECT * FROM find_ls WHERE fts4 MATCH '$S*' LIMIT 10"
 echo; done
+
+*** S> SELECT * FROM find_printf WHERE ix=(SELECT Max (ix) FROM find_printf);
+*** .> function sclocate \
+    { echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
+        cd $FS; ls -ldh `pwd`/*@*.sqlite
+        sqlite3 `ls -1t *@*.sqlite | head -1` "SELECT * FROM find_printf WHERE fn LIKE '$1%' LIMIT 10"
+        echo;
+    done; }
 
 *** new model:
 **** 1 [[fvlocation]] :: id/ed by (key): location fname, location dirname, mtime, [[fs-id]]
@@ -101,6 +110,12 @@ echo; done
     - mount-point/s to real data-store/s
     - file-link/s replacements instead of files which you customized
     - dir-link/s replacements of dir/s which where empty & you want them fill
+
+** ~/bin/ls needs
+*** one-elements file-spec in ARGV now (<2014-01-18 Sat>)
+*** -I'*~' in dired-listing-switches
+    (dired-listing-switches "--group-directories-first --time-style=long-iso -I'*~' -l")
+
 
 ** dev act/s file:../lib/tests/test_nose.py
 *** [[dev env depl]]
