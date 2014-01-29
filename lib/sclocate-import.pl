@@ -17,6 +17,7 @@ BEGIN
         mtime DATETIME,
         dir TEXT,
         fn TEXT);" }
+#>! ins. after dt> ut :: unlink-time - when file is moved or unlinked
 
 s/'/''/g;
 m{^

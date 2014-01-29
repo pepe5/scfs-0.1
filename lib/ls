@@ -62,6 +62,8 @@ do
                       $ENV{"CAT"} =~ /(.*)@([^.,]+)[.,]/;
                       print join (" ",@A[0..1]).qq{ $1 $2 }.join (" ",@A[3..$#A-1])."$A[$#A]"'
         done
+        #>! | { while read L; do Ls="`echo \"$Ls\n$L\"`"; done;
+        # 	    echo '' -fn count: `echo "$Ls" | sed -ne '2,$p' | wc -l`; }
         if [[ $GROUP = fn ]]; then echo; fi
     fi
 done

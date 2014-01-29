@@ -47,15 +47,146 @@ cd $FS; ls -ldh `pwd`/*@*.sqlite
 sqlite3 *@*.sqlite "SELECT * FROM find_ls WHERE fts4 MATCH '$S*' LIMIT 10"
 echo; done
 
-*** S> SELECT * FROM find_printf WHERE ix=(SELECT Max (ix) FROM find_printf);
-*** .> function sclocate \
-    { echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
-        cd $FS; ls -ldh `pwd`/*@*.sqlite
-        sqlite3 `ls -1t *@*.sqlite | head -1` "SELECT * FROM find_printf WHERE fn LIKE '$1%' LIMIT 10"
-        echo;
-    done; }
+*** S> SELECT * FROM find_printf WHERE ix=(SELECT Max (ix) FROM find_printf); # +
+**** S> SELECT s, count(s) as scnt
+                    FROM find_printf
+                    WHERE s <> 0
+                    GROUP BY s
+                    ORDER BY scnt DESC
+                    LIMIT 10;
+**** #> <2014-01-27 Mon>
+     ...>    ...>    ...>    ...> 
+     8192|1621
+     834|1555
+     10645|1156
+     10596|1036
+     1527|624
+     10674|616
+     10620|569
+     15360|450
+     828|417
+     1830|410
+     ..
 
-*** new model:
+**** S> sqlite> SELECT fn, count(s) as ncnt
+                    FROM find_printf
+                    GROUP BY fn
+                    ORDER BY ncnt DESC
+                    LIMIT 10;
+**** #> <2014-01-27 Mon>
+     ...>    ...>    ...>    ...> 
+     index.html|53110
+     django.po|3748
+     django.mo|3638
+     __init__.py|1424
+     __init__.pyc|1296
+     %gconf.xml|777
+     EmoticonHappy.gif|588
+     djangojs.mo|354
+     djangojs.po|354
+     README|341
+
+** function sclocate \
+   { echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
+       cd $FS; ls -ldh `pwd`/*@*.sqlite
+       sqlite3 `ls -1t *@*.sqlite | head -1` "SELECT * FROM find_printf WHERE fn LIKE '$1%' LIMIT 10"
+       echo;
+   done; }
+
+*** ALTER TABLE find_printf ADD COLUMN md5sum TEXT:
+**** #> echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
+         cd $FS; ls -1dh `pwd`/*@*.sqlite
+     done | while read CAT; do
+	 ls -ldh "$CAT"
+	 sqlite3 "$CAT" "ALTER TABLE find_printf ADD COLUMN md5sum TEXT"
+     done
+
+** /random sync/ - CAT originated
+   - if last rec. doesnt match actual finding, -> append refresh
+
+** TODO deduplicate by hard-links (-xdev)
+*** $> echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
+        cd $FS; ls -1dh `pwd`/*@*.sqlite
+    done | egrep '@oc.*-15' | while read CAT; do 
+        L=$(sqlite3 $CAT "SELECT s,fn FROM find_printf LIMIT 1")
+        S=${L%%|*}
+        F=${L##*|}
+        echo $CAT: -S:$S -F: $F
+    done
+
+*** $> DIR=$HOME/Desktop
+       $> FN=eng.org
+       $> ls -l "$DIR/$FN"
+       -rw-rw-r--. 1 kraljo kraljo 295916 Jan 24 15:18 /home/kraljo/Desktop/eng.org
+
+       $> CAT=//vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-15.sqlite
+       $> echo; sqlite3 "$CAT" "
+                             SELECT inode,du,perms,lns,s,mtime,dir,fn
+                             FROM find_printf
+                             WHERE fn = '$FN'
+                             LIMIT 10" \
+                         | perl -nle '
+                             @A=split /\|/;
+                             print join (" ",@A[0..3])." - - ".join (" ",@A[4..$#A-1])."$A[$#A]"'
+       > > > > > > > 
+       657721 288 -rw-rw-r-- 1 - - 294454 2014-01-15 10:52:17 ./home/kraljo/Desktop/eng.org
+
+       $> find "$DIR/$FN" -type f -printf "%i %k %M %n - - %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" | perl -pe 's/([\d-]+\s+[\d:]+)\.\d+/$1/'
+       657718 292 -rw-rw-r-- 1 - - 295916 2014-01-24 15:18:23 /home/kraljo/Desktop/eng.org
+
+*** S> SELECT scnt, f.* FROM find_printf f CROSS JOIN
+( SELECT s, count(s) as scnt
+    FROM find_printf
+    WHERE s <> 0
+    GROUP BY s
+    ) c
+ON c.s = f.s
+ORDER BY scnt DESC
+LIMIT 10;
+**** #> <2014-01-27 Mon>
+   ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...> 
+1621|3239|2014-01-15 14:40:23|5386221|8|-rwxr-xr-x|1|kraljo guest|8192|2011-11-11 10:22:55|./kraljo/.ILC/ClientDatabase/LocalClaimDB/seg0/|c4f1.dat|
+1621|3240|2014-01-15 14:40:23|5386155|8|-rwxr-xr-x|1|kraljo guest|8192|2011-11-11 10:22:55|./kraljo/.ILC/ClientDatabase/LocalClaimDB/seg0/|c101.dat|
+1621|3241|2014-01-15 14:40:23|5386200|8|-rwxr-xr-x|1|kraljo guest|8192|2011-11-11 10:22:55|./kraljo/.ILC/ClientDatabase/LocalClaimDB/seg0/|c3b1.dat|
+1621|3242|2014-01-15 14:40:23|5386172|8|-rwxr-xr-x|1|kraljo guest|8192|2011-11-11 10:22:55|./kraljo/.ILC/ClientDatabase/LocalClaimDB/seg0/|c200.dat|
+1621|3243|2014-01-15 14:40:23|5386195|8|-rwxr-xr-x|1|kraljo guest|8192|2011-11-11 10:22:55|./kraljo/.ILC/ClientDatabase/LocalClaimDB/seg0/|c361.dat|
+1621|3244|2014-01-15 14:40:23|5386236|8|-rwxr-xr-x|1|kraljo guest|8192|2011-11-11 10:22:55|./kraljo/.ILC/ClientDatabase/LocalClaimDB/seg0/|cd1.dat|
+1621|3245|2014-01-15 14:40:23|5386237|8|-rwxr-xr-x|1|kraljo guest|8192|2011-11-11 10:22:55|./kraljo/.ILC/ClientDatabase/LocalClaimDB/seg0/|ce1.dat|
+1621|3248|2014-01-15 14:40:23|5386231|8|-rwxr-xr-x|1|kraljo guest|8192|2011-11-11 10:22:55|./kraljo/.ILC/ClientDatabase/LocalClaimDB/seg0/|c81.dat|
+1621|3250|2014-01-15 14:40:23|5386213|8|-rwxr-xr-x|1|kraljo guest|8192|2011-11-11 10:22:55|./kraljo/.ILC/ClientDatabase/LocalClaimDB/seg0/|c471.dat|
+1621|3252|2014-01-15 14:40:23|5386168|8|-rwxr-xr-x|1|kraljo guest|8192|2011-11-11 10:22:55|./kraljo/.ILC/ClientDatabase/LocalClaimDB/seg0/|c1d1.dat|
+
+*** S> SELECT scnt, ncnt, f.* FROM find_printf f CROSS JOIN
+( SELECT s, count(s) as scnt
+    FROM find_printf
+    WHERE s <> 0
+    GROUP BY s
+    ) sc ON sc.s = f.s
+CROSS JOIN
+( SELECT fn, count(fn) as ncnt
+    FROM find_printf
+    GROUP BY fn
+    ) nc ON nc.fn = f.fn
+ORDER BY scnt DESC, fn
+LIMIT 10;
+**** #> <2014-01-27 Mon>
+   ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...> 
+1621|2|207588|2014-01-15 14:41:41|5114049|8|-rwxrwx---|1|kraljo guest|8192|2008-10-22 18:36:16|./kraljo/Downloads/4-ibm/gsa/03_EuC_Spain/Maestro job specifications/|Daily restart of BEA instance eInvestor_Maestro_Scheduler_v1.xls|
+1621|2|276867|2014-01-15 14:41:47|134018|8|-rwxrwx---|1|kraljo guest|8192|2008-10-22 18:36:16|./kraljo/Downloads/4-ibm/gsa~poluted/03_EuC_Spain/Maestro job specifications/|Daily restart of BEA instance eInvestor_Maestro_Scheduler_v1.xls|
+1621|2|278330|2014-01-15 14:41:47|5512974|8|-rw-rw-r--|1|kraljo guest|8192|2005-09-23 08:28:56|./kraljo/.wine/drive_c/windows/Microsoft.NET/Framework/v2.0.50727/|IEExecRemote.dll|
+1621|2|278665|2014-01-15 14:41:47|5643297|8|-rw-rw-r--|1|kraljo guest|8192|2011-11-11 13:00:56|./kraljo/.wine/drive_c/windows/assembly/GAC_MSIL/IEExecRemote/2.0.0.0__b03f5f7f11d50a3a/|IEExecRemote.dll|
+1621|1|278137|2014-01-15 14:41:47|5513028|8|-rw-rw-r--|1|kraljo guest|8192|2005-09-23 08:28:56|./kraljo/.wine/drive_c/windows/Microsoft.NET/Framework/v2.0.50727/|System.Drawing.tlb|
+1621|1|278392|2014-01-15 14:41:47|5513078|8|-rw-rw-r--|1|kraljo guest|8192|2005-09-23 08:28:32|./kraljo/.wine/drive_c/windows/Microsoft.NET/Framework/v2.0.50727/|aspnet_isapi.dll|
+1621|26|3291|2014-01-15 14:40:23|4724549|8|-rwxr-xr-x|1|kraljo guest|8192|2012-08-29 20:00:22|./kraljo/.ILC/ClientDatabase/LocalClaimDB/seg0/|c10.dat|
+1621|26|48099|2014-01-15 14:40:27|529566|8|-rw-rw-r--|1|kraljo guest|8192|2012-04-07 22:40:05|./kraljo/opt/magnolia-4.5.2/apache-tomcat-6.0.32/webapps/magnoliaAuthor/repositories/magnolia/workspaces/templates/db/seg0/|c10.dat|
+1621|26|48189|2014-01-15 14:40:27|525669|8|-rw-rw-r--|1|kraljo guest|8192|2012-04-07 22:44:18|./kraljo/opt/magnolia-4.5.2/apache-tomcat-6.0.32/webapps/magnoliaAuthor/repositories/magnolia/workspaces/mgnlSystem/db/seg0/|c10.dat|
+1621|26|48282|2014-01-15 14:40:27|529466|8|-rw-rw-r--|1|kraljo guest|8192|2012-04-07 22:39:59|./kraljo/opt/magnolia-4.5.2/apache-tomcat-6.0.32/webapps/magnoliaAuthor/repositories/magnolia/workspaces/dms/db/seg0/|c10.dat|
+
+*** DONE :whatif: inode/s == -> skip - is DONE
+*** TODO :whatif: size/s <> -> make refresh
+*** TODO :whatif: else (inode/s <>, but size/s ==) -> make refresh w/ md5 sum
+
+** new model:
 **** 1 [[fvlocation]] :: id/ed by (key): location fname, location dirname, mtime, [[fs-id]]
 **** redundant data > [[fvlocation]] dependent:
 ***** fs data ~> size, x-time/s, fs-based perm/s, ..
