@@ -12,7 +12,7 @@
 cd $FS
 F=$(df -hP | egrep " `pwd`$" | cut -d\  -f1 | xargs basename)@`uname -n`,`date -Id`; echo F:$F
 mv -vbf $F.sqlite{,~}
-find . -type f -printf "%i %k %M %n %u %g %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" | ~/bin/sclocate-import.pl | pv | sqlite3 $F.sqlite
+find . -xdev -type f -printf "%i %k %M %n %u %g %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" | ~/bin/sclocate-import.pl | pv | sqlite3 $F.sqlite
 ls -ldht `pwd`/*@*.sqlite* `pwd`/$F.sqlite | sort -t@ -k2r -u
 echo; done
 **** $> echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
@@ -86,6 +86,7 @@ echo; done
      djangojs.po|354
      README|341
 
+** TODO use -xdev
 ** function sclocate \
    { echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
        cd $FS; ls -ldh `pwd`/*@*.sqlite
@@ -156,7 +157,8 @@ LIMIT 10;
 1621|3250|2014-01-15 14:40:23|5386213|8|-rwxr-xr-x|1|kraljo guest|8192|2011-11-11 10:22:55|./kraljo/.ILC/ClientDatabase/LocalClaimDB/seg0/|c471.dat|
 1621|3252|2014-01-15 14:40:23|5386168|8|-rwxr-xr-x|1|kraljo guest|8192|2011-11-11 10:22:55|./kraljo/.ILC/ClientDatabase/LocalClaimDB/seg0/|c1d1.dat|
 
-*** S> SELECT scnt, ncnt, f.* FROM find_printf f CROSS JOIN
+*** S> SELECT scnt, f.s, ncnt, f.fn, f.* FROM find_printf f 
+CROSS JOIN
 ( SELECT s, count(s) as scnt
     FROM find_printf
     WHERE s <> 0
@@ -169,22 +171,105 @@ CROSS JOIN
     ) nc ON nc.fn = f.fn
 ORDER BY scnt DESC, fn
 LIMIT 10;
-**** #> <2014-01-27 Mon>
-   ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...> 
-1621|2|207588|2014-01-15 14:41:41|5114049|8|-rwxrwx---|1|kraljo guest|8192|2008-10-22 18:36:16|./kraljo/Downloads/4-ibm/gsa/03_EuC_Spain/Maestro job specifications/|Daily restart of BEA instance eInvestor_Maestro_Scheduler_v1.xls|
-1621|2|276867|2014-01-15 14:41:47|134018|8|-rwxrwx---|1|kraljo guest|8192|2008-10-22 18:36:16|./kraljo/Downloads/4-ibm/gsa~poluted/03_EuC_Spain/Maestro job specifications/|Daily restart of BEA instance eInvestor_Maestro_Scheduler_v1.xls|
-1621|2|278330|2014-01-15 14:41:47|5512974|8|-rw-rw-r--|1|kraljo guest|8192|2005-09-23 08:28:56|./kraljo/.wine/drive_c/windows/Microsoft.NET/Framework/v2.0.50727/|IEExecRemote.dll|
-1621|2|278665|2014-01-15 14:41:47|5643297|8|-rw-rw-r--|1|kraljo guest|8192|2011-11-11 13:00:56|./kraljo/.wine/drive_c/windows/assembly/GAC_MSIL/IEExecRemote/2.0.0.0__b03f5f7f11d50a3a/|IEExecRemote.dll|
-1621|1|278137|2014-01-15 14:41:47|5513028|8|-rw-rw-r--|1|kraljo guest|8192|2005-09-23 08:28:56|./kraljo/.wine/drive_c/windows/Microsoft.NET/Framework/v2.0.50727/|System.Drawing.tlb|
-1621|1|278392|2014-01-15 14:41:47|5513078|8|-rw-rw-r--|1|kraljo guest|8192|2005-09-23 08:28:32|./kraljo/.wine/drive_c/windows/Microsoft.NET/Framework/v2.0.50727/|aspnet_isapi.dll|
-1621|26|3291|2014-01-15 14:40:23|4724549|8|-rwxr-xr-x|1|kraljo guest|8192|2012-08-29 20:00:22|./kraljo/.ILC/ClientDatabase/LocalClaimDB/seg0/|c10.dat|
-1621|26|48099|2014-01-15 14:40:27|529566|8|-rw-rw-r--|1|kraljo guest|8192|2012-04-07 22:40:05|./kraljo/opt/magnolia-4.5.2/apache-tomcat-6.0.32/webapps/magnoliaAuthor/repositories/magnolia/workspaces/templates/db/seg0/|c10.dat|
-1621|26|48189|2014-01-15 14:40:27|525669|8|-rw-rw-r--|1|kraljo guest|8192|2012-04-07 22:44:18|./kraljo/opt/magnolia-4.5.2/apache-tomcat-6.0.32/webapps/magnoliaAuthor/repositories/magnolia/workspaces/mgnlSystem/db/seg0/|c10.dat|
-1621|26|48282|2014-01-15 14:40:27|529466|8|-rw-rw-r--|1|kraljo guest|8192|2012-04-07 22:39:59|./kraljo/opt/magnolia-4.5.2/apache-tomcat-6.0.32/webapps/magnoliaAuthor/repositories/magnolia/workspaces/dms/db/seg0/|c10.dat|
 
+**** <2014-01-29 Wed>
+   ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...> 
+1621|8192|2|Daily restart of BEA instance eInvestor_Maestro_Scheduler_v1.xls|207588|2014-01-15 14:41:41|5114049|8|-rwxrwx---|1|kraljo guest|8192|2008-10-22 18:36:16|./kraljo/Downloads/4-ibm/gsa/03_EuC_Spain/Maestro job specifications/|Daily restart of BEA instance eInvestor_Maestro_Scheduler_v1.xls|
+1621|8192|2|Daily restart of BEA instance eInvestor_Maestro_Scheduler_v1.xls|276867|2014-01-15 14:41:47|134018|8|-rwxrwx---|1|kraljo guest|8192|2008-10-22 18:36:16|./kraljo/Downloads/4-ibm/gsa~poluted/03_EuC_Spain/Maestro job specifications/|Daily restart of BEA instance eInvestor_Maestro_Scheduler_v1.xls|
+1621|8192|2|IEExecRemote.dll|278330|2014-01-15 14:41:47|5512974|8|-rw-rw-r--|1|kraljo guest|8192|2005-09-23 08:28:56|./kraljo/.wine/drive_c/windows/Microsoft.NET/Framework/v2.0.50727/|IEExecRemote.dll|
+1621|8192|2|IEExecRemote.dll|278665|2014-01-15 14:41:47|5643297|8|-rw-rw-r--|1|kraljo guest|8192|2011-11-11 13:00:56|./kraljo/.wine/drive_c/windows/assembly/GAC_MSIL/IEExecRemote/2.0.0.0__b03f5f7f11d50a3a/|IEExecRemote.dll|
+1621|8192|1|System.Drawing.tlb|278137|2014-01-15 14:41:47|5513028|8|-rw-rw-r--|1|kraljo guest|8192|2005-09-23 08:28:56|./kraljo/.wine/drive_c/windows/Microsoft.NET/Framework/v2.0.50727/|System.Drawing.tlb|
+1621|8192|1|aspnet_isapi.dll|278392|2014-01-15 14:41:47|5513078|8|-rw-rw-r--|1|kraljo guest|8192|2005-09-23 08:28:32|./kraljo/.wine/drive_c/windows/Microsoft.NET/Framework/v2.0.50727/|aspnet_isapi.dll|
+1621|8192|26|c10.dat|3291|2014-01-15 14:40:23|4724549|8|-rwxr-xr-x|1|kraljo guest|8192|2012-08-29 20:00:22|./kraljo/.ILC/ClientDatabase/LocalClaimDB/seg0/|c10.dat|
+1621|8192|26|c10.dat|48099|2014-01-15 14:40:27|529566|8|-rw-rw-r--|1|kraljo guest|8192|2012-04-07 22:40:05|./kraljo/opt/magnolia-4.5.2/apache-tomcat-6.0.32/webapps/magnoliaAuthor/repositories/magnolia/workspaces/templates/db/seg0/|c10.dat|
+1621|8192|26|c10.dat|48189|2014-01-15 14:40:27|525669|8|-rw-rw-r--|1|kraljo guest|8192|2012-04-07 22:44:18|./kraljo/opt/magnolia-4.5.2/apache-tomcat-6.0.32/webapps/magnoliaAuthor/repositories/magnolia/workspaces/mgnlSystem/db/seg0/|c10.dat|
+1621|8192|26|c10.dat|48282|2014-01-15 14:40:27|529466|8|-rw-rw-r--|1|kraljo guest|8192|2012-04-07 22:39:59|./kraljo/opt/magnolia-4.5.2/apache-tomcat-6.0.32/webapps/magnoliaAuthor/repositories/magnolia/workspaces/dms/db/seg0/|c10.dat|
+
+*** list f-ix/s of file/s w/ reoccurring size/s $> echo; mount \
+| perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
+    cd $FS; ls -1dh `pwd`/*@*.sqlite
+  done \
+| egrep '@oc.*-15.sqlite' | while read CAT; do 
+    sqlite3 "$CAT" "
+        SELECT ix FROM find_printf f
+        CROSS JOIN
+        ( SELECT s, count(s) as scnt
+            FROM find_printf
+            WHERE s <> 0
+            GROUP BY s
+            ) sc ON sc.s = f.s
+        CROSS JOIN
+        ( SELECT fn, count(fn) as ncnt
+            FROM find_printf
+            GROUP BY fn
+            ) nc ON nc.fn = f.fn
+        ORDER BY scnt DESC, f.fn
+        LIMIT 10" \
+    | awk -v CAT=$CAT '{print $0":"CAT}'
+  done | cat -n | tail
+
+**** <2014-01-29 Wed>
+> > > > > > > > > > > > > > > > > > > > 
+    51	26271:/mnt/lifeboat-tmp/vg_lifeboat-lv_tmp@oc0653706537.ibm.com,2014-01-15.sqlite
+    52	26170:/mnt/lifeboat-tmp/vg_lifeboat-lv_tmp@oc0653706537.ibm.com,2014-01-15.sqlite
+    53	26004:/mnt/lifeboat-tmp/vg_lifeboat-lv_tmp@oc0653706537.ibm.com,2014-01-15.sqlite
+    54	26250:/mnt/lifeboat-tmp/vg_lifeboat-lv_tmp@oc0653706537.ibm.com,2014-01-15.sqlite
+    55	26090:/mnt/lifeboat-tmp/vg_lifeboat-lv_tmp@oc0653706537.ibm.com,2014-01-15.sqlite
+    56	25747:/mnt/lifeboat-tmp/vg_lifeboat-lv_tmp@oc0653706537.ibm.com,2014-01-15.sqlite
+    57	25809:/mnt/lifeboat-tmp/vg_lifeboat-lv_tmp@oc0653706537.ibm.com,2014-01-15.sqlite
+    58	25900:/mnt/lifeboat-tmp/vg_lifeboat-lv_tmp@oc0653706537.ibm.com,2014-01-15.sqlite
+    59	25748:/mnt/lifeboat-tmp/vg_lifeboat-lv_tmp@oc0653706537.ibm.com,2014-01-15.sqlite
+    60	25808:/mnt/lifeboat-tmp/vg_lifeboat-lv_tmp@oc0653706537.ibm.com,2014-01-15.sqlite
+
+*** list ls-dils/s of file/s w/ reoccurring size/s $> echo; mount \
+| perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
+    cd $FS; ls -1dh `pwd`/*@*.sqlite
+  done \
+| egrep '@oc.*-15.sqlite' | while read CAT; do 
+    sqlite3 "$CAT" "
+            SELECT ix FROM find_printf f
+            CROSS JOIN (SELECT s, count(s) as scnt FROM find_printf WHERE s <> 0 GROUP BY s) sc ON sc.s = f.s
+            CROSS JOIN (SELECT fn, count(fn) as ncnt FROM find_printf GROUP BY fn) nc ON nc.fn = f.fn
+            ORDER BY scnt DESC, f.fn
+            LIMIT 10" \
+        | awk -v CAT=$CAT '{print $0,CAT}'
+  done | head \
+| while read IX CAT; do
+    echo -n $IX $CAT:
+    LASTC=$(sqlite3 "$CAT" "
+            SELECT inode,du,'-',lns,'-','-',s,mtime,dir,fn
+            FROM find_printf f
+            WHERE dir = (SELECT dir FROM find_printf WHERE ix=$IX)
+            AND fn = (SELECT fn FROM find_printf WHERE ix=$IX)
+            ORDER BY dt DESC
+            LIMIT 1"\
+        | perl -nle '
+            @A=split /\|/;
+            print join (" ",@A[0..$#A-1])."$A[$#A]"')
+    S=`echo $LASTC | cut -d\  -f7`
+    P=`echo $LASTC | cut -d\  -f10-`
+    F=${P##*/}
+    echo '' -S: $S -F: $F -P:$P
+    echo '' -LASTC:$LASTC
+    # echo " -|LASTC|: `echo $LASTC | wc -w`"
+    if [[ 0 != `echo $LASTC | wc -w` ]]
+    then
+       LASTF=$(find "`dirname $CAT`$P" \
+                -type f \
+                -printf "%i %k - %n - - %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" \
+            | perl -pe 's/([\d-]+\s+[\d:]+)\.\d+/$1/')
+        echo '' -LASTF:$LASTF
+    fi
+    echo
+done
+
+
+*** phase-1: only if fname/s ==:
 *** DONE :whatif: inode/s == -> skip - is DONE
 *** TODO :whatif: size/s <> -> make refresh
 *** TODO :whatif: else (inode/s <>, but size/s ==) -> make refresh w/ md5 sum
+
+*** TODO phase-2: even for fname/s <>..
 
 ** new model:
 **** 1 [[fvlocation]] :: id/ed by (key): location fname, location dirname, mtime, [[fs-id]]

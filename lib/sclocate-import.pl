@@ -1,6 +1,6 @@
 #!/usr/bin/perl -nl
 # read file:~/text/scfs/doc/README.org
-#>! use as: find . -type f -printf "%i %k %M %n %u %g %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" | perl -nl $0 | pv | sqlite3 $F.sqlite
+#>! use as: find . -xdev -type f -printf "%i %k %M %n %u %g %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" | perl -nl $0 | pv | sqlite3 $F.sqlite
 use POSIX;
 BEGIN
 { print "PRAGMA foreign_keys=OFF;
