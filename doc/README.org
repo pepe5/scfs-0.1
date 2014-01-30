@@ -231,9 +231,9 @@ LIMIT 10;
             CROSS JOIN (SELECT s, count(s) as scnt FROM find_printf WHERE s <> 0 GROUP BY s) sc ON sc.s = f.s
             CROSS JOIN (SELECT fn, count(fn) as ncnt FROM find_printf GROUP BY fn) nc ON nc.fn = f.fn
             ORDER BY scnt DESC, f.fn
-            LIMIT 10" \
+            LIMIT 100" \
         | awk -v CAT=$CAT '{print $0,CAT}'
-  done | head \
+  done \
 | while read IX CAT; do
     LASTC=$(sqlite3 "$CAT" "
             SELECT inode,du,'-',lns,'-','-',s,mtime,dir,fn
@@ -248,18 +248,22 @@ LIMIT 10;
     S=`echo $LASTC | cut -d\  -f7`
     P=`echo $LASTC | cut -d\  -f10-`
     F=${P##*/}
-    echo $IX $CAT: -S: $S -F:$F
-    echo ' <-'$LASTC
     # echo " -|LASTC|: `echo $LASTC | wc -w`"
     if [[ 0 != `echo $LASTC | wc -w` ]]
     then
-       LASTF=$(find "`dirname $CAT`$P" \
+       LASTF=$(find 2>&1 "`dirname $CAT`/$P" \
                 -type f \
                 -printf "%i %k - %n - - %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" \
             | perl -pe 's/([\d-]+\s+[\d:]+)\.\d+/$1/')
-        echo ' ->'$LASTF
+        if [[ "`echo $LASTC | cut -d\  -f-9`" != "`echo $LASTF | cut -d\  -f-9`" ]];
+        then
+            echo
+            echo $IX $CAT: '<>' # -S: $S -F:$F
+            echo ' <-'$LASTC
+            echo ' ->'$LASTF
+        else echo -n .
+        fi
     fi
-    echo
 done
 
 
