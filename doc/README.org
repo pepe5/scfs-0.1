@@ -223,9 +223,9 @@ LIMIT 10;
 
 *** list ls-dils/s of file/s w/ reoccurring size/s $> echo; mount \
 | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
-    cd $FS; ls -1dh `pwd`/*@*.sqlite
+    cd $FS; ls -1dht `pwd`/*@*[0-9].sqlite | head -1
   done \
-| egrep '@oc.*-15.sqlite' | while read CAT; do 
+| while read CAT; do 
     sqlite3 "$CAT" "
             SELECT ix FROM find_printf f
             CROSS JOIN (SELECT s, count(s) as scnt FROM find_printf WHERE s <> 0 GROUP BY s) sc ON sc.s = f.s
@@ -235,7 +235,6 @@ LIMIT 10;
         | awk -v CAT=$CAT '{print $0,CAT}'
   done | head \
 | while read IX CAT; do
-    echo -n $IX $CAT:
     LASTC=$(sqlite3 "$CAT" "
             SELECT inode,du,'-',lns,'-','-',s,mtime,dir,fn
             FROM find_printf f
@@ -249,8 +248,8 @@ LIMIT 10;
     S=`echo $LASTC | cut -d\  -f7`
     P=`echo $LASTC | cut -d\  -f10-`
     F=${P##*/}
-    echo '' -S: $S -F: $F -P:$P
-    echo '' -LASTC:$LASTC
+    echo $IX $CAT: -S: $S -F:$F
+    echo ' <-'$LASTC
     # echo " -|LASTC|: `echo $LASTC | wc -w`"
     if [[ 0 != `echo $LASTC | wc -w` ]]
     then
@@ -258,7 +257,7 @@ LIMIT 10;
                 -type f \
                 -printf "%i %k - %n - - %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" \
             | perl -pe 's/([\d-]+\s+[\d:]+)\.\d+/$1/')
-        echo '' -LASTF:$LASTF
+        echo ' ->'$LASTF
     fi
     echo
 done
