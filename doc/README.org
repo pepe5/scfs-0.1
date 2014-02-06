@@ -86,7 +86,7 @@ echo; done
      djangojs.po|354
      README|341
 
-** TODO use -xdev
+** use -xdev
 ** function sclocate \
    { echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
        cd $FS; ls -ldh `pwd`/*@*.sqlite
@@ -94,13 +94,15 @@ echo; done
        echo;
    done; }
 
-*** ALTER TABLE find_printf ADD COLUMN md5sum TEXT:
+*** ALTER TABLE find_printf ADD COLUMN md5 TEXT:
 **** #> echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
          cd $FS; ls -1dht `pwd`/*@*[0-9].sqlite | head -1
      done | while read CAT; do
 	 ls -ldh "$CAT"
-	 sqlite3 "$CAT" "ALTER TABLE find_printf ADD COLUMN md5sum TEXT"
+	 sqlite3 "$CAT" "ALTER TABLE find_printf ADD COLUMN md5 TEXT"
      done
+
+*** ALTER TABLE find_printf ADD COLUMN ut TEXT
 
 ** /random sync/ - CAT originated
    - if last rec. doesnt match actual finding, -> append refresh
