@@ -12,7 +12,8 @@
 cd $FS
 F=$(df -hP | egrep " `pwd`$" | cut -d\  -f1 | xargs basename)@`uname -n`,`date -Id`; echo F:$F
 mv -vbf $F.sqlite{,~}
-find . -xdev -type f -printf "%i %k %M %n %u %g %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" | ~/bin/sclocate-import.pl | pv | sqlite3 $F.sqlite
+find . -xdev -type f -printf "%i %k %M %n %u %g %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" \
+ | perl ~/bin/sclocate-import.pl | pv | sqlite3 $F.sqlite
 ls -ldht `pwd`/*@*.sqlite* `pwd`/$F.sqlite | sort -t@ -k2r -u
 echo; done
 **** $> echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
@@ -431,7 +432,7 @@ done
 
 * STU
 ** :whatif: new (sql) schema #> Error: table find_printf has 10 columns but 11 values were supplied
-   - > cound file:../lib/sclocate-import.pl::/,$/
+   - > count file:../lib/sclocate-import.pl::/,$/
    - <2014-01-15 Wed> i missed ',' after /lns INTEGER/
 
 ** query iface grep-find~
