@@ -38,6 +38,7 @@ m{^
 print "INSERT INTO find_printf VALUES
       ( NULL,
         '".(strftime "%F %T", localtime)."',
-        '$1','$2','$3','$4','$5','$6','$7','$8','$9');";
+        '$1','$2','$3','$4','$5','$6','$7','$8','$9',
+        NULL, NULL);";
 
 END { print "COMMIT;" }
