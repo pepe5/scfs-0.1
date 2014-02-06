@@ -1,105 +1,62 @@
-#!/usr/bin/python
-#
-###########################################################################
-#  Copyright (C) 2006 by Dorin Scutara\u015fu <dorin.scutarasu@gmail.com> #
-#                                                                         #
-#  This program is free software; you can redistribute it and/or modify   #
-#  it under the terms of the GNU General Public License. See the file     #
-#  COPYING for details.                                                   #
-###########################################################################
-
-import sys,os
-
-# from pysqlite2 import dbapi2 as sqlite
-import sqlite3 as sqlite
-
-# sys.path = [os.path.dirname(sys.argv[0])] + sys.path
-# print ' -path: %s' % sys.path
-from Scfs.CatalogCreator import CatalogCreator
-
-usage = '''
-Usage: %s add <CDMountPoint> <CDLabel> <dbfile>
-       %s del <CDLabel> <dbfile>
-       %s help
-''' % (sys.argv[0],sys.argv[0],sys.argv[0])
+#!/bin/bash
+function find_cats \
+    { mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
+        cd $FS; ls -1dht `pwd`/*@*[0-9].sqlite | head -1
+    done; }
 
 
-def removeLabel(dbFile,CDLabel):
-    try:
-        if not os.path.exists(dbFile):
-            raise ValueError('Database not found.')
-        con = sqlite.connect(dbFile)
-        cur = con.cursor()
-        cur.execute("select fid,label from CDs where label = '%s'" %CDLabel)
-        rows = cur.fetchall()
-        if len(rows) == 0 :
-            raise ValueError("Label doesn't exist.")
-        cur.execute('delete from CDs where label = "%s"' %CDLabel)
-        cur.execute('drop table if exists %s_files' %CDLabel)
-        cur.execute('drop index if exists %s_pid_idx' %CDLabel)
-        cur.execute('drop index if exists %s_pid_fname_idx' %CDLabel)
-        con.commit()
-    except sqlite.OperationalError:
-        raise ValueError('Deletion failed. Probably invalid database.')
-    
-def labels(dbFile):
-    try:
-        con = sqlite.connect(dbFile)
-        con.row_factory = sqlite.Row
-        cur = con.cursor()
-        cur.execute("select label from CDs")
-        rows = cur.fetchall()
-        
-        for row in rows:
-            yield row['label']
-    except sqlite.OperationalError:
-        raise ValueError('Deletion failed. Probably invalid database.')
+# IN/s: < [[find_cats]]
+function list_sdups \
+    { while read CAT; do 
+        sqlite3 "$CAT" "
+            SELECT ix FROM find_printf f
+            CROSS JOIN (SELECT s, count(s) as scnt FROM find_printf WHERE s <> 0 GROUP BY s) sc ON sc.s = f.s
+            CROSS JOIN (SELECT fn, count(fn) as ncnt FROM find_printf GROUP BY fn) nc ON nc.fn = f.fn
+            ORDER BY scnt DESC, f.fn
+            LIMIT 100" \
+          | awk -v CAT=$CAT '{print $0,CAT}';
+        done; }
 
-if __name__ == '__main__':
-    try:
-        if sys.argv[1] in ['-h','--help','help']:
-            print usage
-            sys.exit(0)
-        elif sys.argv[1] in ['add','a']:
-            action = 'add'
-            mountPoint = sys.argv[2]
-            CDLabel = sys.argv[3]
-            dbFile = sys.argv[4]
-        elif sys.argv[1] in ['del','rm','remove','d','r']:
-            action = 'del'
-            CDLabel = sys.argv[2]
-            dbFile = sys.argv[3]
-        elif sys.argv[1] in ['list','l']:
-            action = 'list'
-            dbFile = sys.argv[2]
-        else:
-            print >> sys.stderr, """
-Bad syntax.
-%s
-""" % (usage)
-            sys.exit(1)
-    except IndexError:
-        print >> sys.stderr, """
-Not enouth arguments.
-%s
-""" % (usage)
-    else:
-        try:
-            if action == 'add':
-                catCreator = CatalogCreator(dbFile, mountPoint, CDLabel)
-                catCreator.run()
-            elif action == 'del':
-                removeLabel(dbFile,CDLabel)
-            elif action == 'list':
-                if not os.path.exists(dbFile):
-                    raise ValueError('Database not found.')
-                print ('These are the labels of the CDs added to database '
-                     '%s:\n' % dbFile)
-                count = 0
-                for label in labels(dbFile):
-                    print label
-                    count = count + 1
-                print '\n%d CD labels found.' % count
-        except (OSError,ValueError),details:
-            print >> sys.stderr,"Error:", details
 
+# list last file/'s rec. candidates:
+# IN/s: < [[list_sdups]]
+# EG/s: find_cats | list_sdups | list_last_FCs
+function list_last_FCs \
+    { while read IX CAT; do
+        LASTC=$(sqlite3 "$CAT" "
+            SELECT inode,du,'-',lns,'-','-',s,mtime,dir,fn
+            FROM find_printf f
+            WHERE dir = (SELECT dir FROM find_printf WHERE ix=$IX)
+            AND fn = (SELECT fn FROM find_printf WHERE ix=$IX)
+            ORDER BY dt DESC
+            LIMIT 1"\
+          | perl -nle '
+            @A=split /\|/;
+            print join (" ",@A[0..$#A-1])."$A[$#A]"')
+        S=`echo $LASTC | cut -d\  -f7`
+        P=`echo $LASTC | cut -d\  -f10-`
+        F=${P##*/}
+        if [[ 0 != `echo $LASTC | wc -w` ]]
+        then
+            LASTF=$(find 2>&1 "`dirname $CAT`/$P" \
+                -type f \
+                -printf "%i %k - %n - - %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" \
+                | perl -pe 's/([\d-]+\s+[\d:]+)\.\d+/$1/')
+            if [[ "`echo $LASTC | cut -d\  -f-9`" != "`echo $LASTF | cut -d\  -f-9`" ]];
+            then
+                echo
+                echo $IX $CAT: '<>' # -S: $S -F:$F
+                echo ' <-'$LASTC
+                echo ' ->'$LASTF
+            else echo -n .
+            fi
+        fi
+        done; }
+
+##
+# original version:
+# !/usr/bin/python
+# Usage: %s add <CDMountPoint> <CDLabel> <dbfile>
+#        %s del <CDLabel> <dbfile>
+#        %s help
+# ''' % (sys.argv[0],sys.argv[0],sys.argv[0])

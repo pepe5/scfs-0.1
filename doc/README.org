@@ -96,7 +96,7 @@ echo; done
 
 *** ALTER TABLE find_printf ADD COLUMN md5sum TEXT:
 **** #> echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
-         cd $FS; ls -1dh `pwd`/*@*.sqlite
+         cd $FS; ls -1dht `pwd`/*@*[0-9].sqlite | head -1
      done | while read CAT; do
 	 ls -ldh "$CAT"
 	 sqlite3 "$CAT" "ALTER TABLE find_printf ADD COLUMN md5sum TEXT"
@@ -107,7 +107,7 @@ echo; done
 
 ** TODO deduplicate by hard-links (-xdev)
 *** $> echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
-        cd $FS; ls -1dh `pwd`/*@*.sqlite
+        cd $FS; ls -1dht `pwd`/*@*[0-9].sqlite | head -1
     done | egrep '@oc.*-15' | while read CAT; do 
         L=$(sqlite3 $CAT "SELECT s,fn FROM find_printf LIMIT 1")
         S=${L%%|*}
@@ -187,7 +187,7 @@ LIMIT 10;
 
 *** list f-ix/s of file/s w/ reoccurring size/s $> echo; mount \
 | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
-    cd $FS; ls -1dh `pwd`/*@*.sqlite
+    cd $FS; ls -1dht `pwd`/*@*[0-9].sqlite | head -1
   done \
 | egrep '@oc.*-15.sqlite' | while read CAT; do 
     sqlite3 "$CAT" "
@@ -269,6 +269,7 @@ done
 
 *** phase-1: only if fname/s ==:
 *** DONE :whatif: inode/s == -> skip - is DONE
+*** TODO :whatif: last f doesnt exists -> upd w/ ut (unliked recognition time)
 *** TODO :whatif: size/s <> -> make refresh
 *** TODO :whatif: else (inode/s <>, but size/s ==) -> make refresh w/ md5 sum
 
@@ -293,6 +294,20 @@ done
 **** redundant data > every-time calculated:
 ***** [[fversion]] HA ~> mirrors#, age of cache/s, accessibility stat/s
 ***** [[fversion]] SYNChronicity ~> if it is head of [[File-tree]]
+
+** basic cmd/s:
+*** find-cats
+*** find-id <file> [ --in <cat> ]
+    - foreach-> CAT/* (listed by [[find-cats]])
+    - list /actual/ rec for <file> from all CAT/s
+
+*** upd-rec <file>
+    - upd. /actual/ rec. -- if it exists || create one
+**** it should work ~ this:
+     1. get Actual-candidate (A1=1, A2=2, A3=3, A4='')
+     2. get Last-record (L1=1, L2=2, L3='', L4=4)
+     3. only iff all filled L-field/s (L/s) are == (to counterparts) -> fill rest (empty) L/s w/ non-empty A/s
+     4. otherwise make new Last-rec (& previous one deactivate by utime)
 
 
 ** print " -makedirs exception: %s" % err >> test exception instead
