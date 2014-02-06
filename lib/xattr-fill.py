@@ -4,7 +4,7 @@ import os
 import sys
 from pysqlite2 import dbapi2 as sqlite
 
-dbfile = os.path.expanduser ('~/.scfs/cat1.cdcat')
+dbfile = os.path.expanduser ('~/.scfs/cat1.sqlite')
 if not os.path.exists (dbfile):
     raise ValueError ('Database not found.')
 con = sqlite.connect (dbfile)

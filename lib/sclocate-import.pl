@@ -16,7 +16,7 @@ BEGIN
         s INTEGER,
         mtime DATETIME,
         dir TEXT,
-        fn TEXT
+        fn TEXT,
         ut DATETIME,
         md5 TEXT);" }
 #>! ins. after dt> ut :: unlink-time - when file is moved or unlinked
@@ -36,9 +36,18 @@ m{^
 
 # s/\\([^\\])/$1/g; #< deprecated for find-printf
 print "INSERT INTO find_printf VALUES
-      ( NULL,
-        '".(strftime "%F %T", localtime)."',
-        '$1','$2','$3','$4','$5','$6','$7','$8','$9',
-        NULL, NULL);";
+( NULL,
+  '".(strftime "%F %T", localtime)."',
+  '$1',
+  '$2',
+  '$3',
+  '$4',
+  '$5',
+  '$6',
+  '$7',
+  '$8',
+  '$9',
+  NULL,
+  NULL);";
 
 END { print "COMMIT;" }

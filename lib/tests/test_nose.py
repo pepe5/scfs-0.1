@@ -86,6 +86,7 @@ def test_setup ():
     mkdirp(os.path.join(Config.srcd, 'a'), os.path.join(Config.srcd, 'b/bb'))
 
 def scatXattrs (argstr, **kw):
+    '''fill xatrs by info from'''
     pass
 
 def test_uc1 ():
