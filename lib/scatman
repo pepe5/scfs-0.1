@@ -22,12 +22,12 @@ function tun_cat \
         case $1 in
             (--ix1 | *) echo '' -tun_cat: 'indexing i,s,mt,dir, & fn..' 1>&2
                 sqlite3 "$CAT" <<-EOF
-                    CREATE INDEX "find_printf_inode" ON find_printf (inode ASC);
-                    CREATE INDEX "find_printf_s" ON find_printf (s ASC);
-                    CREATE INDEX "find_printf_mtime" ON find_printf (mtime ASC);
-                    CREATE INDEX "find_printf_dir" ON find_printf (dir ASC);
-                    CREATE INDEX "find_printf_fn" ON find_printf (fn ASC);
-                    EOF
+			CREATE INDEX "find_printf_inode" ON find_printf (inode ASC);
+			CREATE INDEX "find_printf_s" ON find_printf (s ASC);
+			CREATE INDEX "find_printf_mtime" ON find_printf (mtime ASC);
+			CREATE INDEX "find_printf_dir" ON find_printf (dir ASC);
+			CREATE INDEX "find_printf_fn" ON find_printf (fn ASC);
+			EOF
                 ls -ldht "$CAT" # `pwd`/*@*.sqlite* `pwd`/$F.sqlite | sort -t@ -k2r -u
                 ;;
         esac
