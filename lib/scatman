@@ -4,7 +4,6 @@ function find_cats \
         cd $FS; ls -1dht `pwd`/*@*[0-9].sqlite | head -1
     done; }
 
-
 # IN/s: < [[find_cats]]
 function list_sdups \
     { while read CAT; do 
@@ -17,10 +16,11 @@ function list_sdups \
           | awk -v CAT=$CAT '{print $0,CAT}';
         done; }
 
+# EX/s: find_cats | tun_cat
 function tun_cat \
     { while read CAT; do
         case $1 in
-            (--ix1 | *) echo '' -tun_cat: 'indexing i,s,mt,dir, & fn..' 1>&2
+            (--ix1 | *) echo '' -tun_cat: 'indexing $CAT: i,s,mt,dir, & fn..' 1>&2
                 sqlite3 "$CAT" <<-EOF
 			CREATE INDEX "find_printf_inode" ON find_printf (inode ASC);
 			CREATE INDEX "find_printf_s" ON find_printf (s ASC);
@@ -33,9 +33,17 @@ function tun_cat \
         esac
         done; }
 
+# EX/s: sclocate eng.%
+function sclocate \
+    { echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
+        cd $FS; ls -ldh `pwd`/*@*.sqlite
+        sqlite3 `ls -1t *@*.sqlite | head -1` "SELECT * FROM find_printf WHERE fn LIKE '$1' LIMIT 10"
+        echo;
+    done; }
+
 # list last file/'s rec. candidates:
 # IN/s: < [[list_sdups]]
-# EG/s: find_cats | list_sdups | list_last_FCs
+# EX/s: find_cats | list_sdups | list_last_FCs
 function list_last_FCs \
     { while read IX CAT; do
         LASTC=$(sqlite3 "$CAT" "

@@ -89,11 +89,13 @@ echo; done
 
 ** use -xdev
 ** function sclocate \
-   { echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
-       cd $FS; ls -ldh `pwd`/*@*.sqlite
-       sqlite3 `ls -1t *@*.sqlite | head -1` "SELECT * FROM find_printf WHERE fn LIKE '$1%' LIMIT 10"
-       echo;
-   done; }
+   - > moved to scatman
+*** :ARCHIVE: :
+    { echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
+        cd $FS; ls -ldh `pwd`/*@*.sqlite
+        sqlite3 `ls -1t *@*.sqlite | head -1` "SELECT * FROM find_printf WHERE fn LIKE '$1%' LIMIT 10"
+        echo;
+    done; }
 
 *** ALTER TABLE find_printf ADD COLUMN md5 TEXT:
 **** #> echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
