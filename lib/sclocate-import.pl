@@ -1,24 +1,31 @@
 #!/usr/bin/perl -nl
 # read file:~/text/scfs/doc/README.org
-#>! use as: find . -xdev -type f -printf "%i %k %M %n %u %g %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" | perl -nl $0 | pv | sqlite3 $F.sqlite
+#>! use as: find . -xdev -type f -printf "%i %k %M %n %u %g %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n" | perl -nl $0 --create | pv | sqlite3 $F.sqlite
 use POSIX;
 BEGIN
-{ print "PRAGMA foreign_keys=OFF;
-      BEGIN TRANSACTION;
-      CREATE TABLE find_printf
-      ( ix INTEGER PRIMARY KEY AUTOINCREMENT,
-        dt DATETIME DEFAULT CURRENT_TIMESTAMP,
-        inode INTEGER,
-        du INTEGER,
-        perms TEXT,
-        lns INTEGER,
-        ug TEXT,
-        s INTEGER,
-        mtime DATETIME,
-        dir TEXT,
-        fn TEXT,
-        ut DATETIME,
-        md5 TEXT);" }
+{
+    print "BEGIN TRANSACTION;";
+    if ('--create' ~~ @ARGV)
+    {
+        print STDERR " -argv: ". join (' ', @ARGV);
+        @ARGV = grep { $_ != $element_omitted } @ARGV;
+        print "PRAGMA foreign_keys=OFF;
+        CREATE TABLE find_printf
+        ( ix INTEGER PRIMARY KEY AUTOINCREMENT,
+          dt DATETIME DEFAULT CURRENT_TIMESTAMP,
+          inode INTEGER,
+          du INTEGER,
+          perms TEXT,
+          lns INTEGER,
+          ug TEXT,
+          s INTEGER,
+          mtime DATETIME,
+          dir TEXT,
+          fn TEXT,
+          ut DATETIME,
+          md5 TEXT);" 
+    }
+}
 #>! ins. after dt> ut :: unlink-time - when file is moved or unlinked
 
 s/'/''/g;

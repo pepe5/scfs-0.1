@@ -4,6 +4,8 @@ function find_cats \
         cd $FS; ls -1dht `pwd`/*@*[0-9].sqlite | head -1
     done; }
 
+
+# list files with equal sizes
 # IN/s: < [[find_cats]]
 function list_sdups \
     { while read CAT; do 
@@ -15,6 +17,7 @@ function list_sdups \
             LIMIT 100" \
           | awk -v CAT=$CAT '{print $0,CAT}';
         done; }
+
 
 # EX/s: find_cats | tun_cat
 function tun_cat \
@@ -33,6 +36,7 @@ function tun_cat \
         esac
         done; }
 
+
 # EX/s: sclocate eng.%
 function sclocate \
     { find_cats | while read CAT; do
@@ -40,6 +44,7 @@ function sclocate \
         sqlite3 "$CAT" "SELECT * FROM find_printf WHERE fn LIKE '$1' LIMIT 10"
         echo;
     done; }
+
 
 # list last file/'s rec. candidates:
 # IN/s: < [[list_sdups]]
@@ -71,10 +76,19 @@ function list_last_FCs \
                 echo $IX $CAT: '<>' # -S: $S -F:$F
                 echo ' <-'$LASTC
                 echo ' ->'$LASTF
+                case $1 in
+                    (+add | *) echo '' -tun_cat: 'indexing $CAT: i,s,mt,dir, & fn..' 1>&2
+                        sqlite3 "$CAT" "
+			INSERT ***
+			"
+                        ls -ldht "$CAT" # `pwd`/*@*.sqlite* `pwd`/$F.sqlite | sort -t@ -k2r -u
+                        ;;
+                esac
             else echo -n .
             fi
         fi
         done; }
+
 
 ##
 # original version:
