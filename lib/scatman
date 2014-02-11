@@ -1,4 +1,10 @@
 #!/bin/bash
+#>! move perl -pe 's/([\d-]+\s+[\d:]+)\.\d+/$1/') from sclocate-import to here
+function find_act \
+    { find "$1" -xdev -type f -printf "%i %k %M %n %u %g %s %TY-%Tm-%Td %TH:%TM:%TS %h/%f\n"
+    true; }
+
+
 function find_cats \
     { mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
         cd $FS; ls -1dht `pwd`/*@*[0-9].sqlite | head -1
@@ -23,7 +29,7 @@ function list_sdups \
 function tun_cat \
     { while read CAT; do
         case $1 in
-            (--ix1 | *) echo '' -tun_cat: 'indexing $CAT: i,s,mt,dir, & fn..' 1>&2
+            (--ix1 | *) echo 1>&2 '' -tun_cat: 'indexing $CAT: i,s,mt,dir, & fn..'
                 sqlite3 "$CAT" <<-EOF
 			CREATE INDEX "find_printf_inode" ON find_printf (inode ASC);
 			CREATE INDEX "find_printf_s" ON find_printf (s ASC);
@@ -46,15 +52,17 @@ function sclocate \
     done; }
 
 
-# list last file/'s rec. candidates:
+# find last file/'s rec. candidates: - and list them, || update them..
 # IN/s: < [[list_sdups]]
-# EX/s: find_cats | list_sdups | list_last_FCs
-function list_last_FCs \
-    { while read IX CAT; do
+# EX/s: find_cats | list_sdups | last_FCs
+function last_FCs \
+    { 
+    while read IX CAT; do
         LASTC=$(sqlite3 "$CAT" "
             SELECT inode,du,'-',lns,'-','-',s,mtime,dir,fn
             FROM find_printf f
-            WHERE dir = (SELECT dir FROM find_printf WHERE ix=$IX)
+            WHERE ut IS NULL
+            AND dir = (SELECT dir FROM find_printf WHERE ix=$IX)
             AND fn = (SELECT fn FROM find_printf WHERE ix=$IX)
             ORDER BY dt DESC
             LIMIT 1"\
@@ -72,19 +80,28 @@ function list_last_FCs \
                 | perl -pe 's/([\d-]+\s+[\d:]+)\.\d+/$1/')
             if [[ "`echo $LASTC | cut -d\  -f-9`" != "`echo $LASTF | cut -d\  -f-9`" ]];
             then
-                echo
-                echo $IX $CAT: '<>' # -S: $S -F:$F
-                echo ' <-'$LASTC
-                echo ' ->'$LASTF
+                echo 1>&2
+                echo 1>&2 $IX $CAT: '<>' # -S: $S -F:$F
+                echo 1>&2 ' <-'$LASTC
+                echo 1>&2 ' ->'$LASTF
                 case $1 in
-                    (+add | *) echo '' -tun_cat: 'indexing $CAT: i,s,mt,dir, & fn..' 1>&2
+                    (+add | *)
+                        echo 1>&2 '' +add/ing: utime-label to $CAT: `dirname $CAT`/$P
                         sqlite3 "$CAT" "
-			INSERT ***
-			"
-                        ls -ldht "$CAT" # `pwd`/*@*.sqlite* `pwd`/$F.sqlite | sort -t@ -k2r -u
-                        ;;
+                            UPDATE find_printf 
+                            SET ut = '"`date +'%Y-%m-%d %T'`"' 
+                            WHEN ut IS NULL
+                            AND ix = $IX";
+                        if [[ $LASTF =~ find: ]]
+                        then true
+                        else 
+                            LASTR=$(find_act "`dirname $CAT`/$P" | head -1)
+                            echo 1>&2 '' +add/ing: rec to $CAT: $LASTR
+                            echo $LASTR | sclocate-import | sqlite3 "$CAT"
+                            ls -ldht "$CAT" # `pwd`/*@*.sqlite* `pwd`/$F.sqlite | sort -t@ -k2r -u
+                        fi;;
                 esac
-            else echo -n .
+            else echo 1>&2 -n .
             fi
         fi
         done; }
