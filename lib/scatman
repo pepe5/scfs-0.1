@@ -20,8 +20,9 @@ function list_sdups \
             CROSS JOIN (SELECT s, count(s) as scnt FROM find_printf WHERE s <> 0 GROUP BY s) sc ON sc.s = f.s
             CROSS JOIN (SELECT fn, count(fn) as ncnt FROM find_printf GROUP BY fn) nc ON nc.fn = f.fn
             ORDER BY scnt DESC, f.fn
-            LIMIT 100" \
+            " \
           | awk -v CAT=$CAT '{print $0,CAT}';
+        # LIMIT 100
         done; }
 
 
@@ -56,8 +57,7 @@ function sclocate \
 # IN/s: < [[list_sdups]]
 # EX/s: find_cats | list_sdups | last_FCs
 function last_FCs \
-    { 
-    while read IX CAT; do
+    { while read IX CAT; do
         LASTC=$(sqlite3 "$CAT" "
             SELECT inode,du,'-',lns,'-','-',s,mtime,dir,fn
             FROM find_printf f
@@ -87,17 +87,22 @@ function last_FCs \
                 case $1 in
                     (+add | *)
                         echo 1>&2 '' +add/ing: utime-label to $CAT: `dirname $CAT`/$P
-                        sqlite3 "$CAT" "
-                            UPDATE find_printf 
-                            SET ut = '"`date +'%Y-%m-%d %T'`"' 
-                            WHEN ut IS NULL
-                            AND ix = $IX";
+                        UT=`date +%Y-%m-%d\ %T`
+                        fuser "$CAT"
+                        usleep 250
+                        sqlite3 "$CAT" <<-EOF
+				UPDATE find_printf 
+				SET ut = '$UT'
+				WHERE ut IS NULL
+				AND ix = $IX;
+				EOF
+                        fuser "$CAT"
                         if [[ $LASTF =~ find: ]]
                         then true
                         else 
                             LASTR=$(find_act "`dirname $CAT`/$P" | head -1)
                             echo 1>&2 '' +add/ing: rec to $CAT: $LASTR
-                            echo $LASTR | sclocate-import | sqlite3 "$CAT"
+                            echo $LASTR | sclocate-import | head #>! sqlite3 "$CAT"
                             ls -ldht "$CAT" # `pwd`/*@*.sqlite* `pwd`/$F.sqlite | sort -t@ -k2r -u
                         fi;;
                 esac

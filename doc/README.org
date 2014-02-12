@@ -280,6 +280,19 @@ done
 
 *** TODO phase-2: even for fname/s <>..
 
+** update rec.
+*** $> echo; find_cats | while read CAT; do
+	echo '' -$CAT:
+        ls -ldh `dirname $CAT`/*@*.sqlite
+        echo -e ".mode insert\nSELECT * FROM find_printf WHERE ut is not null LIMIT 3;" | sqlite3 "$CAT"
+	done
+**** > > > > 
+ -//vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite:
+INSERT INTO table VALUES(321223,'2014-01-30 11:06:51',822076,4,'-rw-r--r--',1,'root root',10,'2014-01-30 11:06:44','./tmp/','ConfigAGN.checkdns.sh.txt','2014-02-11 15:05:46',NULL);
+
+*** #> . ~kraljo/text/scfs/lib/scatman; find_cats | list_sdups | head -100 | last_FCs
+
+
 ** new model:
 **** 1 [[fvlocation]] :: id/ed by (key): location fname, location dirname, mtime, [[fs-id]]
 **** redundant data > [[fvlocation]] dependent:
@@ -295,6 +308,9 @@ done
 ***** [[fversion]]/s can be grouped to [[File-tree]]
       - which is obj. /Class/ (prototype) - not content /instance/
 
+*** constrains:
+**** every inode must have only 1 (-- last) act/ive rec
+**** every f/path must have only 1 (-- last) act/ive rec
 
 **** redundant data > every-time calculated:
 ***** [[fversion]] HA ~> mirrors#, age of cache/s, accessibility stat/s
