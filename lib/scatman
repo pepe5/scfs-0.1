@@ -55,8 +55,8 @@ function sclocate \
 
 # find last file/'s rec. candidates: - and list them, || update them..
 # IN/s: < [[list_sdups]]
-# EX/s: find_cats | list_sdups | last_FCs
-function last_FCs \
+# EX/s: find_cats | list_sdups | last_rec
+function last_rec \
     { while read IX CAT; do
         LASTC=$(sqlite3 "$CAT" "
             SELECT inode,du,'-',lns,'-','-',s,mtime,dir,fn
@@ -89,7 +89,7 @@ function last_FCs \
                         echo 1>&2 '' +add/ing: utime-label to $CAT: `dirname $CAT`/$P
                         UT=`date +%Y-%m-%d\ %T`
                         fuser "$CAT"
-                        usleep 250
+                        sleep 1
                         sqlite3 "$CAT" <<-EOF
 				UPDATE find_printf 
 				SET ut = '$UT'
