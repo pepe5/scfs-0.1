@@ -280,6 +280,43 @@ done
 
 *** TODO phase-2: even for fname/s <>..
 
+** TODO (^^) database is locked Error
+*** $> grep -C5 -in locked /tmp/typescript | cat -n | tail -11
+**** ~#>	23427-12638 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite: <>
+ 23400	23428- <-929992 4 - 1621 - - 6 2012-08-19 21:11:13 ./var/lib/yum/yumdb/i/2204987658a05fb81fb179f351882c0f1614945f-ibm-firstboot-printer-6.00-13.el6-noarch/checksum_type
+ 23401	23429- ->929992 4 - 1629 - - 6 2012-08-19 21:11:13 //./var/lib/yum/yumdb/i/2204987658a05fb81fb179f351882c0f1614945f-ibm-firstboot-printer-6.00-13.el6-noarch/checksum_type
+ 23402	23430- +add/ing: utime-label to //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite: //./var/lib/yum/yumdb/i/2204987658a05fb81fb179f351882c0f1614945f-ibm-firstboot-printer-6.00-13.el6-noarch/checksum_type
+ 23403	23431-//vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite:  4250
+ 23404	23432:Error: near line 1: database is locked
+ 23405	23433-//vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite:  4250
+ 23406	23434- +add/ing: rec to //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite: 929992 4 -rw-r--r-- 1629 root root 6 2012-08-19 21:11:13.0000000000 //./var/lib/yum/yumdb/i/2204987658a05fb81fb179f351882c0f1614945f-ibm-firstboot-printer-6.00-13.el6-noarch/checksum_type
+ 23407	23435--rw-r--r--. 1 root root 113M Feb 12 08:06 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite
+ 23408	23436-
+ 23409	23437-12646 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite: <>
+
+*** $> . ~kraljo/text/scfs/lib/scatman; echo 12638 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite | last_rec
+**** ~#> 12638 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite: <>
+ <-929992 4 - 1621 - - 6 2012-08-19 21:11:13 ./var/lib/yum/yumdb/i/2204987658a05fb81fb179f351882c0f1614945f-ibm-firstboot-printer-6.00-13.el6-noarch/checksum_type
+ ->929992 4 - 1629 - - 6 2012-08-19 21:11:13 //./var/lib/yum/yumdb/i/2204987658a05fb81fb179f351882c0f1614945f-ibm-firstboot-printer-6.00-13.el6-noarch/checksum_type
+ +add/ing: utime-label to //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite: //./var/lib/yum/yumdb/i/2204987658a05fb81fb179f351882c0f1614945f-ibm-firstboot-printer-6.00-13.el6-noarch/checksum_type
+ +add/ing: rec to //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite: 929992 4 -rw-r--r-- 1629 root root 6 2012-08-19 21:11:13.0000000000 //./var/lib/yum/yumdb/i/2204987658a05fb81fb179f351882c0f1614945f-ibm-firstboot-printer-6.00-13.el6-noarch/checksum_type
+-rw-r--r--. 1 root root 113M Feb 12 10:17 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite
+
+*** $> . ~kraljo/text/scfs/lib/scatman; find_cats | list_sdups | cat -n | sed -ne '/11105/,$p' | head
+**** #>
+ 11033	11105 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite
+ 11034	11358 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite
+ 11035	11367 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite
+ 11036	11376 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite
+ 11037	11385 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite
+ 11038	11394 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite
+ 11039	11403 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite
+ 11040	11411 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite
+ 11041	11419 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite
+ 11042	11427 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite
+
+*** $> . ~kraljo/text/scfs/lib/scatman; find_cats | list_sdups | sed -ne '/11105/,$p' | head | last_rec
+
 ** update rec.
 *** $> echo; find_cats | while read CAT; do
 	echo '' -$CAT:
@@ -329,6 +366,9 @@ INSERT INTO table VALUES(321223,'2014-01-30 11:06:51',822076,4,'-rw-r--r--',1,'r
      2. get Last-record (L1=1, L2=2, L3='', L4=4)
      3. only iff all filled L-field/s (L/s) are == (to counterparts) -> fill rest (empty) L/s w/ non-empty A/s
      4. otherwise make new Last-rec (& previous one deactivate by utime)
+
+** TODO [[file:/home/kraljo/text/scfs/lib/scatman::move%20this%20to%20scatfs%20iface][move /locate/ to scatfs iface]]
+   - make scatfs $0-sensitive - and replace fn by our set
 
 
 ** print " -makedirs exception: %s" % err >> test exception instead

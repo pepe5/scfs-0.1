@@ -15,13 +15,14 @@ function find_cats \
 # IN/s: < [[find_cats]]
 function list_sdups \
     { while read CAT; do 
-        sqlite3 "$CAT" "
-            SELECT ix FROM find_printf f
-            CROSS JOIN (SELECT s, count(s) as scnt FROM find_printf WHERE s <> 0 GROUP BY s) sc ON sc.s = f.s
-            CROSS JOIN (SELECT fn, count(fn) as ncnt FROM find_printf GROUP BY fn) nc ON nc.fn = f.fn
-            ORDER BY scnt DESC, f.fn
-            " \
-          | awk -v CAT=$CAT '{print $0,CAT}';
+        sqlite3 "$CAT" <<-EOF | tail -n+2 | awk -v CAT=$CAT '{print $0,CAT}';
+		BEGIN TRANSACTION;
+		SELECT ix FROM find_printf f
+		CROSS JOIN (SELECT s, count(s) as scnt FROM find_printf WHERE s <> 0 GROUP BY s) sc ON sc.s = f.s
+		CROSS JOIN (SELECT fn, count(fn) as ncnt FROM find_printf GROUP BY fn) nc ON nc.fn = f.fn
+		ORDER BY scnt DESC, f.fn;
+		COMMIT;
+		EOF
         # LIMIT 100
         done; }
 
@@ -37,6 +38,7 @@ function tun_cat \
 			CREATE INDEX "find_printf_mtime" ON find_printf (mtime ASC);
 			CREATE INDEX "find_printf_dir" ON find_printf (dir ASC);
 			CREATE INDEX "find_printf_fn" ON find_printf (fn ASC);
+			CREATE INDEX "find_printf_md5" ON find_printf (md5 ASC);
 			EOF
                 ls -ldht "$CAT" # `pwd`/*@*.sqlite* `pwd`/$F.sqlite | sort -t@ -k2r -u
                 ;;
@@ -44,6 +46,7 @@ function tun_cat \
         done; }
 
 
+#>! move this to scatfs iface. (There should be fn-set of ls, cp, mv, locate, & such..)
 # EX/s: sclocate eng.%
 function sclocate \
     { find_cats | while read CAT; do
@@ -88,15 +91,17 @@ function last_rec \
                     (+add | *)
                         echo 1>&2 '' +add/ing: utime-label to $CAT: `dirname $CAT`/$P
                         UT=`date +%Y-%m-%d\ %T`
-                        fuser "$CAT"
+                        echo 1>&2 '' -fuser: `fuser "$CAT"`
                         sleep 1
                         sqlite3 "$CAT" <<-EOF
+				BEGIN TRANSACTION;
 				UPDATE find_printf 
 				SET ut = '$UT'
 				WHERE ut IS NULL
 				AND ix = $IX;
+				COMMIT;
 				EOF
-                        fuser "$CAT"
+                        echo 1>&2 '' -fuser: `fuser "$CAT"`
                         if [[ $LASTF =~ find: ]]
                         then true
                         else 
