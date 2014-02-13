@@ -27,7 +27,7 @@ function list_sdups \
         done; }
 
 
-# EX/s: find_cats | tun_cat
+# EX/s:> find_cats | tun_cat
 function tun_cat \
     { while read CAT; do
         case $1 in
@@ -47,7 +47,7 @@ function tun_cat \
 
 
 #>! move this to scatfs iface. (There should be fn-set of ls, cp, mv, locate, & such..)
-# EX/s: sclocate eng.%
+# EX/s:> sclocate eng.%
 function sclocate \
     { find_cats | while read CAT; do
         ls -ldh `dirname $CAT`/*@*.sqlite
@@ -56,9 +56,23 @@ function sclocate \
     done; }
 
 
+#>! rewrite whole lib to python
+# paginate IN-2 to file to free up origin IN-1
+# EX/s:> pgpipe "seq 8" "cat -n"
+# EX/s:> pgpipe "find_cats | list_sdups" last_rec
+function pgpipe \
+    { for i in `seq 0 3 6`
+    do
+        echo 1>&2 '' -$i..`expr $i + 3 - 1`:
+        eval $1 | sed -ne "`expr $i + 1`,`expr $i + 3`p" > /tmp/.pgpipe
+        cat /tmp/.pgpipe | eval $2
+    done
+    true; }
+
+
 # find last file/'s rec. candidates: - and list them, || update them..
 # IN/s: < [[list_sdups]]
-# EX/s: find_cats | list_sdups | last_rec
+# EX/s:> find_cats | list_sdups | last_rec
 function last_rec \
     { while read IX CAT; do
         LASTC=$(sqlite3 "$CAT" "
@@ -91,7 +105,6 @@ function last_rec \
                     (+add | *)
                         echo 1>&2 '' +add/ing: utime-label to $CAT: `dirname $CAT`/$P
                         UT=`date +%Y-%m-%d\ %T`
-                        echo 1>&2 '' -fuser: `fuser "$CAT"`
                         sleep 1
                         sqlite3 "$CAT" <<-EOF
 				BEGIN TRANSACTION;
@@ -101,7 +114,6 @@ function last_rec \
 				AND ix = $IX;
 				COMMIT;
 				EOF
-                        echo 1>&2 '' -fuser: `fuser "$CAT"`
                         if [[ $LASTF =~ find: ]]
                         then true
                         else 

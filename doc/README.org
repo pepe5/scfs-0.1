@@ -316,6 +316,9 @@ done
  11042	11427 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite
 
 *** $> . ~kraljo/text/scfs/lib/scatman; find_cats | list_sdups | sed -ne '/11105/,$p' | head | last_rec
+*** >? FUSER=`fuser "$CAT"`
+    echo 1>&2 '' -fuser: $FUSER
+    if [[ -n $FUSER ]]; then ps -af | egrep -C2 -in "$FUSER[^[]" 1>&2; fi
 
 ** update rec.
 *** $> echo; find_cats | while read CAT; do
