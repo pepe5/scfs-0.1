@@ -61,7 +61,7 @@ function sclocate \
 # EX/s:> pgpipe "seq 8" "cat -n"
 # EX/s:> pgpipe "find_cats | list_sdups | sed -ne '/11435/,\$p'" last_rec
 function pgpipe \
-    { STEP=1000; UP=9000
+    { STEP=1000; UP=99000
     for i in `seq 0 $STEP $UP`
     do
         eval $1 | sed -ne "`expr $i + 1`,`expr $i + $STEP`p" | pv > /tmp/.pgpipe
