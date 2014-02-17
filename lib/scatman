@@ -5,16 +5,20 @@ function find_act \
     true; }
 
 
+#>! add functionality where find_cats will return last CAT foreach-> A@B*.sqlite set
 function find_cats \
-    { mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
-        cd $FS; ls -1dht `pwd`/*@*[0-9].sqlite | head -1
+    { N=-1; if [[ -n $1 ]]; then N=$1; fi
+    mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS;
+    do
+        cd $FS; ls -1dht `pwd`/*@*[0-9].sqlite | head $N
     done; }
 
 
 # list files with equal sizes
 # IN/s: < [[find_cats]]
 function list_sdups \
-    { while read CAT; do 
+    { while read CAT;
+    do 
         sqlite3 "$CAT" <<-EOF | tail -n+2 | awk -v CAT=$CAT '{print $0,CAT}';
 		BEGIN TRANSACTION;
 		SELECT ix FROM find_printf f
@@ -29,7 +33,8 @@ function list_sdups \
 
 # EX/s:> find_cats | tun_cat
 function tun_cat \
-    { while read CAT; do
+    { while read CAT;
+    do
         case $1 in
             (--ix1 | *) echo 1>&2 '' -tun_cat: 'indexing $CAT: i,s,mt,dir, & fn..'
                 sqlite3 "$CAT" <<-EOF
@@ -49,7 +54,8 @@ function tun_cat \
 #>! move this to scatfs iface. (There should be fn-set of ls, cp, mv, locate, & such..)
 # EX/s:> sclocate eng.%
 function sclocate \
-    { find_cats | while read CAT; do
+    { find_cats | while read CAT;
+    do
         ls -ldh `dirname $CAT`/*@*.sqlite
         sqlite3 "$CAT" "SELECT * FROM find_printf WHERE fn LIKE '$1' LIMIT 10"
         echo;
@@ -61,11 +67,15 @@ function sclocate \
 # EX/s:> pgpipe "seq 8" "cat -n"
 # EX/s:> pgpipe "find_cats | list_sdups | sed -ne '/11435/,\$p'" last_rec
 function pgpipe \
-    { STEP=1000; UP=99000
-    for i in `seq 0 $STEP $UP`
+    { STEP=1000; UP=9888777 #>! i have to go at least to [[file:/tmp/2 >::865935]]
+    seq 0 $STEP $UP | while read i
     do
         eval $1 | sed -ne "`expr $i + 1`,`expr $i + $STEP`p" | pv > /tmp/.pgpipe
-        echo -e 1>&2 "\n -$i..`expr $i + 3 - 1`:" `ls -ldh /tmp/.pgpipe`
+        echo -e 1>&2 "\n -`expr $i + 1`..`expr $i + $STEP`:" `ls -ldh /tmp/.pgpipe`
+        if ! [[ -s /tmp/.pgpipe ]]
+        then
+            echo 1>&2 pgpipe: piping file is 0-sized. Exiting..
+            break; fi
         cat /tmp/.pgpipe | pv | eval $2
     done
     true; }
@@ -75,7 +85,8 @@ function pgpipe \
 # IN/s: < [[list_sdups]]
 # EX/s:> find_cats | list_sdups | last_rec
 function last_rec \
-    { while read IX CAT; do
+    { while read IX CAT;
+    do
         LASTC=$(sqlite3 "$CAT" "
             SELECT inode,du,'-',lns,'-','-',s,mtime,dir,fn
             FROM find_printf f
