@@ -325,6 +325,15 @@ done
 
 
 ** update rec.
+*** TODO :ACT: it (ut-) marks wrong rec/s: $> sqlite3 "$CAT" "SELECT * FROM find_printf WHERE fn = 'pdnsd.cache'
+ORDER BY dt DESC
+LIMIT 10"
+done
+
+**** #> > > > > > > 
+403|2014-01-30 11:06:12|2835|0|-rw-r-----|1|pdnsd pdnsd|0|2010-02-22 11:10:30|./var/cache/pdnsd/|pdnsd.cache||
+499|2014-01-30 11:06:12|6612|4|-rw-------|1|nobody nobody|12|2014-01-22 13:43:37|./var/cache/pdnsd-sasgui/|pdnsd.cache|2014-02-13 15:36:19|
+
 *** TODO make /dev/shm/.scfs.IX-CAT - to be able to suspend by SIGINT
     - this would go 1stly to list_sdups
 

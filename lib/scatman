@@ -84,16 +84,15 @@ function pgpipe \
 # IN/s: < [[list_sdups]]
 # EX/s:> find_cats | list_sdups | last_rec
 function last_rec \
-    { SelSfx="" case $1 in; (+md5:new) SelSfx="$SelSfx AND md5 IS NULL";; esac
-    while read IX CAT;
+    { while read IX CAT;
     do
+        if [[ -z $IX ]]; then continue; fi
         LASTC=$(sqlite3 "$CAT" "
             SELECT inode,du,'-',lns,'-','-',s,mtime,dir,fn
             FROM find_printf f
             WHERE ut IS NULL
             AND dir = (SELECT dir FROM find_printf WHERE ix=$IX)
             AND fn = (SELECT fn FROM find_printf WHERE ix=$IX)
-            $SelSfx
             ORDER BY dt DESC
             LIMIT 1"\
           | perl -nle '
@@ -133,18 +132,34 @@ function last_rec \
                             LASTR=$(find_act "`dirname $CAT`/$P" | head -1)
                             echo 1>&2 '' +add/ing: rec to $CAT: $LASTR
                             echo $LASTR | sclocate-import | head #>! sqlite3 "$CAT"
-                            ls -ldht "$CAT" # `pwd`/*@*.sqlite* `pwd`/$F.sqlite | sort -t@ -k2r -u
+                            ls -ldht 1>&2 "$CAT" # `pwd`/*@*.sqlite* `pwd`/$F.sqlite | sort -t@ -k2r -u
+                            echo $(sqlite3 "$CAT" "
+                                SELECT ix
+                                FROM find_printf f
+                                WHERE ut IS NULL
+                                AND dir = (SELECT dir FROM find_printf WHERE ix=$IX)
+                                AND fn = (SELECT fn FROM find_printf WHERE ix=$IX)
+                                ORDER BY dt DESC
+                                LIMIT 1") $CAT
                         fi;;
                 esac
             else
-                case $1 in
-                    (+md5*)
-                        echo 1>&2 '' -md5: md5sum "`dirname $CAT`/$P";;
-                esac
                 echo 1>&2 -n .
+                echo $IX $CAT
             fi
         fi
         done; }
+
+
+function tun_md5 \
+    { while read IX CAT
+    do
+    if [[ -z $IX ]]; then continue; fi
+    case $1 in
+        (-f | --force | *)
+            echo ...;;
+    esac
+    done; }
 
 
 ##
