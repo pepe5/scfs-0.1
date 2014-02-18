@@ -316,7 +316,7 @@ done
  11042	11427 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite
 
 *** $> . ~kraljo/text/scfs/lib/scatman; find_cats | list_sdups | sed -ne '/11105/,$p' | head | last_rec
-*** >? FUSER=`fuser "$CAT"`
+*** >? FUSER=`fuser "$CAT"` -> [[pgpipe]]
     echo 1>&2 '' -fuser: $FUSER
     if [[ -n $FUSER ]]; then ps -af | egrep -C2 -in "$FUSER[^[]" 1>&2; fi
 
@@ -325,6 +325,9 @@ done
 
 
 ** update rec.
+*** TODO make /dev/shm/.scfs.IX-CAT - to be able to suspend by SIGINT
+    - this would go 1stly to list_sdups
+
 *** $> echo; find_cats | while read CAT; do
 	echo '' -$CAT:
         ls -ldh `dirname $CAT`/*@*.sqlite
@@ -333,8 +336,6 @@ done
 **** > > > > 
  -//vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite:
 INSERT INTO table VALUES(321223,'2014-01-30 11:06:51',822076,4,'-rw-r--r--',1,'root root',10,'2014-01-30 11:06:44','./tmp/','ConfigAGN.checkdns.sh.txt','2014-02-11 15:05:46',NULL);
-
-*** #> . ~kraljo/text/scfs/lib/scatman; find_cats | list_sdups | head -100 | last_rec
 
 *** $> . ~kraljo/text/scfs/lib/scatman; echo; find_cats -5 | while read CAT; do
         cd "`dirname $CAT`"; ls -1dht "$CAT"

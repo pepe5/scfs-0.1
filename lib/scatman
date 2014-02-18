@@ -20,12 +20,10 @@ function list_sdups \
     { while read CAT;
     do 
         sqlite3 "$CAT" <<-EOF | tail -n+2 | awk -v CAT=$CAT '{print $0,CAT}';
-		BEGIN TRANSACTION;
 		SELECT ix FROM find_printf f
 		CROSS JOIN (SELECT s, count(s) as scnt FROM find_printf WHERE s <> 0 GROUP BY s) sc ON sc.s = f.s
 		CROSS JOIN (SELECT fn, count(fn) as ncnt FROM find_printf GROUP BY fn) nc ON nc.fn = f.fn
 		ORDER BY scnt DESC, f.fn;
-		COMMIT;
 		EOF
         # LIMIT 100
         done; }
@@ -67,7 +65,7 @@ function sclocate \
 # EX/s:> pgpipe "seq 8" "cat -n"
 # EX/s:> pgpipe "find_cats | list_sdups | sed -ne '/11435/,\$p'" last_rec
 function pgpipe \
-    { STEP=1000; UP=9888777 #>! i have to go at least to [[file:/tmp/2 >::865935]]
+    { STEP=1000; UP=9888777
     seq 0 $STEP $UP | while read i
     do
         eval $1 | sed -ne "`expr $i + 1`,`expr $i + $STEP`p" | pv > /tmp/.pgpipe
@@ -75,7 +73,8 @@ function pgpipe \
         if ! [[ -s /tmp/.pgpipe ]]
         then
             echo 1>&2 pgpipe: piping file is 0-sized. Exiting..
-            break; fi
+            break
+        fi
         cat /tmp/.pgpipe | pv | eval $2
     done
     true; }
@@ -85,7 +84,8 @@ function pgpipe \
 # IN/s: < [[list_sdups]]
 # EX/s:> find_cats | list_sdups | last_rec
 function last_rec \
-    { while read IX CAT;
+    { SelSfx="" case $1 in; (+md5:new) SelSfx="$SelSfx AND md5 IS NULL";; esac
+    while read IX CAT;
     do
         LASTC=$(sqlite3 "$CAT" "
             SELECT inode,du,'-',lns,'-','-',s,mtime,dir,fn
@@ -93,6 +93,7 @@ function last_rec \
             WHERE ut IS NULL
             AND dir = (SELECT dir FROM find_printf WHERE ix=$IX)
             AND fn = (SELECT fn FROM find_printf WHERE ix=$IX)
+            $SelSfx
             ORDER BY dt DESC
             LIMIT 1"\
           | perl -nle '
@@ -135,7 +136,12 @@ function last_rec \
                             ls -ldht "$CAT" # `pwd`/*@*.sqlite* `pwd`/$F.sqlite | sort -t@ -k2r -u
                         fi;;
                 esac
-            else echo 1>&2 -n .
+            else
+                case $1 in
+                    (+md5*)
+                        echo 1>&2 '' -md5: md5sum "`dirname $CAT`/$P";;
+                esac
+                echo 1>&2 -n .
             fi
         fi
         done; }
