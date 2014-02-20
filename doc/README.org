@@ -324,16 +324,20 @@ done
 *** $> . ~kraljo/text/scfs/lib/scatman; pgpipe "find_cats | list_sdups | sed -ne '19062,\$p'" last_rec
 
 
-** update rec.
-*** TODO :ACT: it (ut-) marks wrong rec/s: $> sqlite3 "$CAT" "SELECT * FROM find_printf WHERE fn = 'pdnsd.cache'
-ORDER BY dt DESC
-LIMIT 10"
-done
+** TODO :ACT: it (ut-) marks wrong rec/s:
+*** (it didnt add act rec?) $> echo; sqlite3 "//vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite" <<-EOF | cat -n | head
+SELECT * FROM find_printf f WHERE f.fn = 'eng.org' LIMIT 10;
+EOF
+**** #> > > > > 
+     1	195057|2014-01-30 11:06:29|657718|292|-rw-rw-r--|1|kraljo kraljo|296794|2014-01-28 16:20:36|./home/kraljo/Desktop/|eng.org|2014-02-17 16:46:45|
 
+*** (^^) $> sqlite3 "$CAT" "SELECT * FROM find_printf WHERE fn = 'pdnsd.cache' ORDER BY dt DESC LIMIT 10"
 **** #> > > > > > > 
 403|2014-01-30 11:06:12|2835|0|-rw-r-----|1|pdnsd pdnsd|0|2010-02-22 11:10:30|./var/cache/pdnsd/|pdnsd.cache||
 499|2014-01-30 11:06:12|6612|4|-rw-------|1|nobody nobody|12|2014-01-22 13:43:37|./var/cache/pdnsd-sasgui/|pdnsd.cache|2014-02-13 15:36:19|
 
+
+** update rec.
 *** TODO make /dev/shm/.scfs.IX-CAT - to be able to suspend by SIGINT
     - this would go 1stly to list_sdups
 
@@ -350,7 +354,6 @@ INSERT INTO table VALUES(321223,'2014-01-30 11:06:51',822076,4,'-rw-r--r--',1,'r
         cd "`dirname $CAT`"; ls -1dht "$CAT"
         sqlite3 "$CAT" "SELECT Count (*) FROM find_printf WHERE ut IS NOT NULL"
     done
-
 
 ** new model:
 **** 1 [[fvlocation]] :: id/ed by (key): location fname, location dirname, mtime, [[fs-id]]

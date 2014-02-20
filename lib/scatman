@@ -18,15 +18,16 @@ function find_cats \
 # IN/s: < [[find_cats]]
 function list_sdups \
     { while read CAT;
-    do 
-        sqlite3 "$CAT" <<-EOF | tail -n+2 | awk -v CAT=$CAT '{print $0,CAT}';
+    do
+    #(<) BEGIN TRANSACTION + | tail -n+2
+    sqlite3 "$CAT" <<-EOF | awk -v CAT=$CAT '{print $0,CAT}';
 		SELECT ix FROM find_printf f
-		CROSS JOIN (SELECT s, count(s) as scnt FROM find_printf WHERE s <> 0 GROUP BY s) sc ON sc.s = f.s
-		CROSS JOIN (SELECT fn, count(fn) as ncnt FROM find_printf GROUP BY fn) nc ON nc.fn = f.fn
+		CROSS JOIN (SELECT s, Count(s) as scnt FROM find_printf WHERE s <> 0 GROUP BY s) sc ON sc.s = f.s
+		CROSS JOIN (SELECT fn, Count(fn) as ncnt FROM find_printf GROUP BY fn) nc ON nc.fn = f.fn
 		ORDER BY scnt DESC, f.fn;
 		EOF
         # LIMIT 100
-        done; }
+    done; }
 
 
 # EX/s:> find_cats | tun_cat
