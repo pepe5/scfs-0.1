@@ -110,7 +110,8 @@ echo; done
 ** /random sync/ - CAT originated
    - if last rec. doesnt match actual finding, -> append refresh
 
-** TODO deduplicate by hard-links (-xdev)
+
+** TODO deduplicate by hard-links (-xdev):
 *** $> echo; mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS; do
         cd $FS; ls -1dht `pwd`/*@*[0-9].sqlite | head -1
     done | egrep '@oc.*-15' | while read CAT; do 
@@ -280,7 +281,7 @@ done
 
 *** TODO phase-2: even for fname/s <>..
 
-** TODO (^^) database is locked Error
+** (^^) database is locked Error
 *** $> grep -C5 -in locked /tmp/typescript | cat -n | tail -11
 **** ~#>	23427-12638 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite: <>
  23400	23428- <-929992 4 - 1621 - - 6 2012-08-19 21:11:13 ./var/lib/yum/yumdb/i/2204987658a05fb81fb179f351882c0f1614945f-ibm-firstboot-printer-6.00-13.el6-noarch/checksum_type
@@ -322,6 +323,167 @@ done
 
 *** $> . ~kraljo/text/scfs/lib/scatman; find_cats | list_sdups | grep -in '11141 //' | head -3
 *** $> . ~kraljo/text/scfs/lib/scatman; pgpipe "find_cats | list_sdups | sed -ne '19062,\$p'" last_rec
+
+** [0/1] fcnt << fncnt:
+*** we do not have fcnt/'s >1 rec/s -> fix 1st [[file:/home/kraljo/text/scfs/lib/scatman::echo%20$LASTR%20|%20sclocate-import][echo $LASTR | sclocate-import]]
+    - <2014-02-20 Thu>
+
+*** we would like to fix it by fn ~> '.bash_history%': $> echo; find_cats | while read CAT; do
+        cd "`dirname $CAT`"; echo '' -`ls -1dht "$CAT"`:
+        sqlite3 "$CAT" "
+		SELECT *
+                FROM find_printf
+                WHERE fn LIKE '.bash_history'
+                OR (dir LIKE '%/Desktop/' AND fn LIKE '%.org')
+                ORDER BY dir, fn, dt DESC"
+    done
+**** :ARCHIVE: fn LIKE '.bash_history%'
+
+*** Count (*) as cntR2x:*
+**** $> echo; find_cats | while read CAT; do
+        cd "`dirname $CAT`"; echo '' -`ls -1dht "$CAT"`:
+        sqlite3 "$CAT" "
+                SELECT Count (*) as cntUt, dir, fn FROM find_printf WHERE ut is NOT NULL
+                ORDER BY cntUt DESC, dir, fn
+                LIMIT 10;"
+    done
+
+**** #> > > > > > 
+ -//vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite:
+bash: cd: /home/guest/mnt/cache: Permission denied
+3591|./tmp/|tmp.Ld35KYZg1Y
+ -/boot/sda2@oc0653706537.ibm.com,2014-01-15.sqlite:
+2|./|sda2@oc0653706537.ibm.com,2014-01-15.sqlite~~
+ -/mnt/lifeboat-root/vg_lifeboat-lv_root@oc0653706537.ibm.com,2014-01-15.sqlite:
+2|./|vg_lifeboat-lv_root@oc0653706537.ibm.com,2014-01-15.sqlite~
+ -/mnt/lifeboat-home/vg_lifeboat-lv_home@oc0653706537.ibm.com,2014-01-15.sqlite:
+337|./kraljo/Downloads/4-ibm/gsa~poluted/TMP-text-teamroom/|<Auto Cooled>How to request access to HMCs in Shared|GSNI environment.txt
+ -/mnt/lifeboat-home/vg_lifeboat-lv_home@oc0653706537.ibm.com,2014-01-15.sqlite:
+337|./kraljo/Downloads/4-ibm/gsa~poluted/TMP-text-teamroom/|<Auto Cooled>How to request access to HMCs in Shared|GSNI environment.txt
+ -/mnt/lifeboat-tmp/vg_lifeboat-lv_tmp@oc0653706537.ibm.com,2014-01-15.sqlite:
+7|./=delta-sam7/=4coo-ibm/Downloads/best-practices/SBPE - Common Best practices/|Mixed Address Database | Mixed Address Database login page.mht
+
+**** :blind:STU:maybe: echo; find_cats | while read CAT; do
+        cd "`dirname $CAT`"; echo '' -`ls -1dht "$CAT"`:
+        sqlite3 "$CAT" "
+                SELECT cntR2x, f.dir, f.fn, * 
+                FROM find_printf f 
+                CROSS JOIN
+                (SELECT Count (*) as cntR2x, dir, fn FROM find_printf WHERE ut is NOT NULL) rec2x
+                ON f.fn = rec2x.fn
+                WHERE f.fn = rec2x.fn
+                AND f.dir = rec2x.dir
+                AND cntR2x > 1
+                AND f.fn NOT LIKE '%@%.sqlite%'
+                ORDER BY cntR2x, f.fn
+                LIMIT 10;"
+    done
+
+**** #> > > > > > > > > > > > > > 
+ -//vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite:
+bash: cd: /home/guest/mnt/cache: Permission denied
+3591|./tmp/|tmp.Ld35KYZg1Y|321686|2014-01-30 11:06:56|822417|8|-rw-------|1|kraljo kraljo|7598|2014-01-27 16:14:43|./tmp/|tmp.Ld35KYZg1Y|2014-02-17 14:56:20||3591|./tmp/|tmp.Ld35KYZg1Y
+ -/boot/sda2@oc0653706537.ibm.com,2014-01-15.sqlite:
+ -/mnt/lifeboat-root/vg_lifeboat-lv_root@oc0653706537.ibm.com,2014-01-15.sqlite:
+ -/mnt/lifeboat-home/vg_lifeboat-lv_home@oc0653706537.ibm.com,2014-01-15.sqlite:
+337|./kraljo/Downloads/4-ibm/gsa~poluted/TMP-text-teamroom/|<Auto Cooled>How to request access to HMCs in Shared|GSNI environment.txt|276767|2014-01-15 14:41:47|5384429|4|-rw-rw-r--|1|kraljo guest|2345|2012-06-10 23:40:52|./kraljo/Downloads/4-ibm/gsa~poluted/TMP-text-teamroom/|<Auto Cooled>How to request access to HMCs in Shared|GSNI environment.txt||2014-02-17 18:03:41||337|./kraljo/Downloads/4-ibm/gsa~poluted/TMP-text-teamroom/|<Auto Cooled>How to request access to HMCs in Shared|GSNI environment.txt
+ -/mnt/lifeboat-home/vg_lifeboat-lv_home@oc0653706537.ibm.com,2014-01-15.sqlite:
+337|./kraljo/Downloads/4-ibm/gsa~poluted/TMP-text-teamroom/|<Auto Cooled>How to request access to HMCs in Shared|GSNI environment.txt|276767|2014-01-15 14:41:47|5384429|4|-rw-rw-r--|1|kraljo guest|2345|2012-06-10 23:40:52|./kraljo/Downloads/4-ibm/gsa~poluted/TMP-text-teamroom/|<Auto Cooled>How to request access to HMCs in Shared|GSNI environment.txt||2014-02-17 18:03:41||337|./kraljo/Downloads/4-ibm/gsa~poluted/TMP-text-teamroom/|<Auto Cooled>How to request access to HMCs in Shared|GSNI environment.txt
+ -/mnt/lifeboat-tmp/vg_lifeboat-lv_tmp@oc0653706537.ibm.com,2014-01-15.sqlite:
+7|./=delta-sam7/=4coo-ibm/Downloads/best-practices/SBPE - Common Best practices/|Mixed Address Database | Mixed Address Database login page.mht|26553|2014-01-15 14:41:53|4588497|1120|-rw-r--r--|1|guest guest|1144900|2013-10-23 21:29:41|./=delta-sam7/=4coo-ibm/Downloads/best-practices/SBPE - Common Best practices/|Mixed Address Database | Mixed Address Database login page.mht||2014-02-18 10:18:10||7|./=delta-sam7/=4coo-ibm/Downloads/best-practices/SBPE - Common Best practices/|Mixed Address Database | Mixed Address Database login page.mht
+
+**** (^^) $> echo; find_cats | while read CAT; do
+        cd "`dirname $CAT`"; echo '' -`ls -1dht "$CAT"`:
+        sqlite3 "$CAT" "
+                SELECT cntR2x, f.dir, f.fn, * 
+                FROM find_printf f 
+                CROSS JOIN
+                (SELECT Count (*) as cntR2x, dir, fn FROM find_printf WHERE ut is NOT NULL) rec2x
+                ON f.fn = rec2x.fn
+                WHERE f.fn = rec2x.fn
+                AND f.dir = rec2x.dir
+                AND cntR2x > 1
+                ORDER BY cntR2x, f.fn
+                LIMIT 10;"
+    done
+
+**** #> > > > > > > > > > > > > 
+ -//vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite:
+bash: cd: /home/guest/mnt/cache: Permission denied
+3591|./tmp/|tmp.Ld35KYZg1Y|321686|2014-01-30 11:06:56|822417|8|-rw-------|1|kraljo kraljo|7598|2014-01-27 16:14:43|./tmp/|tmp.Ld35KYZg1Y|2014-02-17 14:56:20||3591|./tmp/|tmp.Ld35KYZg1Y
+ -/boot/sda2@oc0653706537.ibm.com,2014-01-15.sqlite:
+2|./|sda2@oc0653706537.ibm.com,2014-01-15.sqlite~~|65|2014-01-15 14:40:21|65|8|-rw-r--r--|1|root root|3072|2014-01-15 14:10:05|./|sda2@oc0653706537.ibm.com,2014-01-15.sqlite~~||2014-02-17 16:54:07||2|./|sda2@oc0653706537.ibm.com,2014-01-15.sqlite~~
+ -/mnt/lifeboat-root/vg_lifeboat-lv_root@oc0653706537.ibm.com,2014-01-15.sqlite:
+2|./|vg_lifeboat-lv_root@oc0653706537.ibm.com,2014-01-15.sqlite~|6509|2014-01-15 14:40:21|13|4|-rw-r--r--|1|root root|3072|2014-01-15 14:28:37|./|vg_lifeboat-lv_root@oc0653706537.ibm.com,2014-01-15.sqlite~||2014-02-17 16:54:11||2|./|vg_lifeboat-lv_root@oc0653706537.ibm.com,2014-01-15.sqlite~
+ -/mnt/lifeboat-home/vg_lifeboat-lv_home@oc0653706537.ibm.com,2014-01-15.sqlite:
+337|./kraljo/Downloads/4-ibm/gsa~poluted/TMP-text-teamroom/|<Auto Cooled>How to request access to HMCs in Shared|GSNI environment.txt|276767|2014-01-15 14:41:47|5384429|4|-rw-rw-r--|1|kraljo guest|2345|2012-06-10 23:40:52|./kraljo/Downloads/4-ibm/gsa~poluted/TMP-text-teamroom/|<Auto Cooled>How to request access to HMCs in Shared|GSNI environment.txt||2014-02-17 18:03:41||337|./kraljo/Downloads/4-ibm/gsa~poluted/TMP-text-teamroom/|<Auto Cooled>How to request access to HMCs in Shared|GSNI environment.txt
+ -/mnt/lifeboat-home/vg_lifeboat-lv_home@oc0653706537.ibm.com,2014-01-15.sqlite:
+337|./kraljo/Downloads/4-ibm/gsa~poluted/TMP-text-teamroom/|<Auto Cooled>How to request access to HMCs in Shared|GSNI environment.txt|276767|2014-01-15 14:41:47|5384429|4|-rw-rw-r--|1|kraljo guest|2345|2012-06-10 23:40:52|./kraljo/Downloads/4-ibm/gsa~poluted/TMP-text-teamroom/|<Auto Cooled>How to request access to HMCs in Shared|GSNI environment.txt||2014-02-17 18:03:41||337|./kraljo/Downloads/4-ibm/gsa~poluted/TMP-text-teamroom/|<Auto Cooled>How to request access to HMCs in Shared|GSNI environment.txt
+ -/mnt/lifeboat-tmp/vg_lifeboat-lv_tmp@oc0653706537.ibm.com,2014-01-15.sqlite:
+7|./=delta-sam7/=4coo-ibm/Downloads/best-practices/SBPE - Common Best practices/|Mixed Address Database | Mixed Address Database login page.mht|26553|2014-01-15 14:41:53|4588497|1120|-rw-r--r--|1|guest guest|1144900|2013-10-23 21:29:41|./=delta-sam7/=4coo-ibm/Downloads/best-practices/SBPE - Common Best practices/|Mixed Address Database | Mixed Address Database login page.mht||2014-02-18 10:18:10||7|./=delta-sam7/=4coo-ibm/Downloads/best-practices/SBPE - Common Best practices/|Mixed Address Database | Mixed Address Database login page.mht
+
+*** sqlite> SELECT fcnt, f.dir, f.fn, * 
+FROM find_printf f 
+CROSS JOIN
+(SELECT Count (*) as fcnt, dir, fn FROM find_printf fcnt GROUP BY dir, fn) fcnt 
+ON f.fn = fcnt.fn
+WHERE f.fn = fcnt.fn
+AND f.dir = fcnt.dir
+AND fcnt > 1
+ORDER BY fcnt, f.fn
+LIMIT 10;
+
+**** [[fcnt moc-up]] #...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>    ...>
+2|2|22|2|2|22|md/22|2|2|22
+2|2|22|3|2|22|md/22-2|2|2|22
+
+*** :ARCHIVE: $> echo; sqlite3 "//vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite" <<-EOF | cat -n | head
+SELECT fncnt, fn1, * 
+FROM find_printf f 
+CROSS JOIN
+(SELECT Count (*) as fncnt, fn as fn1 FROM find_printf fncnt GROUP BY fn) fncnt ON f.fn = fncnt.fn1
+WHERE f.fn = fncnt.fn1
+ORDER BY fncnt DESC, f.fn
+LIMIT 10;
+EOF
+
+*** TODO we can start deduplicate duplicates-only simply:
+    - $> echo; sqlite3 "//vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite" <<-EOF | cat -n | head
+      SELECT fncnt, fn1, * 
+      FROM find_printf f 
+      CROSS JOIN
+      (SELECT Count (*) as fncnt, fn as fn1 FROM find_printf fncnt GROUP BY fn) fncnt ON f.fn = fncnt.fn1
+      WHERE f.fn = fncnt.fn1
+      AND fncnt > 1
+      ORDER BY fncnt, f.fn
+      LIMIT 10;
+EOF
+
+**** #> > > > > > > > > 
+     1	2|$271CD7F9B3AA4C33.jpg|216047|2014-01-30 11:06:31|676382|88|-rw-rw-r--|1|kraljo kraljo|86941|2013-09-24 10:36:42|./home/kraljo/Documents/SametimeTranscripts/josef.kral@cz.ibm.com/20130924/|$271CD7F9B3AA4C33.jpg|||2|$271CD7F9B3AA4C33.jpg
+     2	2|$271CD7F9B3AA4C33.jpg|216574|2014-01-30 11:06:32|676397|88|-rw-rw-r--|1|kraljo kraljo|86941|2013-09-24 10:36:57|./home/kraljo/Documents/SametimeTranscripts/aleksandra.podrez@pl.ibm.com/20130924/|$271CD7F9B3AA4C33.jpg|||2|$271CD7F9B3AA4C33.jpg
+     3	2|$2A23622689A1B9F5.jpg|209262|2014-01-30 11:06:31|685815|44|-rw-rw-r--|1|kraljo kraljo|44881|2013-06-13 14:54:28|./home/kraljo/Documents/SametimeTranscripts/Pavel_Hruby@cz.ibm.com/20130613/|$2A23622689A1B9F5.jpg|||2|$2A23622689A1B9F5.jpg
+     4	2|$2A23622689A1B9F5.jpg|215930|2014-01-30 11:06:31|685817|44|-rw-rw-r--|1|kraljo kraljo|44881|2013-06-13 15:04:31|./home/kraljo/Documents/SametimeTranscripts/jaroslav.stava@cz.ibm.com/20130613/|$2A23622689A1B9F5.jpg|||2|$2A23622689A1B9F5.jpg
+     5	2|$3112446286006103.jpg|216056|2014-01-30 11:06:31|676577|36|-rw-rw-r--|1|kraljo kraljo|33420|2013-07-29 10:39:31|./home/kraljo/Documents/SametimeTranscripts/josef.kral@cz.ibm.com/20130729/|$3112446286006103.jpg|||2|$3112446286006103.jpg
+     6	2|$3112446286006103.jpg|217333|2014-01-30 11:06:32|1197241|36|-rw-rw-r--|1|kraljo kraljo|33420|2013-07-29 10:39:16|./home/kraljo/Documents/SametimeTranscripts/Krasimir_Mateev@cz.ibm.com/20130729/|$3112446286006103.jpg|||2|$3112446286006103.jpg
+     7	2|$44C9777985B0BE77.jpg|210041|2014-01-30 11:06:31|1050839|12|-rw-rw-r--|1|kraljo kraljo|10122|2012-10-15 11:49:33|./home/kraljo/Documents/SametimeTranscripts/wdueng@de.ibm.com/20121015/|$44C9777985B0BE77.jpg|||2|$44C9777985B0BE77.jpg
+     8	2|$44C9777985B0BE77.jpg|216152|2014-01-30 11:06:31|1050785|12|-rw-rw-r--|1|kraljo kraljo|10122|2012-10-15 11:48:07|./home/kraljo/Documents/SametimeTranscripts/josef.kral@cz.ibm.com/20121015/|$44C9777985B0BE77.jpg|||2|$44C9777985B0BE77.jpg
+     9	2|$5852E4B4F328398.jpg|208882|2014-01-30 11:06:31|1071973|32|-rw-rw-r--|1|kraljo kraljo|31364|2013-08-01 08:55:45|./home/kraljo/Documents/SametimeTranscripts/francisco_ramon@cz.ibm.com/20130801/|$5852E4B4F328398.jpg|||2|$5852E4B4F328398.jpg
+   10	2|$5852E4B4F328398.jpg|215695|2014-01-30 11:06:31|675091|32|-rw-rw-r--|1|kraljo kraljo|31364|2013-08-01 08:53:11|./home/kraljo/Documents/SametimeTranscripts/fpospisil@cz.ibm.com/20130801/|$5852E4B4F328398.jpg|||2|$5852E4B4F328398.jpg
+
+*** (^^) fcnt moc-up: sqlite> SELECT * FROM find_printf;
+**** :
+1|1|11|md/11
+2|2|22|md/22
+3|2|22|md/22-2
+4|3|22|md/22-3
+
+**** sqlite> SELECT Count (*), * FROM find_printf fcnt GROUP BY dir, fn LIMIT 10;
+**** :
+1|1|1|11|md/11
+2|3|2|22|md/22-2
+1|4|3|22|md/22-3
+
 
 
 ** TODO :ACT: it (ut-) marks wrong rec/s:
