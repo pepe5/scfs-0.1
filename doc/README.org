@@ -281,7 +281,7 @@ done
 
 *** TODO phase-2: even for fname/s <>..
 
-** (^^) database is locked Error
+** (vv) database is locked Error
 *** $> grep -C5 -in locked /tmp/typescript | cat -n | tail -11
 **** ~#>	23427-12638 //vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite: <>
  23400	23428- <-929992 4 - 1621 - - 6 2012-08-19 21:11:13 ./var/lib/yum/yumdb/i/2204987658a05fb81fb179f351882c0f1614945f-ibm-firstboot-printer-6.00-13.el6-noarch/checksum_type
@@ -339,7 +339,16 @@ done
     done
 **** :ARCHIVE: fn LIKE '.bash_history%'
 
-*** Count (*) as cntR2x:*
+
+*** this exactly needs CROSS JOIN - overall (NOT NULL rec/s) count is correct, but f/path/s (& ix/s) are lost
+    - $> . ~kraljo/text/scfs/lib/scatman; echo; find_cats | while read CAT; do
+        cd "`dirname $CAT`"; echo '' -`ls -1dht "$CAT"`:
+        sqlite3 "$CAT" "
+                SELECT ix, dir, fn FROM find_printf WHERE ut is NOT NULL
+                ORDER BY dir, fn;" | cat -n | tail -5
+    done
+
+*** (^^) Count (*) as cntR2x:*
 **** $> echo; find_cats | while read CAT; do
         cd "`dirname $CAT`"; echo '' -`ls -1dht "$CAT"`:
         sqlite3 "$CAT" "
@@ -486,19 +495,6 @@ EOF
 
 
 
-** TODO :ACT: it (ut-) marks wrong rec/s:
-*** (it didnt add act rec?) $> echo; sqlite3 "//vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite" <<-EOF | cat -n | head
-SELECT * FROM find_printf f WHERE f.fn = 'eng.org' LIMIT 10;
-EOF
-**** #> > > > > 
-     1	195057|2014-01-30 11:06:29|657718|292|-rw-rw-r--|1|kraljo kraljo|296794|2014-01-28 16:20:36|./home/kraljo/Desktop/|eng.org|2014-02-17 16:46:45|
-
-*** (^^) $> sqlite3 "$CAT" "SELECT * FROM find_printf WHERE fn = 'pdnsd.cache' ORDER BY dt DESC LIMIT 10"
-**** #> > > > > > > 
-403|2014-01-30 11:06:12|2835|0|-rw-r-----|1|pdnsd pdnsd|0|2010-02-22 11:10:30|./var/cache/pdnsd/|pdnsd.cache||
-499|2014-01-30 11:06:12|6612|4|-rw-------|1|nobody nobody|12|2014-01-22 13:43:37|./var/cache/pdnsd-sasgui/|pdnsd.cache|2014-02-13 15:36:19|
-
-
 ** update rec.
 *** TODO make /dev/shm/.scfs.IX-CAT - to be able to suspend by SIGINT
     - this would go 1stly to list_sdups
@@ -516,6 +512,27 @@ INSERT INTO table VALUES(321223,'2014-01-30 11:06:51',822076,4,'-rw-r--r--',1,'r
         cd "`dirname $CAT`"; ls -1dht "$CAT"
         sqlite3 "$CAT" "SELECT Count (*) FROM find_printf WHERE ut IS NOT NULL"
     done
+
+** [0/2] i need to 1/ remove ut from last rec/s
+   2/ add ut to all non-last rec/s w/ NULL ut
+*** for now i will iterate only
+    - when i am not able to find SELECT (UPDATE) all last rec/s in 1 sql statement :-S
+*** TODO but maybe we could use [[cntUt]]
+*** TODO :ACT:STU: 1st: check for sureness, that i dont have any f/paths w/non-1 rec/s
+    - then (if not)> find_cats | while read CAT; do> sqlite3 "$CAT" "UPDATE find_printf SET ut = NULL;"
+
+** (^^) it (ut-) marks wrong rec/s:
+*** (it didnt add act rec?) $> echo; sqlite3 "//vg_ocrh63-lv_root@oc0653706537.ibm.com,2014-01-30.sqlite" <<-EOF | cat -n | head
+SELECT * FROM find_printf f WHERE f.fn = 'eng.org' LIMIT 10;
+EOF
+**** #> > > > > 
+     1	195057|2014-01-30 11:06:29|657718|292|-rw-rw-r--|1|kraljo kraljo|296794|2014-01-28 16:20:36|./home/kraljo/Desktop/|eng.org|2014-02-17 16:46:45|
+
+*** (^^) $> sqlite3 "$CAT" "SELECT * FROM find_printf WHERE fn = 'pdnsd.cache' ORDER BY dt DESC LIMIT 10"
+**** #> > > > > > > 
+403|2014-01-30 11:06:12|2835|0|-rw-r-----|1|pdnsd pdnsd|0|2010-02-22 11:10:30|./var/cache/pdnsd/|pdnsd.cache||
+499|2014-01-30 11:06:12|6612|4|-rw-------|1|nobody nobody|12|2014-01-22 13:43:37|./var/cache/pdnsd-sasgui/|pdnsd.cache|2014-02-13 15:36:19|
+
 
 ** new model:
 **** 1 [[fvlocation]] :: id/ed by (key): location fname, location dirname, mtime, [[fs-id]]

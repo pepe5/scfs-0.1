@@ -115,6 +115,7 @@ function last_rec \
                 echo 1>&2 ' <-'$LASTC
                 echo 1>&2 ' ->'$LASTF
                 case $1 in
+                    (-l) true;; # echo 1>&2 '' -l/isting only..
                     (+add | *)
                         echo 1>&2 '' +add/ing: utime-label to $CAT: `dirname $CAT`/$P
                         UT=`date +%Y-%m-%d\ %T`
