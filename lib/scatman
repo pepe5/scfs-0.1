@@ -12,11 +12,11 @@ function find_cats \
     mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS;
     do
         cd $FS
-	ls -1dht *@*[0-9].sqlite | perl -ne '/(.*@.*),\d+-\d+-\d+.sqlite/ and print "$1\n"' \
-	    | sort -u | tee >(awk '{print " -"$0":"}' 1>&2) \
+	ls -1dht *@*[0-9].sqlite | perl -ne '/(.*@.*),\d+-\d+-\d+.sqlite/ and print "$1\n"' | sort -u \
 	    | while read CC
 	do
-	    ls -1dht `pwd`/*@*[0-9].sqlite | head $N
+	    echo '' -$CC: 1>&2
+	    ls -1dht `pwd`/$CC*[0-9].sqlite | head $N
 	done
     done; }
 
@@ -63,7 +63,7 @@ function sclocate \
     { fn sclocate 1>&2
     find_cats | while read CAT;
     do
-        ls -ldh `dirname $CAT`/*@*.sqlite
+        echo '' -`ls -ldh "$CAT"`:
         sqlite3 "$CAT" "SELECT * FROM find_printf WHERE fn LIKE '$1' LIMIT 10"
         echo;
     done; }

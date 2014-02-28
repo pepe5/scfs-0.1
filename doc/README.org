@@ -1,6 +1,5 @@
 # -*- org -*-
 * Streaming fevent/s collector
-
 # Hi-lock: (("\\$> .*" (0 (quote hi-red-b) t)))
 # Hi-lock: (("\\#> .*\\|;\\#" (0 (quote font-lock-comment-face) t)))
 # Hi-lock: (("'[^']+'\\|\"[^\"]+\"" (0 (quote font-lock-string-face) t))) ;"
