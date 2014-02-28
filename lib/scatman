@@ -7,10 +7,17 @@ function find_act \
 
 #>! add functionality where find_cats will return last CAT foreach-> A@B*.sqlite set
 function find_cats \
-    { N=-1; if [[ -n $1 ]]; then N=$1; fi
+    { fn find_cats 1>&2
+    N=-1; if [[ -n $1 ]]; then N=$1; fi
     mount | perl -ne 'm{^/.* on (.*) type } and print "$1\n"' | while read FS;
     do
-        cd $FS; ls -1dht `pwd`/*@*[0-9].sqlite | head $N
+        cd $FS
+	ls -1dht *@*[0-9].sqlite | perl -ne '/(.*@.*),\d+-\d+-\d+.sqlite/ and print "$1\n"' \
+	    | sort -u | tee >(awk '{print " -"$0":"}' 1>&2) \
+	    | while read CC
+	do
+	    ls -1dht `pwd`/*@*[0-9].sqlite | head $N
+	done
     done; }
 
 
@@ -53,7 +60,8 @@ function tun_cat \
 #>! move this to scatfs iface. (There should be fn-set of ls, cp, mv, locate, & such..)
 # EX/s:> sclocate eng.%
 function sclocate \
-    { find_cats | while read CAT;
+    { fn sclocate 1>&2
+    find_cats | while read CAT;
     do
         ls -ldh `dirname $CAT`/*@*.sqlite
         sqlite3 "$CAT" "SELECT * FROM find_printf WHERE fn LIKE '$1' LIMIT 10"

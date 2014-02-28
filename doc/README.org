@@ -513,12 +513,12 @@ INSERT INTO table VALUES(321223,'2014-01-30 11:06:51',822076,4,'-rw-r--r--',1,'r
         sqlite3 "$CAT" "SELECT Count (*) FROM find_printf WHERE ut IS NOT NULL"
     done
 
-** [0/2] i need to 1/ remove ut from last rec/s
+** [1/2] i need to 1/ remove ut from last rec/s
    2/ add ut to all non-last rec/s w/ NULL ut
 *** for now i will iterate only
     - when i am not able to find SELECT (UPDATE) all last rec/s in 1 sql statement :-S
 *** TODO but maybe we could use [[cntUt]]
-*** TODO :ACT:STU: 1st: check for sureness, that i dont have any f/paths w/non-1 rec/s
+*** DONE check for sureness, that i dont have any f/path/s w/ multi-rec/s -- [[fpcnt]]
     - then (if not)> find_cats | while read CAT; do> sqlite3 "$CAT" "UPDATE find_printf SET ut = NULL;"
 
 ** (^^) it (ut-) marks wrong rec/s:
